@@ -161,7 +161,11 @@ class Phase2ASystemVerificationTester:
             
             # Verify NO HTTP 500 Pydantic validation errors occur
             if response.status_code == 500:
-                self.log_test("Legal QA API - No HTTP 500 Errors", False, f"HTTP 500 error occurred: {response.text}", response_time)
+                response_text = response.text
+                if 'pydantic' in response_text.lower() or 'validation error' in response_text.lower():
+                    self.log_test("Legal QA API - No HTTP 500 Errors", False, f"HTTP 500 Pydantic validation error: {response_text[:200]}...", response_time)
+                else:
+                    self.log_test("Legal QA API - No HTTP 500 Errors", False, f"HTTP 500 error (non-validation): {response_text[:200]}...", response_time)
             elif response.status_code == 200:
                 self.log_test("Legal QA API - No HTTP 500 Errors", True, f"HTTP 200 success (no validation errors) ✅", response_time)
                 success_count += 1
