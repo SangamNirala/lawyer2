@@ -59,7 +59,7 @@ class Phase2ASystemVerificationTester:
         try:
             total_tests += 1
             start_time = time.time()
-            response = self.session.get(f"{BACKEND_URL}/legal-research-engine/stats")
+            response = self.session.get(f"{BACKEND_URL}/legal-research-engine/stats", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
