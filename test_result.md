@@ -170,7 +170,56 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CONTINUATION TASK - ADVANCED LEGAL RESEARCH ENGINE API FINAL FIXES:
+user_problem_statement: "🎯 PHASE 2A ASYNC BACKGROUND ENRICHMENT TESTING - LEGAL RESEARCH ENGINE PERFORMANCE VERIFICATION:
+
+Execute comprehensive Phase 2A backend testing focusing on async background enrichment functionality for the Legal Research Engine. Based on the continuation request preparation, perform the following SPECIFIC testing sequence:
+
+**A) SERVER STATS VERIFICATION:**
+- Test GET /api/legal-research-engine/stats endpoint
+- Verify response contains "operational" status 
+- Confirm "precedent_matching_stats" field is present and populated
+- Check system health indicators and database connectivity
+
+**B) BACKGROUND ENRICHMENT TRIGGER:**
+- Test background enrichment process trigger (most likely POST /api/legal-qa/rebuild-knowledge-base or POST /api/legal-qa/rebuild-bulk-knowledge-base)
+- Since the exact /api/legal-research-engine/refresh-courtlistener endpoint may not exist, test the available CourtListener rebuild endpoints
+- Verify response returns {status: started} or similar async process indication
+- Confirm background process initiates without blocking
+
+**C) IMMEDIATE PRECEDENT SEARCH PERFORMANCE TEST:**
+- Test POST /api/legal-research-engine/precedent-search endpoint
+- Use specific query case for performance measurement
+- Measure response time (target: < 2 seconds as per requirements)
+- Record initial performance baseline
+
+**D) FOLLOW-UP PRECEDENT SEARCH VERIFICATION:**
+- Wait 5 seconds after background enrichment trigger
+- Execute the same precedent search test again
+- Compare response times before/after enrichment
+- Verify any performance improvements or data enrichment
+
+**TECHNICAL REQUIREMENTS:**
+- Backend URL: https://precedent-verify.preview.emergentagent.com/api
+- MongoDB and AI services are configured and operational
+- Legal Research Engine endpoints are available in server.py
+- CourtListener integration exists through rebuild functionality
+- FAISS embeddings system is in place
+
+**TESTING FOCUS:**
+- Measure and document response times for precedent searches
+- Verify background enrichment process starts correctly
+- Test error handling and edge cases
+- Document any performance differences before/after enrichment
+- Verify all endpoints return proper JSON structure
+
+**SUCCESS CRITERIA:**
+- All 4 test components (A, B, C, D) execute successfully
+- Precedent search response time under 2 seconds
+- Background enrichment triggers without errors
+- Server stats show operational status
+- No critical errors or exceptions
+
+Please execute this Phase 2A testing sequence and provide detailed results with response times, error traces (if any), and verification of the async background enrichment functionality."
 
 ✅ CRITICAL FIXES IMPLEMENTED BY MAIN AGENT:
 
