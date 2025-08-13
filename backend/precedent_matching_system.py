@@ -614,6 +614,33 @@ class PrecedentMatchingSystem:
         except Exception as e:
             logger.error(f"❌ Error loading comprehensive case database: {e}")
     
+    async def _load_case_database_base(self):
+        """Load knowledge base and DB cases only for fast startup"""
+        try:
+            logger.info("📚 Loading base case database (KB + DB only)...")
+            knowledge_base_path = "/app/legal_knowledge_base.json"
+            if os.path.exists(knowledge_base_path):
+                with open(knowledge_base_path, 'r', encoding='utf-8') as f:
+                    cases = json.load(f)
+                await self._process_cases_for_enhanced_indexing(cases)
+                logger.info(f"✅ Loaded {len(cases)} KB cases into precedent database")
+            else:
+                logger.warning("⚠️ Knowledge base not found - continuing with DB only")
+            await self._load_database_cases()
+        except Exception as e:
+            logger.error(f"❌ Error loading base case database: {e}")
+
+    async def _background_enrich_courtlistener(self):
+        """Run CourtListener enrichment in background with safe timeouts"""
+        try:
+            max_cases = int(os.environ.get('COURTLISTENER_MAX_CASES', '120'))
+            years_back = int(os.environ.get('COURTLISTENER_YEARS_BACK', '5'))
+            logger.info(f"⏳ Background CourtListener enrichment: max_cases={max_cases}, years_back={years_back}")
+            await self._load_courtlistener_cases(years_back=years_back, max_cases=max_cases)
+            logger.info("✅ Background CourtListener enrichment completed")
+        except Exception as e:
+            logger.error(f"❌ Background CourtListener enrichment failed: {e}")
+
     async def _process_cases_for_enhanced_indexing(self, cases: List[Dict]):
         """Process cases with enhanced embeddings and metadata extraction"""
         try:
