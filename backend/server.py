@@ -7615,6 +7615,7 @@ if RAG_SYSTEM_AVAILABLE:
         timestamp: str
         model_used: Optional[str] = None
         is_voice_session: Optional[bool] = False  # Indicates if this is a voice session
+        voice_session_id: Optional[str] = None  # Voice session ID if applicable
     
     # Voice Agent specific models
     class VoiceAgentRequest(BaseModel):
