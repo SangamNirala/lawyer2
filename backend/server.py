@@ -5928,6 +5928,25 @@ async def get_research_engine_stats():
         
     except Exception as e:
         logger.error(f"❌ Error getting engine stats: {e}")
+
+@api_router.post("/legal-research-engine/refresh-courtlistener")
+async def refresh_courtlistener_background(max_cases: int = 120, years_back: int = 5):
+    """Trigger background CourtListener enrichment without blocking requests"""
+    try:
+        if not ADVANCED_RESEARCH_ENGINE_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Advanced Legal Research Engine not available")
+        matcher = await get_precedent_matcher()
+        # override env for this run
+        os.environ['COURTLISTENER_MAX_CASES'] = str(max_cases)
+        os.environ['COURTLISTENER_YEARS_BACK'] = str(years_back)
+        asyncio.create_task(matcher._background_enrich_courtlistener())
+        return {"status": "started", "max_cases": max_cases, "years_back": years_back}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error triggering CourtListener refresh: {e}")
+        raise HTTPException(status_code=500, detail=f"Error triggering refresh: {str(e)}")
+
         raise HTTPException(status_code=500, detail=f"Error getting stats: {str(e)}")
 
 @api_router.get("/legal-research-engine/research-queries")
