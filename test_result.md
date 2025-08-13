@@ -42,6 +42,9 @@
         - working: false
           agent: "testing"
           comment: "CRITICAL: is_voice_session Pydantic validation error still present - fix NOT working. Backend logs show: 'Input should be a valid boolean, unable to interpret input [type=bool_parsing, input_value='', input_type=str]'. The field is being set to empty string instead of boolean. Manual curl test confirms validation error in response."
+        - working: true
+          agent: "testing"
+          comment: "COMPLETELY FIXED: is_voice_session Pydantic validation now working perfectly. All test scenarios passed: 1) is_voice: false returns boolean false, 2) is_voice: true returns boolean true with generated voice_session_id, 3) voice_session_id detection correctly overrides is_voice: false to return boolean true. No Pydantic validation errors detected in backend logs. All responses return proper boolean values, not strings or empty values."
 
   - task: "Phase 2A Background Enrichment Performance"
     implemented: true
