@@ -7604,6 +7604,7 @@ if RAG_SYSTEM_AVAILABLE:
         jurisdiction: Optional[str] = None
         legal_domain: Optional[str] = None
         is_voice: Optional[bool] = False  # Voice Agent flag
+        voice_session_id: Optional[str] = None  # Voice session ID override
     
     class LegalQuestionResponse(BaseModel):
         answer: str
