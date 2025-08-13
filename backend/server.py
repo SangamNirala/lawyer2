@@ -7714,13 +7714,24 @@ if RAG_SYSTEM_AVAILABLE:
             # Handle Voice Agent session ID logic
             session_id = request.session_id
             is_voice = request.is_voice or False
+            voice_session_id = request.voice_session_id
             
-            # Generate voice session ID if this is a voice request without session
-            if is_voice and not session_id:
+            # Scenario 1: is_voice=false, no voice_session_id -> normal session
+            # Scenario 2: is_voice=true, no voice_session_id -> generate voice session
+            # Scenario 3: voice_session_id provided -> override to voice session regardless of is_voice
+            
+            if voice_session_id:
+                # Scenario 3: voice_session_id override - always treat as voice session
+                session_id = voice_session_id
+                is_voice = True
+            elif is_voice and not session_id:
+                # Scenario 2: is_voice=true without session -> generate voice session
                 session_id = generate_voice_session_id()
+                voice_session_id = session_id
             elif is_voice and session_id and not is_voice_session(session_id):
                 # Convert regular session to voice session format
-                session_id = generate_voice_session_id()
+                voice_session_id = generate_voice_session_id()
+                session_id = voice_session_id
             
             # Answer the legal question
             result = await rag_system.answer_legal_question(
