@@ -5907,6 +5907,8 @@ async def get_research_engine_stats():
         except Exception as te:
             logger.warning(f"⏱️ get_research_engine timed out or failed: {te}")
             engine = None
+        if engine is None:
+            return {"status": "degraded", "message": "Engine warmup in progress", "engine_stats": None}
         engine_stats = await engine.get_engine_stats()
         
         # Get component stats
