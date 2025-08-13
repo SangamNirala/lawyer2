@@ -16,6 +16,53 @@
 # 
 ## user_problem_statement: {problem_statement}
 ## backend:
+  - task: "Phase 2A Legal Research Engine Stats Verification"
+    implemented: true
+    working: false
+    file: "/api/legal-research-engine/stats"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Legal Research Engine shows status 'unavailable' instead of 'operational'. Advanced Legal Research Engine not available. However, Legal QA System is operational with FAISS vector DB and 304 indexed documents."
+
+  - task: "Phase 2A Background Enrichment Trigger"
+    implemented: true
+    working: true
+    file: "/api/legal-qa/rebuild-knowledge-base"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Standard Knowledge Base Rebuild working perfectly. Process completed successfully in STANDARD mode with 76.6s response time. Background enrichment triggers without errors."
+
+  - task: "Phase 2A Precedent Search Performance Test"
+    implemented: true
+    working: false
+    file: "/api/legal-qa/ask"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Legal QA endpoint has validation error: 'is_voice_session' field parsing issue. HTTP 500 error with Pydantic validation failure. Response time 13-14 seconds (exceeds 2s target). Root cause: LegalQuestionResponse model expects is_voice_session boolean but RAG system not providing it correctly."
+
+  - task: "Phase 2A Follow-up Performance Verification"
+    implemented: true
+    working: false
+    file: "/api/legal-qa/ask"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Follow-up verification failed due to same validation error in legal QA endpoint. Cannot measure performance improvement due to underlying endpoint issues."
 ##   - task: "Task name"
 ##     implemented: true
 ##     working: true  # or false or "NA"
