@@ -7655,6 +7655,9 @@ if RAG_SYSTEM_AVAILABLE:
         by_legal_domain: Dict[str, int]
         by_document_type: Dict[str, int]
         by_source: Dict[str, int]
+        # Aliases for backward compatibility
+        jurisdictions: Optional[Dict[str, int]] = None
+        legal_domains: Optional[Dict[str, int]] = None
     
     # ================================
     # VOICE AGENT UTILITY FUNCTIONS
