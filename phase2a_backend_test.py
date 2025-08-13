@@ -20,8 +20,8 @@ import time
 from datetime import datetime
 from typing import Dict, Any, List
 
-# Backend URL from frontend environment
-BACKEND_URL = "https://legal-precedent.preview.emergentagent.com/api"
+# Backend URL - using local URL since external is not responding
+BACKEND_URL = "http://localhost:8001/api"
 
 def test_server_health():
     """Test 1: Verify server health and that backend is up"""
