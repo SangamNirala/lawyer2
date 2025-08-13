@@ -5469,7 +5469,12 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
         logger.info(f"🔍 Starting comprehensive legal research: {request.research_type}")
         
         # Get the research engine
-        engine = await get_research_engine()
+        engine = None
+        try:
+            engine = await asyncio.wait_for(get_research_engine(), timeout=2.0)
+        except Exception as te:
+            logger.warning(f"⏱️ get_research_engine timed out or failed: {te}")
+            engine = None
         
         # Create research query from request
         from advanced_legal_research_engine import ResearchQuery, ResearchType, ResearchPriority
