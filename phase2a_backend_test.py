@@ -15,7 +15,7 @@ BACKEND_URL = "https://backend-test-ready.preview.emergentagent.com/api"
 LOCAL_BACKEND_URL = "http://localhost:8001/api"
 
 # Choose which backend to test
-BACKEND = BACKEND_URL  # Using production backend URL for testing
+BACKEND = LOCAL_BACKEND_URL  # Using local backend URL for testing
 
 def print_header(title):
     """Print a formatted header"""
