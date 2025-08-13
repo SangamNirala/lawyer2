@@ -7643,8 +7643,8 @@ if RAG_SYSTEM_AVAILABLE:
         return f"voice_session_{timestamp}_{random_suffix}"
     
     def is_voice_session(session_id: str) -> bool:
-        """Check if session ID is a voice session"""
-        return session_id and session_id.startswith("voice_session_")
+        """Check if session ID is a voice session (always returns a strict boolean)"""
+        return bool(session_id) and str(session_id).startswith("voice_session_")
     
     def validate_voice_session_format(session_id: str) -> bool:
         """Validate voice session ID format"""
