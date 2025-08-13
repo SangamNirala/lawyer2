@@ -48,11 +48,11 @@
 
   - task: "Phase 2A Background Enrichment Performance"
     implemented: true
-    working: false
+    working: true
     file: "/api/legal-qa/rebuild-knowledge-base"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
