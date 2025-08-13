@@ -20,7 +20,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://backend-test-results.preview.emergentagent.com/api"
+BACKEND_URL = "http://localhost:8001/api"
 
 def log_test(message, level="INFO"):
     """Log test messages with timestamp"""
