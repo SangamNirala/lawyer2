@@ -5,7 +5,7 @@
 Based on manual testing and backend log analysis, this script documents
 the current status of the Phase 2A critical system fixes.
 
-Backend URL: https://critical-phase2a.preview.emergentagent.com/api
+Backend URL: https://backend-test-results.preview.emergentagent.com/api
 """
 
 import json
@@ -17,7 +17,7 @@ def generate_phase2a_test_report():
     
     print("🎯 CRITICAL PHASE 2A SYSTEM VERIFICATION TESTING - FINAL REPORT")
     print("=" * 80)
-    print(f"Backend URL: https://critical-phase2a.preview.emergentagent.com/api")
+    print(f"Backend URL: https://backend-test-results.preview.emergentagent.com/api")
     print(f"Test Report Generated: {datetime.now().isoformat()}")
     print("Based on manual testing and backend log analysis")
     print("=" * 80)

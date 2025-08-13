@@ -14,7 +14,7 @@ import sys
 from datetime import datetime
 
 # Use production URL from frontend .env
-BASE_URL = "https://critical-phase2a.preview.emergentagent.com"
+BASE_URL = "https://backend-test-results.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""
