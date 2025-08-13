@@ -535,8 +535,16 @@ class PrecedentMatchingSystem:
                 ai_client=self.gemini_api_key
             )
             
-            # Load enhanced case database
-            await self._load_case_database()
+            # Load enhanced case database quickly (KB + DB only)
+            await self._load_case_database_base()
+
+            # Start background enrichment from CourtListener if enabled
+            enrich_on_start = os.environ.get('COURTLISTENER_ENRICH_ON_START', 'true').lower() in ('1','true','yes')
+            if enrich_on_start:
+                asyncio.create_task(self._background_enrich_courtlistener())
+                logger.info("🧵 Started background CourtListener enrichment task")
+            else:
+                logger.info("⏭️ Skipping automatic CourtListener enrichment on start (config)")
             
             logger.info("🎉 Enhanced Precedent Matching System fully initialized!")
             
