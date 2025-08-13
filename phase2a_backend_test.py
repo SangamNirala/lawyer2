@@ -11,11 +11,11 @@ import sys
 from datetime import datetime
 
 # Backend URL
-BACKEND_URL = "https://legal-precedent.preview.emergentagent.com/api"
+BACKEND_URL = "https://backend-test-ready.preview.emergentagent.com/api"
 LOCAL_BACKEND_URL = "http://localhost:8001/api"
 
 # Choose which backend to test
-BACKEND = LOCAL_BACKEND_URL  # Change to BACKEND_URL for production testing
+BACKEND = BACKEND_URL  # Using production backend URL for testing
 
 def print_header(title):
     """Print a formatted header"""
