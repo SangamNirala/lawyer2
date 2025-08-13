@@ -7720,7 +7720,7 @@ if RAG_SYSTEM_AVAILABLE:
             
             # Enhance response with voice session information
             response_data = {**result}
-            response_data["is_voice_session"] = is_voice or is_voice_session(session_id or "")
+            response_data["is_voice_session"] = bool(is_voice or is_voice_session(session_id or ""))
             
             return LegalQuestionResponse(**response_data)
             
