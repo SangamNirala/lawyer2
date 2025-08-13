@@ -5873,7 +5873,12 @@ async def get_research_status(research_id: str):
             raise HTTPException(status_code=503, detail="Advanced Legal Research Engine not available")
         
         # Get the research engine
-        engine = await get_research_engine()
+        engine = None
+        try:
+            engine = await asyncio.wait_for(get_research_engine(), timeout=2.0)
+        except Exception as te:
+            logger.warning(f"⏱️ get_research_engine timed out or failed: {te}")
+            engine = None
         
         # Get research status
         status = await engine.get_research_status(research_id)
