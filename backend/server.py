@@ -5881,6 +5881,8 @@ async def get_research_status(research_id: str):
             engine = None
         
         # Get research status
+        if engine is None:
+            raise HTTPException(status_code=503, detail="Research engine initializing - try again shortly")
         status = await engine.get_research_status(research_id)
         
         return ResearchStatusResponse(**status)
