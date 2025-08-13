@@ -139,14 +139,15 @@ class Phase2ALegalResearchTester:
         # Test Legal QA query (alternative to precedent search)
         test_query = {
             "question": "What are the legal precedents for contract breach and damages in commercial disputes?",
-            "context": "Commercial contract dispute involving delivery delays and monetary damages",
-            "jurisdiction": "US"
+            "jurisdiction": "US",
+            "legal_domain": "contract_law",
+            "is_voice": False
         }
         
         try:
             start_time = time.time()
             response = self.session.post(
-                f"{BACKEND_URL}/legal-qa/query",
+                f"{BACKEND_URL}/legal-qa/ask",
                 json=test_query
             )
             response_time = time.time() - start_time
