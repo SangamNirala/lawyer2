@@ -7889,6 +7889,10 @@ if RAG_SYSTEM_AVAILABLE:
             rag_system = await get_rag_system()
             stats = await rag_system.get_system_stats()
             
+            # Add total_documents alias for backward compatibility
+            if 'indexed_documents' in stats and 'total_documents' not in stats:
+                stats['total_documents'] = stats['indexed_documents']
+            
             return RAGSystemStatsResponse(**stats)
             
         except Exception as e:
