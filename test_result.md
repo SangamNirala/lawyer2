@@ -22,7 +22,7 @@
     file: "/api/legal-research-engine/stats"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "testing"
