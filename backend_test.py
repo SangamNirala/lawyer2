@@ -8,7 +8,7 @@ PRIORITY 1 - Legal Research Engine Status Verification
 PRIORITY 2 - Legal QA API Pydantic Validation Fix Verification  
 PRIORITY 3 - Background Enrichment Performance
 
-Backend URL: https://legal-rag-fix.preview.emergentagent.com/api
+Backend URL: https://critical-phase2a.preview.emergentagent.com/api
 """
 
 import requests
@@ -19,7 +19,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://legal-rag-fix.preview.emergentagent.com/api"
+BACKEND_URL = "https://critical-phase2a.preview.emergentagent.com/api"
 
 class Phase2ASystemVerificationTester:
     def __init__(self):
