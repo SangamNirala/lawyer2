@@ -506,12 +506,16 @@ class PrecedentMatchingSystem:
                 logger.info("✅ Groq AI client initialized")
             
             # Initialize CourtListener client
+            # Support unauthenticated mode if key is missing (lower rate limits)
+            headers = {"User-Agent": "LegalMateAI/precedent-matching"}
             if self.courtlistener_api_key:
-                self.courtlistener_client = httpx.AsyncClient(
-                    base_url="https://www.courtlistener.com/api/rest/v3",
-                    headers={"Authorization": f"Token {self.courtlistener_api_key}"}
-                )
-                logger.info("✅ CourtListener client initialized")
+                headers["Authorization"] = f"Token {self.courtlistener_api_key}"
+            self.courtlistener_client = httpx.AsyncClient(
+                base_url="https://www.courtlistener.com/api/rest/v3",
+                headers=headers,
+                timeout=30.0
+            )
+            logger.info("✅ CourtListener client initialized (auth: %s)" % ("yes" if self.courtlistener_api_key else "no"))
             
             # Initialize MongoDB connection
             if self.mongo_url:
@@ -595,6 +599,9 @@ class PrecedentMatchingSystem:
             
             # Load additional cases from database if available
             await self._load_database_cases()
+            
+            # Always attempt to enrich with recent CourtListener opinions if allowed
+            await self._load_courtlistener_cases(max_cases=200)
             
         except Exception as e:
             logger.error(f"❌ Error loading comprehensive case database: {e}")
@@ -694,6 +701,122 @@ class PrecedentMatchingSystem:
             
         except Exception as e:
             logger.error(f"❌ Error loading database cases: {e}")
+    
+    async def _load_courtlistener_cases(self, years_back: int = 5, max_cases: int = 150):
+        """Fetch recent opinions from CourtListener and index them.
+        Works with or without API key (lower rate limits without key).
+        """
+        try:
+            if not self.courtlistener_client:
+                # As a fallback, create a client without auth
+                self.courtlistener_client = httpx.AsyncClient(
+                    base_url="https://www.courtlistener.com/api/rest/v3",
+                    headers={"User-Agent": "LegalMateAI/precedent-matching"},
+                    timeout=30.0
+                )
+            
+            start_date = (datetime.utcnow() - timedelta(days=365 * years_back)).strftime('%Y-%m-%d')
+            params = {
+                'filed_after': start_date,
+                'order_by': '-date_filed',
+                'type': 'opinion',
+                'page_size': 50,
+                'format': 'json'
+            }
+            
+            collected = 0
+            next_url = '/search/'
+            cases: List[Dict[str, Any]] = []
+            
+            while next_url and collected < max_cases:
+                try:
+                    resp = await self.courtlistener_client.get(next_url, params=params if next_url == '/search/' else None)
+                    if resp.status_code != 200:
+                        logger.warning(f"CourtListener request failed: {resp.status_code} {resp.text[:200]}")
+                        break
+                    data = resp.json()
+                except Exception as e:
+                    logger.error(f"Error fetching CourtListener data: {e}")
+                    break
+                
+                for result in data.get('results', []):
+                    if collected >= max_cases:
+                        break
+                    try:
+                        case_id = str(result.get('id', ''))
+                        title = result.get('caseName', '') or result.get('caseNameFull', '') or result.get('caseNameShort', '')
+                        date_filed = result.get('dateFiled') or result.get('date_filed')
+                        citation = None
+                        cites = result.get('citations') or []
+                        if isinstance(cites, list) and cites:
+                            citation = cites[0].get('cite')
+                        absolute_url = result.get('absolute_url') or result.get('absoluteUrl')
+                        court = result.get('court', '')
+                        jurisdiction = 'US'
+                        
+                        # Fetch opinion text where possible
+                        content = await self._fetch_courtlistener_opinion_text(result)
+                        if not content:
+                            # Fallback to snippet
+                            content = result.get('snippet', '') or ''
+                        
+                        if not title and not content:
+                            continue
+                        
+                        case_obj = {
+                            'id': f"cl_{case_id}",
+                            'title': title or (absolute_url or 'CourtListener Opinion'),
+                            'content': content[:8000],
+                            'jurisdiction': jurisdiction,
+                            'court': court,
+                            'citation': citation or '',
+                            'date_filed': date_filed or '',
+                            'source': 'courtlistener',
+                            'source_url': f"https://www.courtlistener.com{absolute_url}" if absolute_url else '',
+                            'citation_count': result.get('citeCount', 0) or result.get('citation_count', 0),
+                            'legal_domain': 'general'
+                        }
+                        cases.append(case_obj)
+                        collected += 1
+                    except Exception as e:
+                        logger.warning(f"Error parsing CourtListener result: {e}")
+                        continue
+                
+                next_url = data.get('next')
+                # Respect rate limits
+                await asyncio.sleep(0.2 if self.courtlistener_api_key else 0.6)
+            
+            if cases:
+                await self._process_cases_for_enhanced_indexing(cases)
+                logger.info(f"✅ Indexed {len(cases)} CourtListener opinions")
+            else:
+                logger.info("ℹ️ No CourtListener opinions fetched")
+        except Exception as e:
+            logger.error(f"❌ Error loading CourtListener cases: {e}")
+    
+    async def _fetch_courtlistener_opinion_text(self, result: Dict[str, Any]) -> str:
+        """Attempt to retrieve full opinion text for a search result."""
+        try:
+            # If opinions endpoint id available, try fetching
+            opinion_id = result.get('id')
+            if opinion_id is not None:
+                url = f"/opinions/{opinion_id}/"
+                try:
+                    resp = await self.courtlistener_client.get(url, params={'format': 'json'})
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        text = data.get('plain_text') or data.get('html') or ''
+                        if text:
+                            # Strip HTML if needed
+                            return text if isinstance(text, str) else ''
+                except Exception:
+                    pass
+            
+            # Try to follow absolute_url if present (as a last resort skip due to HTML)
+            snippet = result.get('snippet', '') or ''
+            return snippet
+        except Exception:
+            return ""
     
     async def find_similar_cases(self, query_case: Dict[str, Any], 
                                filters: Dict[str, Any] = None) -> List[PrecedentMatch]:
