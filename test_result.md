@@ -33,11 +33,11 @@
 
   - task: "Phase 2A Legal QA API Pydantic Validation Fix"
     implemented: true
-    working: false
+    working: true
     file: "/api/legal-qa/ask"
     stuck_count: 2
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
