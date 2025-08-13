@@ -244,9 +244,17 @@ class Phase2ASystemVerificationTester:
                         self.log_test(f"Legal QA API - {test_case['label']}", False, f"is_voice_session mismatch: expected {test_case['is_voice']}, got {is_voice_session}", response_time)
                         
                 elif response.status_code == 500:
-                    self.log_test(f"Legal QA API - {test_case['label']}", False, f"HTTP 500 Pydantic validation error: {response.text}", response_time)
+                    response_text = response.text
+                    if 'pydantic' in response_text.lower() or 'validation error' in response_text.lower():
+                        self.log_test(f"Legal QA API - {test_case['label']}", False, f"HTTP 500 Pydantic validation error: {response_text[:200]}...", response_time)
+                    else:
+                        self.log_test(f"Legal QA API - {test_case['label']}", False, f"HTTP 500 error (non-validation): {response_text[:200]}...", response_time)
                 else:
-                    self.log_test(f"Legal QA API - {test_case['label']}", False, f"HTTP {response.status_code}: {response.text}", response_time)
+                    response_text = response.text
+                    if 'pydantic' in response_text.lower() or 'validation error' in response_text.lower():
+                        self.log_test(f"Legal QA API - {test_case['label']}", False, f"HTTP {response.status_code} Pydantic validation error: {response_text[:200]}...", response_time)
+                    else:
+                        self.log_test(f"Legal QA API - {test_case['label']}", False, f"HTTP {response.status_code}: {response_text[:200]}...", response_time)
                     
             except Exception as e:
                 self.log_test(f"Legal QA API - {test_case['label']}", False, f"Exception: {str(e)}")
