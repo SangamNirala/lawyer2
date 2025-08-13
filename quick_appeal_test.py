@@ -7,7 +7,7 @@ import requests
 import json
 import time
 
-BACKEND_URL = "https://app-preview-down.preview.emergentagent.com/api"
+BACKEND_URL = "https://lawcite-network.preview.emergentagent.com/api"
 
 def test_basic_appeal_analysis():
     """Test basic appeal analysis functionality"""
