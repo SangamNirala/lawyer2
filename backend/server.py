@@ -5899,7 +5899,12 @@ async def get_research_engine_stats():
             return {"status": "unavailable", "message": "Advanced Legal Research Engine not available"}
         
         # Get engine stats
-        engine = await get_research_engine()
+        engine = None
+        try:
+            engine = await asyncio.wait_for(get_research_engine(), timeout=2.0)
+        except Exception as te:
+            logger.warning(f"⏱️ get_research_engine timed out or failed: {te}")
+            engine = None
         engine_stats = await engine.get_engine_stats()
         
         # Get component stats
