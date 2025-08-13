@@ -103,3 +103,4 @@ newspaper3k>=0.2.8
 textstat>=0.7.0
 lxml[html_clean]>=4.9.0
 networkx>=3.0
+joblib
