@@ -8005,6 +8005,10 @@ if RAG_SYSTEM_AVAILABLE:
                 source = doc.get("source", "unknown")
                 stats["by_source"][source] = stats["by_source"].get(source, 0) + 1
             
+            # Add alias fields for backward compatibility
+            stats["jurisdictions"] = stats["by_jurisdiction"]
+            stats["legal_domains"] = stats["by_legal_domain"]
+            
             return KnowledgeBaseStatsResponse(**stats)
             
         except Exception as e:
