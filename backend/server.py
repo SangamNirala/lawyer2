@@ -7647,6 +7647,7 @@ if RAG_SYSTEM_AVAILABLE:
         active_sessions: int
         total_conversations: int
         indexed_documents: Optional[int] = None
+        total_documents: Optional[int] = None  # Alias for indexed_documents for backward compatibility
     
     class KnowledgeBaseStatsResponse(BaseModel):
         total_documents: int
