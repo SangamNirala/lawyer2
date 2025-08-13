@@ -33,7 +33,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://backend-test-results.preview.emergentagent.com/api"
+BACKEND_URL = "https://app-preview-down.preview.emergentagent.com/api"
 
 def test_evidence_complexity_correlation():
     """Test TASK 2: Evidence/complexity correlation with AI parameter extraction"""

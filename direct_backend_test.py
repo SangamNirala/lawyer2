@@ -7,7 +7,7 @@ Direct testing to verify critical system fixes using curl-like approach:
 - Background Enrichment Performance
 - Legal Research Engine Status (if accessible)
 
-Backend URL: https://backend-test-results.preview.emergentagent.com/api
+Backend URL: https://app-preview-down.preview.emergentagent.com/api
 """
 
 import subprocess
@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://backend-test-results.preview.emergentagent.com/api"
+BACKEND_URL = "https://app-preview-down.preview.emergentagent.com/api"
 
 class DirectPhase2ATester:
     def __init__(self):

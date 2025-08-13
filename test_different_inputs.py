@@ -8,7 +8,7 @@ import json
 import sys
 
 # Backend URL from environment
-BACKEND_URL = "https://backend-test-results.preview.emergentagent.com/api"
+BACKEND_URL = "https://app-preview-down.preview.emergentagent.com/api"
 
 def test_with_different_inputs():
     """Test with different user input values"""

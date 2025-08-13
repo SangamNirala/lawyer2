@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 class AttorneyReviewStatusTester:
-    def __init__(self, base_url="https://backend-test-results.preview.emergentagent.com"):
+    def __init__(self, base_url="https://app-preview-down.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
