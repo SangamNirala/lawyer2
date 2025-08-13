@@ -7969,13 +7969,16 @@ if RAG_SYSTEM_AVAILABLE:
             knowledge_base_path = "/app/legal_knowledge_base.json"
             
             if not os.path.exists(knowledge_base_path):
-                return KnowledgeBaseStatsResponse(
+                empty_stats = KnowledgeBaseStatsResponse(
                     total_documents=0,
                     by_jurisdiction={},
                     by_legal_domain={},
                     by_document_type={},
-                    by_source={}
+                    by_source={},
+                    jurisdictions={},
+                    legal_domains={}
                 )
+                return empty_stats
             
             with open(knowledge_base_path, 'r', encoding='utf-8') as f:
                 knowledge_base = json.load(f)
