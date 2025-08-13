@@ -5497,6 +5497,8 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
         )
         
         # Execute comprehensive research
+        if engine is None:
+            raise HTTPException(status_code=503, detail="Advanced Legal Research Engine initializing - please retry shortly")
         result = await engine.coordinate_research(research_query)
         
         # Store research session in database - convert enums to strings for serialization
