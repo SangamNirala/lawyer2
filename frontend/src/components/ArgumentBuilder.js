@@ -284,7 +284,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
   };
 
   const deleteArgument = (index) => {
-    setArguments(arguments.filter((_, idx) => idx !== index));
+    setArgumentsList(argumentsList.filter((_, idx) => idx !== index));
   };
 
   const moveArgument = useCallback((dragIndex, hoverIndex) => {
