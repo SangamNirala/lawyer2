@@ -1523,7 +1523,7 @@ function App() {
           )}
           
           {/* Legal Question Answering */}
-          {showLegalQA && !showLitigationAnalytics && !showLegalResearch && (
+          {showLegalQA && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
             <LegalQuestionAnswering />
           )}
           
