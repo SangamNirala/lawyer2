@@ -5524,7 +5524,11 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
         # Execute comprehensive research
         if engine is None:
             raise HTTPException(status_code=503, detail="Advanced Legal Research Engine initializing - please retry shortly")
-        result = await engine.coordinate_research(research_query)
+        ok, info = await run_with_timeout(engine.coordinate_research(research_query), 18.0)
+        if not ok:
+            logger.warning(f"/research timed out or failed: {info}")
+            raise HTTPException(status_code=504, detail="Research operation timed out; please retry with narrower scope")
+        result = info
         
         # Store research session in database - convert enums to strings for serialization
         def serialize_enums(obj):
