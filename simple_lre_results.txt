@@ -1,0 +1,9 @@
+🚀 SIMPLE LEGAL RESEARCH ENGINE TEST
+============================================================
+Testing Stats... ❌ TIMEOUT (10s)
+
+Testing Research... ❌ TIMEOUT (20s)
+
+Testing Generate Memo... ❌ TIMEOUT (20s)
+
+Testing Structure Arguments... 
