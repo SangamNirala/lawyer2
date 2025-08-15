@@ -35,6 +35,7 @@ except ImportError:
 import time
 from tenacity import retry, stop_after_attempt, wait_exponential
 from dataclasses import asdict
+from enum import Enum
 
 # Helper function to handle MongoDB ObjectId serialization
 def convert_objectid_to_str(doc):
