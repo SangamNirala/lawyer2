@@ -104,3 +104,4 @@ textstat>=0.7.0
 lxml[html_clean]>=4.9.0
 networkx>=3.0
 joblib
+threadpoolctl>=3.0
