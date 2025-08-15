@@ -5967,7 +5967,11 @@ async def assess_research_quality(request: QualityAssessmentRequest):
         scorer = await get_quality_scorer()
         
         # Assess research quality
-        assessment = await scorer.assess_research_quality(request.research_data)
+        ok, info = await run_with_timeout(scorer.assess_research_quality(request.research_data), 12.0)
+        if not ok:
+            logger.warning(f"Quality assessment timed out: {info}")
+            raise HTTPException(status_code=408, detail="Quality assessment timed out; please retry")
+        assessment = info
         
         return QualityAssessmentResponse(**assessment)
         
