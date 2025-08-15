@@ -1510,8 +1510,13 @@ function App() {
             <VoiceAgent onClose={() => setShowVoiceAgent(false)} />
           )}
           
+          {/* Legal Research Dashboard */}
+          {showLegalResearch && !showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && (
+            <LegalResearchDashboard onBack={() => setShowLegalResearch(false)} />
+          )}
+          
           {/* Classic Mode */}
-          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && (
+          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
             <>
               {currentStep < 4 && (
                 <div className="mb-8">
