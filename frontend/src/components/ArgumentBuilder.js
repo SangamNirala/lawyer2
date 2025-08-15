@@ -254,7 +254,7 @@ const ArgumentComponent = ({ argument, index, onUpdate, onDelete, moveArgument }
 };
 
 const ArgumentBuilder = ({ researchData, precedents = [] }) => {
-  const [arguments, setArguments] = useState([]);
+  const [argumentsList, setArgumentsList] = useState([]);
   const [newArgumentContent, setNewArgumentContent] = useState('');
   const [argumentTitle, setArgumentTitle] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
