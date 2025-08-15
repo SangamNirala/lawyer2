@@ -5522,12 +5522,13 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
                 return {key: serialize_enums(value) for key, value in obj.items()}
             elif isinstance(obj, list):
                 return [serialize_enums(item) for item in obj]
-            elif hasattr(obj, '__dict__') and hasattr(obj, 'value'):
-                # This is an enum, return its value
+            elif isinstance(obj, Enum):
                 return obj.value
             elif hasattr(obj, '__dict__'):
-                # This is a dataclass or similar object, convert to dict and recurse
-                return serialize_enums(asdict(obj))
+                try:
+                    return serialize_enums(asdict(obj))
+                except Exception:
+                    return obj.__dict__
             else:
                 return obj
         
