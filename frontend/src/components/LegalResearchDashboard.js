@@ -337,7 +337,15 @@ const LegalResearchDashboard = ({ onBack }) => {
         </TabsList>
 
         <TabsContent value="search" className="mt-6">
-          <ResearchInterface />
+          <ResearchInterface 
+            researchQuery={researchQuery}
+            onQueryChange={handleTextareaChange}
+            isSearching={isSearching}
+            onResearch={handleResearch}
+            onClearQuery={handleClearQuery}
+            onQuickSearch={handleQuickSearch}
+            dashboardStats={dashboardStats}
+          />
         </TabsContent>
 
         <TabsContent value="results" className="mt-6">
