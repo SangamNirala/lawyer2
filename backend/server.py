@@ -5696,16 +5696,16 @@ async def analyze_citation_network(request: CitationAnalysisRequest):
         # Convert to response format
         return CitationNetworkResponse(
             network_id=network["network_id"],
-            total_nodes=network["total_nodes"],
-            total_edges=network["total_edges"],
-            network_density=network["network_density"],
-            average_path_length=network["average_path_length"],
-            clustering_coefficient=network["clustering_coefficient"],
-            landmark_cases=network["landmark_cases"],
-            authority_ranking=network["authority_ranking"],
-            legal_evolution_chains=network["legal_evolution_chains"],
-            overruling_relationships=network["overruling_relationships"],
-            jurisdiction_scope=network["jurisdiction_scope"],
+            total_nodes=network["summary"]["total_nodes"],
+            total_edges=network["summary"]["total_edges"],
+            network_density=network.get("network_density", 0.0),
+            average_path_length=network.get("average_path_length", 0.0),
+            clustering_coefficient=network.get("clustering_coefficient", 0.0),
+            landmark_cases=network.get("landmark_cases", []),
+            authority_ranking=network.get("authority_ranking", {}),
+            legal_evolution_chains=network.get("legal_evolution_chains", []),
+            overruling_relationships=network.get("overruling_relationships", []),
+            jurisdiction_scope=network.get("jurisdiction_scope", ""),
             analysis_timestamp=datetime.fromisoformat(network["analysis_timestamp"])
         )
         
