@@ -381,7 +381,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
         <p className="text-gray-600">Generated on {new Date().toLocaleDateString()}</p>
       </div>
 
-      {arguments.map((argument, index) => (
+      {argumentsList.map((argument, index) => (
         <div key={argument.id} className="space-y-3">
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-semibold">Argument {index + 1}</h3>
