@@ -1487,7 +1487,7 @@ function App() {
           )}
           
           {/* Plain English Creator */}
-          {showPlainEnglishCreator && !showAnalytics && !useEnhancedWizard && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
+          {showPlainEnglishCreator && !showAnalytics && !useEnhancedWizard && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
             <PlainEnglishContractCreator
               contractTypes={contractTypes}
               jurisdictions={jurisdictions}
@@ -1496,7 +1496,7 @@ function App() {
           )}
           
           {/* Analytics Dashboard */}
-          {showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
+          {showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
             <AnalyticsDashboard onBack={() => setShowAnalytics(false)} />
           )}
           
