@@ -1,4 +1,5 @@
 🚀 MINIMAL LEGAL RESEARCH ENGINE TEST
 ==================================================
 Testing Stats... ❌ TIMEOUT
-Testing Research... 
+Testing Research... ❌ TIMEOUT
+Testing Precedent Search... 
