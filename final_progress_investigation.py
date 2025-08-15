@@ -9,7 +9,7 @@ import time
 import uuid
 
 def final_investigation():
-    base_url = "https://api-performance.preview.emergentagent.com"
+    base_url = "https://legal-api-debug-1.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🔍 FINAL PROGRESS PERCENTAGE INVESTIGATION")

@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BASE_URL = "https://api-performance.preview.emergentagent.com"
+BASE_URL = "https://legal-api-debug-1.preview.emergentagent.com"
 
 def test_endpoint_quick(name, method, url, payload=None):
     """Quick endpoint test with 10 second timeout"""
