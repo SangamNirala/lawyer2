@@ -314,7 +314,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
       });
 
       if (response.data.structured_arguments) {
-        setArguments(response.data.structured_arguments.map((arg, index) => ({
+        setArgumentsList(response.data.structured_arguments.map((arg, index) => ({
           id: Date.now() + index,
           content: arg.argument,
           supporting_evidence: arg.supporting_precedents || [],
