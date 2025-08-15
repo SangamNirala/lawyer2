@@ -5827,8 +5827,10 @@ async def generate_research_memo(request: MemoGenerationRequest):
         full_memo_content = f"{memo_result.get('title', '')}\n\n{memo_result.get('executive_summary', '')}{memo_sections_content}\n\n{memo_result.get('conclusion', '')}"
         
         # Store memo in database with correct field mapping
+        memo_id = memo_result.get("memo_id", str(uuid.uuid4()))
         memo_doc = {
-            "id": memo_result.get("memo_id", str(uuid.uuid4())),  # Map memo_id to id
+            "id": memo_id,  # Map memo_id to id
+            "memo_id": memo_id,  # Also include memo_id for database index
             "research_query": request.memo_data.get("query", ""),
             "memo_type": request.memo_type,
             "generated_memo": full_memo_content,  # Combined content
