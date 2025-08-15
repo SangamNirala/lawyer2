@@ -1474,7 +1474,7 @@ function App() {
           )}
           
           {/* Analytics Dashboard */}
-          {showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && (
+          {showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
             <AnalyticsDashboard onBack={() => setShowAnalytics(false)} />
           )}
           
