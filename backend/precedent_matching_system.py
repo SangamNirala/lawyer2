@@ -734,15 +734,36 @@ class PrecedentMatchingSystem:
             # Perform comprehensive 6-dimensional similarity analysis
             precedent_matches = []
             
-            for case_data in similar_cases:
-                match = await self._comprehensive_case_similarity_analysis(
-                    query_case=query_case,
-                    candidate_case=case_data,
-                    filters=filters
-                )
-                
-                if match and match.similarity_scores.overall_similarity >= min_similarity:
-                    precedent_matches.append(match)
+            # Add timeout protection to prevent infinite loops
+            analysis_timeout = 30  # Maximum 30 seconds per search
+            start_analysis_time = time.time()
+            
+            for i, case_data in enumerate(similar_cases):
+                # Check timeout to prevent infinite loops
+                if time.time() - start_analysis_time > analysis_timeout:
+                    logger.warning(f"⚠️ Analysis timeout reached after {i} cases, breaking loop")
+                    break
+                    
+                try:
+                    # Add individual analysis timeout
+                    match = await asyncio.wait_for(
+                        self._comprehensive_case_similarity_analysis(
+                            query_case=query_case,
+                            candidate_case=case_data,  
+                            filters=filters
+                        ),
+                        timeout=5.0  # 5 seconds per case analysis
+                    )
+                    
+                    if match and match.similarity_scores.overall_similarity >= min_similarity:
+                        precedent_matches.append(match)
+                        
+                except asyncio.TimeoutError:
+                    logger.warning(f"⚠️ Case analysis timeout for case {case_data.get('id', 'unknown')}")
+                    continue
+                except Exception as e:
+                    logger.warning(f"⚠️ Error analyzing case {case_data.get('id', 'unknown')}: {e}")
+                    continue
             
             # Enhanced ranking with multiple factors
             precedent_matches = await self._rank_precedent_matches(precedent_matches, query_case)
