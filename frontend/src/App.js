@@ -1245,6 +1245,7 @@ function App() {
               setShowLegalQA(false);
               setShowVoiceAgent(false);
               setShowLitigationAnalytics(false);
+              setShowAIAgentHub(false);
             }}
             className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
           >
