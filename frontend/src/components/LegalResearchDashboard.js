@@ -187,7 +187,7 @@ const LegalResearchDashboard = ({ onBack }) => {
     </Card>
   ), [researchQuery, isSearching, dashboardStats, handleResearch]);
 
-  const ResearchResults = () => {
+  const ResearchResults = React.useMemo(() => {
     if (!searchResults) {
       return (
         <Card>
