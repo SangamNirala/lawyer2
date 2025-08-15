@@ -1302,6 +1302,7 @@ function App() {
               setShowVoiceAgent(false);
               setShowAnalytics(false);
               setShowLegalResearch(false);
+              setShowAIAgentHub(false);
             }}
             className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
           >
