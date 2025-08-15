@@ -5519,7 +5519,11 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
         
         research_doc = serialize_enums(asdict(result))
         research_doc["_id"] = result.id
-        await db.legal_research_queries.insert_one(research_doc)
+        await db.legal_research_queries.replace_one(
+            {"_id": result.id},
+            research_doc,
+            upsert=True
+        )
         
         logger.info(f"✅ Research completed: {result.sources_count} sources, confidence: {result.confidence_score:.2f}")
         
