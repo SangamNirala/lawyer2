@@ -8,4 +8,23 @@ Testing Generate Memo... ❌ TIMEOUT (20s)
 
 Testing Structure Arguments... ❌ TIMEOUT (20s)
 
-Testing Multi-Jurisdiction Search... 
+Testing Multi-Jurisdiction Search... ❌ TIMEOUT (20s)
+
+Testing Quality Assessment... ❌ TIMEOUT (15s)
+
+Testing Research Queries List... ❌ TIMEOUT (10s)
+
+Testing Research Memos List... ❌ ERROR: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+
+============================================================
+SUMMARY:
+❌ Stats
+❌ Research
+❌ Generate Memo
+❌ Structure Arguments
+❌ Multi-Jurisdiction Search
+❌ Quality Assessment
+❌ Research Queries List
+❌ Research Memos List
+
+SUCCESS RATE: 0/8 (0.0%)
