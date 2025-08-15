@@ -908,7 +908,7 @@ class ResearchQualityScorer:
                                       source_authorities: List[SourceAuthority]):
         """Store quality assessment in database"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
             
             assessment_data = asdict(metrics)
