@@ -537,7 +537,7 @@ class ExpertReviewSystem:
     
     async def _store_review_result(self, result: ExpertReviewResult):
         """Store expert review result in database"""
-        if not self.db:
+        if self.db is None:
             return
         
         try:
