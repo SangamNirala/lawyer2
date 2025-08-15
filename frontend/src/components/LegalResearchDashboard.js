@@ -112,10 +112,11 @@ const LegalResearchDashboard = ({ onBack }) => {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Textarea
+            ref={textareaRef}
             key="research-query-textarea"
             placeholder="e.g., What are the precedents for contract breach in employment termination cases?"
             value={researchQuery}
-            onChange={(e) => setResearchQuery(e.target.value)}
+            onChange={handleTextareaChange}
             className="min-h-24"
           />
           <div className="flex gap-2">
