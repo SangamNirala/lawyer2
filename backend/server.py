@@ -5849,11 +5849,16 @@ async def structure_legal_arguments(request: LegalArgumentRequest):
         await structurer.initialize()
         
         # Structure arguments (structurer returns a list of items; aggregate into response)
-        argument_list = await structurer.structure_legal_arguments(
+        ok, info = await run_with_timeout(structurer.structure_legal_arguments(
             argument_data=request.argument_data,
             argument_strength=request.argument_strength,
             include_counterarguments=request.include_counterarguments
-        )
+        ), 30.0)
+        
+        if not ok:
+            raise HTTPException(status_code=408, detail=f"Legal argument structuring timed out: {info}")
+        
+        argument_list = info
 
         # Aggregate into a single cohesive structure
         structure = {
