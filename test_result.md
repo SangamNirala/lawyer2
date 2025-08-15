@@ -69,6 +69,18 @@
         - working: true
           agent: "testing"
           comment: "PHASE 2A COMPREHENSIVE VERIFICATION COMPLETED: Background enrichment system is fully operational. Legal QA API validation issues completely resolved, enabling proper background enrichment testing. FAISS vector database operational with 304 indexed documents. Stats endpoints working with both original and alias fields (indexed_documents/total_documents, by_jurisdiction/jurisdictions, by_legal_domain/legal_domains). All blocking validation errors eliminated."
+
+  - task: "Legal Research Engine Comprehensive Endpoint Testing"
+    implemented: true
+    working: false
+    file: "/api/legal-research-engine/*"
+    stuck_count: 2
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "COMPREHENSIVE LEGAL RESEARCH ENGINE TESTING COMPLETED - MIXED RESULTS: Tested all 8 Legal Research Engine endpoints as requested in review. SUCCESS RATE: 25% (2/8 endpoints working). ✅ WORKING ENDPOINTS: 1) Precedent Search (POST /api/legal-research-engine/precedent-search) - Working perfectly with 1.007s response time, returns 200 OK status. 2) Quality Assessment (POST /api/legal-research-engine/quality-assessment) - Working correctly, returns proper assessment data with quality scores. ❌ FAILING ENDPOINTS (6/8): 1) Stats Endpoint - TIMEOUT (>30s), hangs indefinitely despite previous reports of working. 2) Main Research Endpoint - 500 Error: 'E11000 duplicate key error collection: legal_ai.legal_research', MongoDB duplicate key constraint violation. 3) Citation Analysis - 500 Error: 'total_nodes' field missing, incomplete response structure. 4) Generate Memo - 500 Error: 'professional' is not a valid MemoFormat, enum validation issue persists. 5) Structure Arguments - TIMEOUT (>30s), hangs indefinitely. 6) Multi-Jurisdiction Search - 500 Error: 'list' object has no attribute 'get', data structure handling issue. 🔍 CRITICAL ISSUES IDENTIFIED: Backend logs show multiple system errors: Database connection validation issues ('Database objects do not implement truth value testing'), enum serialization problems, field mapping errors, and infinite loops in precedent matching. The threadpoolctl dependency installation mentioned in review request has NOT resolved the core issues. PERFORMANCE DEGRADATION: Stats endpoint that was previously working (0.003s response time) is now timing out, indicating system regression. RECOMMENDATION: Main agent needs to investigate MongoDB duplicate key constraints, fix enum validation for MemoFormat, resolve database connection validation logic, and address infinite loops in precedent matching system."
 ##   - task: "Task name"
 ##     implemented: true
 ##     working: true  # or false or "NA"
