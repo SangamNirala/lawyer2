@@ -846,7 +846,7 @@ class LegalAccuracyValidationSystem:
     
     async def _store_validation_result(self, result: ComprehensiveValidationResult):
         """Store validation result in database"""
-        if not self.db:
+        if self.db is None:
             return
         
         try:
