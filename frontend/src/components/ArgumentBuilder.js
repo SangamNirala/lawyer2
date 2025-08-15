@@ -562,8 +562,8 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
               {/* Arguments Panel */}
               <div className="lg:col-span-3">
                 <div className="space-y-4">
-                  {arguments.length > 0 ? (
-                    arguments.map((argument, index) => (
+                  {argumentsList.length > 0 ? (
+                    argumentsList.map((argument, index) => (
                       <ArgumentComponent
                         key={argument.id}
                         argument={argument}
