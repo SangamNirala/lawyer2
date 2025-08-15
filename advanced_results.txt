@@ -28,3 +28,17 @@ Priority: high
 Legal Issues: breach_of_contract, force_majeure, damages
 
 Request URL: https://legal-timeout-fix.preview.emergentagent.com/api/legal-research-engine/research
+❌ Exception occurred: HTTPSConnectionPool(host='legal-timeout-fix.preview.emergentagent.com', port=443): Read timed out. (read timeout=120)
+--------------------------------------------------
+
+🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍 TEST 3 🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍🔍
+🔍 TESTING PRECEDENT SEARCH ENDPOINT
+======================================================================
+
+📋 Test Case: Precedent Search
+Case Facts: Commercial contract dispute involving breach of delivery terms and force majeure clause
+Legal Issues: breach_of_contract, force_majeure, commercial_damages
+Max Results: 15
+Min Similarity: 0.6
+
+Request URL: https://legal-timeout-fix.preview.emergentagent.com/api/legal-research-engine/precedent-search
