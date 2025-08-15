@@ -336,7 +336,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
   };
 
   const saveArgumentStructure = async () => {
-    if (arguments.length === 0) {
+    if (argumentsList.length === 0) {
       alert('No arguments to save.');
       return;
     }
