@@ -492,7 +492,7 @@ class PrecedentMatchingSystem:
         logger.info("🔍 Enhanced Precedent Matching System initialized")
     
     async def initialize(self):
-        """Initialize all enhanced system components"""
+        """Initialize all enhanced system components with non-blocking case database loading"""
         try:
             logger.info("🚀 Initializing Enhanced Precedent Matching System...")
             
@@ -519,11 +519,19 @@ class PrecedentMatchingSystem:
                 self.db = self.db_client[self.db_name]
                 logger.info("✅ MongoDB connection established")
             
-            # Initialize enhanced embeddings model
-            await self._initialize_embeddings()
+            # Initialize enhanced embeddings model with timeout
+            try:
+                await asyncio.wait_for(self._initialize_embeddings(), timeout=5.0)
+            except asyncio.TimeoutError:
+                logger.warning("⚠️ Embeddings initialization timed out, will use fallback")
+                self.embeddings_model = None
             
-            # Initialize enhanced FAISS index
-            await self._initialize_faiss_index()
+            # Initialize enhanced FAISS index with timeout
+            try:
+                await asyncio.wait_for(self._initialize_faiss_index(), timeout=2.0)
+            except asyncio.TimeoutError:
+                logger.warning("⚠️ FAISS index initialization timed out, will use fallback")
+                self.faiss_index = None
             
             # Initialize similarity calculator
             self.similarity_calculator = SimilarityCalculator(
@@ -531,14 +539,59 @@ class PrecedentMatchingSystem:
                 ai_client=self.gemini_api_key
             )
             
-            # Load enhanced case database
-            await self._load_case_database()
+            # Start case database loading in background (non-blocking)
+            asyncio.create_task(self._load_case_database_background())
             
-            logger.info("🎉 Enhanced Precedent Matching System fully initialized!")
+            logger.info("🎉 Enhanced Precedent Matching System initialized (case database loading in background)!")
             
         except Exception as e:
             logger.error(f"❌ Error initializing enhanced precedent matching system: {e}")
-            raise
+            # Don't raise - allow system to continue with basic functionality
+            logger.info("⚡ Continuing with basic precedent matching capabilities")
+    
+    async def _load_case_database_background(self):
+        """Load case database in background to avoid blocking initialization"""
+        try:
+            logger.info("📚 Starting background case database loading...")
+            
+            # Use timeout for the entire background loading process
+            await asyncio.wait_for(self._load_case_database_with_timeout(), timeout=30.0)
+            
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Background case database loading timed out after 30s")
+            logger.info("⚡ Precedent matching will work with limited case database")
+        except Exception as e:
+            logger.error(f"❌ Error in background case database loading: {e}")
+            logger.info("⚡ Precedent matching will work with basic functionality")
+    
+    async def _load_case_database_with_timeout(self):
+        """Load case database with proper timeout handling"""
+        try:
+            logger.info("📚 Loading comprehensive case database...")
+            
+            # Load from legal knowledge base with size limit
+            knowledge_base_path = "/app/legal_knowledge_base.json"
+            if os.path.exists(knowledge_base_path):
+                with open(knowledge_base_path, 'r', encoding='utf-8') as f:
+                    cases = json.load(f)
+                
+                # Limit case processing for performance  
+                limited_cases = cases[:100]  # Only process first 100 cases for now
+                logger.info(f"📊 Processing limited set of {len(limited_cases)} cases for performance")
+                
+                await asyncio.wait_for(
+                    self._process_cases_for_enhanced_indexing(limited_cases), 
+                    timeout=20.0
+                )
+                logger.info(f"✅ Loaded {len(limited_cases)} cases into enhanced precedent database")
+            else:
+                logger.warning("⚠️ Legal knowledge base not found, skipping for now")
+            
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Case database loading timed out, using minimal database")
+        except Exception as e:
+            logger.error(f"❌ Error loading case database: {e}")
+            logger.info("⚡ Continuing with minimal case database")
     
     async def _initialize_embeddings(self):
         """Initialize enhanced embeddings model for legal semantic similarity"""
