@@ -512,7 +512,7 @@ class ExpertReviewSystem:
     
     async def _store_review_request(self, request: ExpertReviewRequest, expert: SimulatedExpert):
         """Store expert review request in database"""
-        if not self.db:
+        if self.db is None:
             return
         
         try:
