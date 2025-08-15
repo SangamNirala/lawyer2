@@ -6077,42 +6077,65 @@ async def get_research_status(research_id: str):
 
 @api_router.get("/legal-research-engine/stats")
 async def get_research_engine_stats():
-    """Get comprehensive Advanced Legal Research Engine statistics"""
+    """Get comprehensive Advanced Legal Research Engine statistics with optimized timeouts"""
     try:
         if not ADVANCED_RESEARCH_ENGINE_AVAILABLE:
             return {"status": "unavailable", "message": "Advanced Legal Research Engine not available"}
         
-        # Get engine stats
+        # Get engine stats with very short timeout
         engine = None
         try:
-            engine = await asyncio.wait_for(get_research_engine(), timeout=2.0)
-        except Exception as te:
-            logger.warning(f"⏱️ get_research_engine timed out or failed: {te}")
-            engine = None
+            engine = await asyncio.wait_for(get_research_engine(), timeout=1.0)
+        except asyncio.TimeoutError:
+            logger.warning("⏱️ get_research_engine timed out during stats request")
+            return {"status": "initializing", "message": "Engine still warming up - please retry in a moment"}
+        except Exception as e:
+            logger.warning(f"⏱️ get_research_engine failed: {e}")
+            return {"status": "degraded", "message": "Engine initialization issue", "error": str(e)}
+        
         if engine is None:
             return {"status": "degraded", "message": "Engine warmup in progress", "engine_stats": None}
-        engine_stats = await engine.get_engine_stats()
         
-        # Get component stats
+        # Get engine stats with timeout
         try:
-            matcher = await get_precedent_matcher()
-            precedent_stats = await matcher.get_system_stats()
+            engine_stats = await asyncio.wait_for(engine.get_engine_stats(), timeout=1.5)
+        except asyncio.TimeoutError:
+            engine_stats = {"status": "timeout", "message": "Engine stats timeout"}
+        except Exception as e:
+            engine_stats = {"status": "error", "message": f"Engine stats error: {e}"}
+        
+        # Get component stats with individual timeouts
+        try:
+            matcher = await asyncio.wait_for(get_precedent_matcher(), timeout=0.5)
+            precedent_stats = await asyncio.wait_for(matcher.get_system_stats(), timeout=0.5)
         except:
-            precedent_stats = {"status": "unavailable"}
+            precedent_stats = {"status": "timeout_or_unavailable"}
         
         try:
-            scorer = await get_quality_scorer()
-            quality_stats = await scorer.get_system_stats()
+            scorer = await asyncio.wait_for(get_quality_scorer(), timeout=0.5)
+            quality_stats = await asyncio.wait_for(scorer.get_system_stats(), timeout=0.5)
         except:
-            quality_stats = {"status": "unavailable"}
+            quality_stats = {"status": "timeout_or_unavailable"}
         
-        # Get database stats
-        db_stats = {
-            "legal_research_queries": await db.legal_research_queries.count_documents({}),
-            "precedent_relationships": await db.precedent_relationships.count_documents({}),
-            "citation_network": await db.citation_network.count_documents({}),
-            "research_memos": await db.research_memos.count_documents({})
-        }
+        # Get database stats with timeout
+        try:
+            db_stats = await asyncio.wait_for(asyncio.gather(
+                db.legal_research_queries.count_documents({}),
+                db.precedent_relationships.count_documents({}),
+                db.citation_network.count_documents({}),
+                db.research_memos.count_documents({})
+            ), timeout=1.0)
+            
+            db_stats = {
+                "legal_research_queries": db_stats[0],
+                "precedent_relationships": db_stats[1], 
+                "citation_network": db_stats[2],
+                "research_memos": db_stats[3]
+            }
+        except asyncio.TimeoutError:
+            db_stats = {"status": "timeout", "message": "Database stats timeout"}
+        except Exception as e:
+            db_stats = {"status": "error", "message": f"Database error: {e}"}
         
         return {
             "status": "operational",
