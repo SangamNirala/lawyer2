@@ -1506,7 +1506,7 @@ function App() {
           )}
           
           {/* Voice Agent */}
-          {showVoiceAgent && !showLitigationAnalytics && (
+          {showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
             <VoiceAgent onClose={() => setShowVoiceAgent(false)} />
           )}
           
