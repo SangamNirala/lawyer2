@@ -19,6 +19,7 @@ import PlainEnglishContractCreator from './components/PlainEnglishContractCreato
 import LegalQuestionAnswering from './components/LegalQuestionAnswering';
 import VoiceAgent from './components/VoiceAgent';
 import LitigationAnalytics from './components/LitigationAnalytics';
+import LegalResearchDashboard from './components/LegalResearchDashboard';
 import ResizeObserverErrorBoundary from './components/ResizeObserverErrorBoundary';
 // Compliance System Components
 import AttorneyDashboard from './components/AttorneyDashboard';
