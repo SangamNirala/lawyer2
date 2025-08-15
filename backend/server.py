@@ -428,7 +428,7 @@ class CitationAnalysisRequest(BaseModel):
 class MemoGenerationRequest(BaseModel):
     memo_data: Dict[str, Any]
     memo_type: str = "comprehensive"  # brief, comprehensive, summary
-    format_style: str = "professional"
+    format_style: str = "traditional"
 
 class LegalArgumentRequest(BaseModel):
     argument_data: Dict[str, Any]
