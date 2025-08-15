@@ -5556,23 +5556,7 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
                 raise HTTPException(status_code=504, detail="Research operation timed out; please retry with simpler query")
         
         # Store research session in database - convert enums to strings for serialization
-        def serialize_enums(obj):
-            """Recursively convert enum objects to strings for MongoDB serialization"""
-            if isinstance(obj, dict):
-                return {key: serialize_enums(value) for key, value in obj.items()}
-            elif isinstance(obj, list):
-                return [serialize_enums(item) for item in obj]
-            elif isinstance(obj, Enum):
-                return obj.value
-            elif hasattr(obj, '__dict__'):
-                try:
-                    return serialize_enums(asdict(obj))
-                except Exception:
-                    return obj.__dict__
-            else:
-                return obj
-        
-        research_doc = serialize_enums(asdict(result))
+        research_doc = serialize_enums_for_mongodb(asdict(result))
         research_doc["_id"] = result.id
         await db.legal_research_queries.insert_one(research_doc)
         
