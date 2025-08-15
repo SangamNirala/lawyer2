@@ -15709,5 +15709,400 @@ else:
 # END LITIGATION ANALYTICS ENGINE ENDPOINTS
 # ====================================================================================================
 
+# ====================================================================================================
+# CONTEXT-AWARE AI AGENTS - PHASE 1.3 IMPLEMENTATION
+# ====================================================================================================
+
+# Import AI Agent Manager
+try:
+    from context_aware_ai_agents import (
+        get_ai_agent_manager, AgentType, AgentContext, 
+        AgentResponse, MessageType, PriorityLevel
+    )
+    ai_agents_available = True
+    logger.info("✅ Context-Aware AI Agents module loaded successfully")
+except ImportError as e:
+    logger.error(f"❌ Failed to import AI Agents module: {e}")
+    ai_agents_available = False
+
+# Request/Response models for AI Agents
+class AIAgentRequest(BaseModel):
+    message: str
+    session_id: str
+    user_id: Optional[str] = None
+    case_id: Optional[str] = None
+    contract_id: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    case_type: Optional[str] = None
+    contract_type: Optional[str] = None
+    current_phase: Optional[str] = None
+    key_facts: List[str] = Field(default_factory=list)
+    context_metadata: Dict[str, Any] = Field(default_factory=dict)
+
+class AIAgentResponseModel(BaseModel):
+    response_id: str
+    agent_type: str
+    content: str
+    recommendations: List[str] = Field(default_factory=list)
+    action_items: List[Dict[str, Any]] = Field(default_factory=list)
+    confidence_score: float
+    context_updates: Dict[str, Any] = Field(default_factory=dict)
+    follow_up_questions: List[str] = Field(default_factory=list)
+    priority_alerts: List[Dict[str, Any]] = Field(default_factory=list)
+    timestamp: str
+
+class AgentStatisticsResponse(BaseModel):
+    total_agents: int
+    agent_types: List[str]
+    session_counts: Dict[str, int]
+    conversation_counts: Dict[str, int]
+    system_status: str = "operational"
+
+if ai_agents_available:
+    
+    @api_router.post("/ai-agents/contract-negotiation", response_model=AIAgentResponseModel)
+    async def contract_negotiation_agent(request: AIAgentRequest):
+        """
+        Contract Negotiation Agent - Specialized AI for Deal Structuring
+        
+        Provides expert guidance on:
+        - Contract term optimization
+        - Risk allocation strategies
+        - Negotiation tactics and positioning
+        - Deal structure recommendations
+        - Clause analysis and alternatives
+        - Commercial term benchmarking
+        
+        The agent maintains conversation context and provides personalized recommendations
+        based on contract type, negotiation phase, and historical interactions.
+        """
+        try:
+            logger.info(f"🤝 Contract Negotiation Agent processing request for session {request.session_id}")
+            
+            agent_manager = await get_ai_agent_manager(db)
+            
+            # Process message with contract negotiation agent
+            response = await agent_manager.process_message(
+                agent_type=AgentType.CONTRACT_NEGOTIATION,
+                message=request.message,
+                session_id=request.session_id,
+                user_id=request.user_id,
+                case_id=request.case_id,
+                contract_id=request.contract_id,
+                jurisdiction=request.jurisdiction,
+                contract_type=request.contract_type,
+                current_phase=request.current_phase,
+                key_facts=request.key_facts,
+                context_metadata=request.context_metadata
+            )
+            
+            return AIAgentResponseModel(
+                response_id=response.response_id,
+                agent_type=response.agent_type.value,
+                content=response.content,
+                recommendations=response.recommendations,
+                action_items=response.action_items,
+                confidence_score=response.confidence_score,
+                context_updates=response.context_updates,
+                follow_up_questions=response.follow_up_questions,
+                priority_alerts=response.priority_alerts,
+                timestamp=response.timestamp.isoformat()
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Contract Negotiation Agent error: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Contract Negotiation Agent failed: {str(e)}"
+            )
+
+    @api_router.post("/ai-agents/litigation-strategy", response_model=AIAgentResponseModel)
+    async def litigation_strategy_agent(request: AIAgentRequest):
+        """
+        Litigation Strategy Agent - Specialized AI for Case Management
+        
+        Provides expert guidance on:
+        - Case strategy development
+        - Discovery planning and management
+        - Motion practice strategy
+        - Settlement vs. trial analysis
+        - Evidence evaluation and presentation
+        - Risk assessment and mitigation
+        - Timeline and resource planning
+        
+        The agent understands procedural rules, evidence standards, and strategic litigation planning.
+        """
+        try:
+            logger.info(f"⚖️ Litigation Strategy Agent processing request for session {request.session_id}")
+            
+            agent_manager = await get_ai_agent_manager(db)
+            
+            # Process message with litigation strategy agent
+            response = await agent_manager.process_message(
+                agent_type=AgentType.LITIGATION_STRATEGY,
+                message=request.message,
+                session_id=request.session_id,
+                user_id=request.user_id,
+                case_id=request.case_id,
+                contract_id=request.contract_id,
+                jurisdiction=request.jurisdiction,
+                case_type=request.case_type,
+                current_phase=request.current_phase,
+                key_facts=request.key_facts,
+                context_metadata=request.context_metadata
+            )
+            
+            return AIAgentResponseModel(
+                response_id=response.response_id,
+                agent_type=response.agent_type.value,
+                content=response.content,
+                recommendations=response.recommendations,
+                action_items=response.action_items,
+                confidence_score=response.confidence_score,
+                context_updates=response.context_updates,
+                follow_up_questions=response.follow_up_questions,
+                priority_alerts=response.priority_alerts,
+                timestamp=response.timestamp.isoformat()
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Litigation Strategy Agent error: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Litigation Strategy Agent failed: {str(e)}"
+            )
+
+    @api_router.post("/ai-agents/compliance-monitoring", response_model=AIAgentResponseModel)
+    async def compliance_monitoring_agent(request: AIAgentRequest):
+        """
+        Compliance Monitoring Agent - Specialized AI for Regulatory Oversight
+        
+        Provides expert guidance on:
+        - Regulatory compliance analysis
+        - Industry standard adherence
+        - Risk assessment and monitoring
+        - Compliance policy recommendations
+        - Violation detection and prevention
+        - Documentation requirements
+        - Training and awareness programs
+        
+        The agent monitors for potential violations and provides proactive compliance guidance.
+        """
+        try:
+            logger.info(f"🛡️ Compliance Monitoring Agent processing request for session {request.session_id}")
+            
+            agent_manager = await get_ai_agent_manager(db)
+            
+            # Process message with compliance monitoring agent
+            response = await agent_manager.process_message(
+                agent_type=AgentType.COMPLIANCE_MONITORING,
+                message=request.message,
+                session_id=request.session_id,
+                user_id=request.user_id,
+                case_id=request.case_id,
+                contract_id=request.contract_id,
+                jurisdiction=request.jurisdiction,
+                case_type=request.case_type,
+                contract_type=request.contract_type,
+                current_phase=request.current_phase,
+                key_facts=request.key_facts,
+                context_metadata=request.context_metadata
+            )
+            
+            return AIAgentResponseModel(
+                response_id=response.response_id,
+                agent_type=response.agent_type.value,
+                content=response.content,
+                recommendations=response.recommendations,
+                action_items=response.action_items,
+                confidence_score=response.confidence_score,
+                context_updates=response.context_updates,
+                follow_up_questions=response.follow_up_questions,
+                priority_alerts=response.priority_alerts,
+                timestamp=response.timestamp.isoformat()
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Compliance Monitoring Agent error: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Compliance Monitoring Agent failed: {str(e)}"
+            )
+
+    @api_router.post("/ai-agents/client-communication", response_model=AIAgentResponseModel)
+    async def client_communication_agent(request: AIAgentRequest):
+        """
+        Client Communication Agent - Specialized AI for Relationship Management
+        
+        Provides expert guidance on:
+        - Professional communication drafting
+        - Client expectation management
+        - Relationship building strategies
+        - Service delivery optimization
+        - Conflict resolution and difficult conversations
+        - Progress updates and status reporting
+        - Fee discussions and billing communications
+        
+        The agent helps craft appropriate communications and manage client relationships effectively.
+        """
+        try:
+            logger.info(f"📞 Client Communication Agent processing request for session {request.session_id}")
+            
+            agent_manager = await get_ai_agent_manager(db)
+            
+            # Process message with client communication agent
+            response = await agent_manager.process_message(
+                agent_type=AgentType.CLIENT_COMMUNICATION,
+                message=request.message,
+                session_id=request.session_id,
+                user_id=request.user_id,
+                case_id=request.case_id,
+                contract_id=request.contract_id,
+                jurisdiction=request.jurisdiction,
+                case_type=request.case_type,
+                contract_type=request.contract_type,
+                current_phase=request.current_phase,
+                key_facts=request.key_facts,
+                context_metadata=request.context_metadata
+            )
+            
+            return AIAgentResponseModel(
+                response_id=response.response_id,
+                agent_type=response.agent_type.value,
+                content=response.content,
+                recommendations=response.recommendations,
+                action_items=response.action_items,
+                confidence_score=response.confidence_score,
+                context_updates=response.context_updates,
+                follow_up_questions=response.follow_up_questions,
+                priority_alerts=response.priority_alerts,
+                timestamp=response.timestamp.isoformat()
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ Client Communication Agent error: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Client Communication Agent failed: {str(e)}"
+            )
+
+    @api_router.get("/ai-agents/statistics", response_model=AgentStatisticsResponse)
+    async def get_ai_agent_statistics():
+        """
+        Get AI Agent System Statistics
+        
+        Returns comprehensive statistics about all AI agents including:
+        - Active session counts
+        - Total conversation counts  
+        - Agent availability status
+        - System performance metrics
+        """
+        try:
+            logger.info("📊 Retrieving AI Agent system statistics")
+            
+            agent_manager = await get_ai_agent_manager(db)
+            stats = await agent_manager.get_agent_statistics()
+            
+            return AgentStatisticsResponse(
+                total_agents=stats.get("total_agents", 0),
+                agent_types=stats.get("agent_types", []),
+                session_counts=stats.get("session_counts", {}),
+                conversation_counts=stats.get("conversation_counts", {}),
+                system_status="operational"
+            )
+            
+        except Exception as e:
+            logger.error(f"❌ AI Agent statistics error: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to retrieve AI agent statistics: {str(e)}"
+            )
+
+    @api_router.get("/ai-agents/session/{session_id}/history")
+    async def get_agent_conversation_history(session_id: str, agent_type: str):
+        """
+        Get Conversation History for AI Agent Session
+        
+        Retrieves the complete conversation history for a specific agent session,
+        including context updates and system messages.
+        """
+        try:
+            logger.info(f"📋 Retrieving conversation history for session {session_id}, agent {agent_type}")
+            
+            # Get conversation from database
+            conversation = await db.ai_agent_conversations.find_one({
+                "session_id": session_id,
+                "agent_type": agent_type
+            })
+            
+            if not conversation:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No conversation found for session {session_id} with agent {agent_type}"
+                )
+            
+            # Format conversation history
+            formatted_history = []
+            for msg in conversation.get("conversation_history", []):
+                formatted_msg = {
+                    "message_id": msg["message_id"],
+                    "message_type": msg["message_type"],
+                    "content": msg["content"],
+                    "timestamp": msg["timestamp"].isoformat() if isinstance(msg["timestamp"], datetime) else msg["timestamp"],
+                    "priority": msg.get("priority", "medium")
+                }
+                formatted_history.append(formatted_msg)
+            
+            return {
+                "session_id": session_id,
+                "agent_type": agent_type,
+                "conversation_history": formatted_history,
+                "context_metadata": conversation.get("context_metadata", {}),
+                "last_updated": conversation.get("last_updated").isoformat() if conversation.get("last_updated") else None,
+                "total_messages": len(formatted_history)
+            }
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Error retrieving conversation history: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to retrieve conversation history: {str(e)}"
+            )
+
+else:
+    # Fallback endpoints when AI agents are not available
+    @api_router.post("/ai-agents/contract-negotiation")
+    async def contract_negotiation_fallback(request: dict):
+        raise HTTPException(
+            status_code=503,
+            detail="Contract Negotiation Agent is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.post("/ai-agents/litigation-strategy")
+    async def litigation_strategy_fallback(request: dict):
+        raise HTTPException(
+            status_code=503,
+            detail="Litigation Strategy Agent is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.post("/ai-agents/compliance-monitoring")
+    async def compliance_monitoring_fallback(request: dict):
+        raise HTTPException(
+            status_code=503,
+            detail="Compliance Monitoring Agent is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.post("/ai-agents/client-communication")
+    async def client_communication_fallback(request: dict):
+        raise HTTPException(
+            status_code=503,
+            detail="Client Communication Agent is currently unavailable. Please check system configuration."
+        )
+
+# END CONTEXT-AWARE AI AGENTS
+# ====================================================================================================
+
 # Include all API routes in the main app (after ALL endpoints are defined)
 app.include_router(api_router)
