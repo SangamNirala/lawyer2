@@ -1528,17 +1528,22 @@ function App() {
           )}
           
           {/* Voice Agent */}
-          {showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
+          {showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
             <VoiceAgent onClose={() => setShowVoiceAgent(false)} />
           )}
           
+          {/* AI Agent Hub */}
+          {showAIAgentHub && !showLitigationAnalytics && !showLegalResearch && !showVoiceAgent && !showAnalytics && !showLegalQA && !useEnhancedWizard && !showPlainEnglishCreator && (
+            <AIAgentHub onBack={() => setShowAIAgentHub(false)} />
+          )}
+          
           {/* Legal Research Dashboard */}
-          {showLegalResearch && !showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && (
+          {showLegalResearch && !showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && !showAIAgentHub && (
             <LegalResearchDashboard onBack={() => setShowLegalResearch(false)} />
           )}
           
           {/* Classic Mode */}
-          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
+          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
             <>
               {currentStep < 4 && (
                 <div className="mb-8">
