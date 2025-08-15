@@ -272,7 +272,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
       created_at: new Date().toISOString()
     };
 
-    setArguments([...arguments, newArgument]);
+    setArgumentsList([...argumentsList, newArgument]);
     setNewArgumentContent('');
   };
 
