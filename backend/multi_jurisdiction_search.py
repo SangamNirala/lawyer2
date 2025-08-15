@@ -702,6 +702,82 @@ class MultiJurisdictionSearch:
             
         except Exception as e:
             logger.error(f"❌ Error updating performance metrics: {e}")
+
+    async def create_basic_results(self, query: str, jurisdictions: List[str]):
+        """Create basic multi-jurisdiction results as fallback when full search times out"""
+        try:
+            logger.info("🔧 Creating basic multi-jurisdiction search results...")
+            
+            # Create basic result structure for each jurisdiction
+            basic_results = []
+            
+            for jurisdiction in jurisdictions:
+                basic_result = {
+                    "id": str(uuid.uuid4()),
+                    "title": f"Basic Legal Research Result - {jurisdiction}",
+                    "jurisdiction": jurisdiction,
+                    "court": f"{jurisdiction} Court",
+                    "citation": f"Basic Citation for {jurisdiction}",
+                    "summary": f"Basic analysis of '{query}' under {jurisdiction} law. Full search timed out, showing placeholder result.",
+                    "relevance_score": 0.4,
+                    "authority_level": "basic",
+                    "date": datetime.utcnow().strftime("%Y-%m-%d"),
+                    "legal_principles": [f"Basic legal principle from {jurisdiction}"],
+                    "key_holdings": [f"Basic holding relevant to query in {jurisdiction}"],
+                    "source": "fallback_basic"
+                }
+                basic_results.append(basic_result)
+            
+            # Create basic comparison analysis
+            comparison_analysis = {
+                "similarities": [f"Common legal principle across {', '.join(jurisdictions)}"],
+                "differences": [f"Jurisdictional variation between {jurisdictions[0]} and others"],
+                "conflict_areas": ["Potential conflicts require detailed analysis"],
+                "harmonization_opportunities": ["Areas where jurisdictions align"],
+                "analysis_method": "basic_fallback"
+            }
+            
+            # Create basic jurisdiction recommendations
+            jurisdiction_recommendations = [
+                {
+                    "jurisdiction": jurisdictions[0] if jurisdictions else "US",
+                    "recommendation_strength": "moderate",
+                    "reasons": ["Default jurisdiction due to timeout", "Requires detailed analysis"],
+                    "pros": ["Accessible jurisdiction"],
+                    "cons": ["Limited analysis due to timeout"],
+                    "confidence": 0.3
+                }
+            ]
+            
+            # Return structured results compatible with existing format
+            return {
+                "results": basic_results,
+                "comparison": comparison_analysis,
+                "recommendations": jurisdiction_recommendations,
+                "total_results": len(basic_results),
+                "search_method": "fallback_basic",
+                "timeout_notice": "Full multi-jurisdiction search timed out - showing basic results"
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error creating basic multi-jurisdiction results: {e}")
+            # Return minimal results even on error
+            return {
+                "results": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "title": "Multi-jurisdiction search failed",
+                        "jurisdiction": "Unknown",
+                        "summary": "Error occurred during basic result generation",
+                        "relevance_score": 0.1,
+                        "source": "error_fallback"
+                    }
+                ],
+                "comparison": {"analysis_method": "error_fallback"},
+                "recommendations": [],
+                "total_results": 0,
+                "error": "Basic result generation failed"
+            }
     
     async def get_system_stats(self) -> Dict[str, Any]:
         """Get comprehensive system statistics"""
