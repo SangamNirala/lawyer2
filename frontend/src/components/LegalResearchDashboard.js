@@ -185,7 +185,7 @@ const LegalResearchDashboard = ({ onBack }) => {
         )}
       </CardContent>
     </Card>
-  );
+  ), [researchQuery, isSearching, dashboardStats, handleResearch]);
 
   const ResearchResults = () => {
     if (!searchResults) {
