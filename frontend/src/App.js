@@ -1264,6 +1264,7 @@ function App() {
               setShowVoiceAgent(false);
               setShowLitigationAnalytics(false);
               setShowLegalResearch(false);
+              setShowAIAgentHub(false);
               setCurrentStep(1);
             }}
             variant="outline"
