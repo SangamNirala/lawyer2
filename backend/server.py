@@ -5521,14 +5521,23 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
             user_context=request.user_context
         )
         
-        # Execute comprehensive research
+        # Execute comprehensive research with optimized timeout handling
         if engine is None:
             raise HTTPException(status_code=503, detail="Advanced Legal Research Engine initializing - please retry shortly")
-        ok, info = await run_with_timeout(engine.coordinate_research(research_query), 18.0)
-        if not ok:
-            logger.warning(f"/research timed out or failed: {info}")
-            raise HTTPException(status_code=504, detail="Research operation timed out; please retry with narrower scope")
-        result = info
+        
+        # Use faster, more responsive research with shorter timeout
+        try:
+            result = await engine.coordinate_research_optimized(research_query, timeout=12.0)
+            logger.info(f"✅ Research completed via optimized path in {result.processing_time:.2f}s")
+        except Exception as e:
+            logger.warning(f"⚠️ Optimized research failed, falling back to basic research: {e}")
+            # Fallback to basic research with minimal operations
+            try:
+                result = await engine.coordinate_research_basic(research_query, timeout=8.0)
+                logger.info(f"✅ Research completed via fallback path")
+            except Exception as fe:
+                logger.error(f"❌ Both research paths failed: {fe}")
+                raise HTTPException(status_code=504, detail="Research operation timed out; please retry with simpler query")
         
         # Store research session in database - convert enums to strings for serialization
         def serialize_enums(obj):
