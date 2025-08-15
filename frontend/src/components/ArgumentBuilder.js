@@ -589,7 +589,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
           <TabsContent value="preview" className="mt-6">
             <Card>
               <CardContent className="p-8">
-                {arguments.length > 0 ? (
+                {argumentsList.length > 0 ? (
                   <ArgumentPreview />
                 ) : (
                   <div className="text-center py-12">
