@@ -1183,6 +1183,7 @@ function App() {
               setShowLegalQA(false);
               setShowVoiceAgent(false);
               setShowLitigationAnalytics(false);
+              setShowLegalResearch(false);
             }}
             className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
           >
