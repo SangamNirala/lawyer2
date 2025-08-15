@@ -5694,21 +5694,53 @@ async def analyze_citation_network(request: CitationAnalysisRequest):
             jurisdiction_filter=request.jurisdiction_filter
         )
         
-        # Convert to response format
-        return CitationNetworkResponse(
-            network_id=network["network_id"],
-            total_nodes=network["summary"]["total_nodes"],
-            total_edges=network["summary"]["total_edges"],
-            network_density=network["network_metrics"].get("network_density", 0.0),
-            average_path_length=network["network_metrics"].get("average_path_length", 0.0),
-            clustering_coefficient=network["network_metrics"].get("clustering_coefficient", 0.0),
-            landmark_cases=[case["case_title"] for case in network.get("landmark_cases", [])[:5]],
-            authority_ranking=dict(list(network.get("authority_rankings", {}).items())[:10]),
-            legal_evolution_chains=network.get("legal_evolution_chains", []),
-            overruling_relationships=network.get("overruling_relationships", []),
-            jurisdiction_scope=network.get("jurisdiction_scope", []),
-            analysis_timestamp=datetime.fromisoformat(network["last_updated"])
-        )
+        # Convert to response format with robust fallbacks
+        try:
+            summary = network.get("summary") or {}
+            total_nodes = summary.get("total_nodes", network.get("total_nodes", 0))
+            total_edges = summary.get("total_edges", network.get("total_edges", 0))
+            network_metrics = network.get("network_metrics") or {}
+            last_updated = network.get("last_updated") or network.get("analysis_timestamp") or datetime.utcnow().isoformat()
+
+            # Normalize authority ranking to a list of objects for consistency
+            authority_dict = network.get("authority_rankings", {}) or {}
+            if isinstance(authority_dict, dict):
+                authority_list = [{"case_id": k, "score": v} for k, v in list(authority_dict.items())[:10]]
+            elif isinstance(authority_dict, list):
+                authority_list = authority_dict[:10]
+            else:
+                authority_list = []
+
+            return CitationNetworkResponse(
+                network_id=network.get("network_id", str(uuid.uuid4())),
+                total_nodes=total_nodes,
+                total_edges=total_edges,
+                network_density=network_metrics.get("network_density", 0.0),
+                average_path_length=network_metrics.get("average_path_length", 0.0),
+                clustering_coefficient=network_metrics.get("clustering_coefficient", 0.0),
+                landmark_cases=[case.get("case_title", "") for case in network.get("landmark_cases", [])[:5]],
+                authority_ranking=authority_list,
+                legal_evolution_chains=network.get("legal_evolution_chains", []),
+                overruling_relationships=network.get("overruling_relationships", []),
+                jurisdiction_scope=network.get("jurisdiction_scope", []),
+                analysis_timestamp=datetime.fromisoformat(last_updated) if isinstance(last_updated, str) else last_updated
+            )
+        except Exception as conv_err:
+            logger.warning(f"CitationAnalysis: fallback conversion due to {conv_err}")
+            return CitationNetworkResponse(
+                network_id=network.get("network_id", str(uuid.uuid4())),
+                total_nodes=int(network.get("total_nodes", 0)),
+                total_edges=int(network.get("total_edges", 0)),
+                network_density=0.0,
+                average_path_length=0.0,
+                clustering_coefficient=0.0,
+                landmark_cases=[case.get("case_title", "") for case in network.get("landmark_cases", [])[:5]] if isinstance(network.get("landmark_cases", []), list) else [],
+                authority_ranking=[],
+                legal_evolution_chains=[],
+                overruling_relationships=[],
+                jurisdiction_scope=[],
+                analysis_timestamp=datetime.utcnow()
+            )
         
     except HTTPException:
         raise
