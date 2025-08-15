@@ -51,6 +51,8 @@ class MemoFormat(Enum):
     CREAC = "creac"
     TRADITIONAL = "traditional"
     EXECUTIVE_BRIEF = "executive_brief"
+    PROFESSIONAL = "professional"  # Add missing professional format
+    BRIEF = "brief"  # Add brief format for compatibility
 
 
 class QualityLevel(Enum):
