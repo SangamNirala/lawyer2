@@ -1085,7 +1085,7 @@ class ResearchMemoGenerator:
     async def _store_memo(self, memo: GeneratedMemo):
         """Store generated memo in database"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
             
             memo_data = asdict(memo)
