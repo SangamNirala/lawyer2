@@ -25,6 +25,7 @@ import ResizeObserverErrorBoundary from './components/ResizeObserverErrorBoundar
 import AttorneyDashboard from './components/AttorneyDashboard';
 import { AttorneySupervisionNotice, ComplianceModeIndicator, LegalDisclaimerFooter } from './components/ComplianceNotices';
 import ConsentManager from './components/ConsentManager';
+import AIAgentHub from './components/AIAgentHub';
 import { FileText, Zap, Shield, Users, CheckCircle, AlertTriangle, Download, Eye, Calendar, Sparkles, Wand2, Clock, BarChart3, MessageSquare, Scale, Mic, Search } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
