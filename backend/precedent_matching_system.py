@@ -1595,28 +1595,41 @@ class PrecedentMatchingSystem:
             if not self.gemini_api_key:
                 return f"Match based on {similarity.overall_similarity:.1%} overall similarity"
             
-            prompt = f"""
-            Explain why this legal case is a relevant precedent match:
-            
-            Query Case: {query_case.get('facts', '')[:300]}
-            Precedent Case: {candidate_case.get('title', '')} - {candidate_case.get('content', '')[:300]}
-            
-            Similarity Scores:
-            - Overall: {similarity.overall_similarity:.1%}
-            - Factual: {similarity.factual_similarity:.1%}
-            - Legal: {similarity.legal_similarity:.1%}
-            
-            Provide a concise explanation (2-3 sentences) of why this precedent is relevant.
-            """
-            
-            model = genai.GenerativeModel('gemini-1.5-pro')
-            response = await asyncio.to_thread(model.generate_content, prompt)
-            
-            return response.text.strip()[:500]  # Limit length
+            # Add timeout protection for AI analysis
+            try:
+                reasoning = await asyncio.wait_for(
+                    self._ai_generate_reasoning(query_case, candidate_case, similarity),
+                    timeout=10.0  # 10 second timeout for AI reasoning
+                )
+                return reasoning
+            except asyncio.TimeoutError:
+                logger.warning("⚠️ AI reasoning generation timeout, using fallback")
+                return f"Match based on {similarity.overall_similarity:.1%} overall similarity (AI timeout)"
             
         except Exception as e:
-            logger.error(f"❌ Error generating AI match reasoning: {e}")
-            return f"Match based on {similarity.overall_similarity:.1%} overall similarity across multiple dimensions"
+            logger.warning(f"⚠️ Error generating AI match reasoning: {e}")
+            return f"Match based on {similarity.overall_similarity:.1%} overall similarity"
+    
+    async def _ai_generate_reasoning(self, query_case: Dict, candidate_case: Dict, similarity: SimilarityScore) -> str:
+        """Helper method for AI reasoning generation"""
+        prompt = f"""
+        Explain why this legal case is a relevant precedent match:
+        
+        Query Case: {query_case.get('facts', '')[:300]}
+        Precedent Case: {candidate_case.get('title', '')} - {candidate_case.get('content', '')[:300]}
+        
+        Similarity Scores:
+        - Overall: {similarity.overall_similarity:.1%}
+        - Factual: {similarity.factual_similarity:.1%}
+        - Legal: {similarity.legal_similarity:.1%}
+        
+        Provide a concise explanation (2-3 sentences) of why this precedent is relevant.
+        """
+        
+        model = genai.GenerativeModel('gemini-1.5-pro')
+        response = await asyncio.to_thread(model.generate_content, prompt)
+        
+        return response.text.strip()[:500]  # Limit length
     
     async def _identify_distinguishing_factors(self, query_case: Dict, candidate_case: Dict) -> List[str]:
         """Identify distinguishing factors between cases"""
