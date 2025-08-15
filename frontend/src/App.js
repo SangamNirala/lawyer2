@@ -1217,6 +1217,7 @@ function App() {
               setShowPlainEnglishCreator(false);
               setShowLegalQA(false);
               setShowLitigationAnalytics(false);
+              setShowLegalResearch(false);
             }}
             className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
           >
@@ -1224,6 +1225,24 @@ function App() {
             AI Voice Agent
             <Badge variant="secondary" className="ml-2 bg-cyan-400 text-cyan-900 text-xs">
               VOICE-POWERED
+            </Badge>
+          </Button>
+          <Button
+            onClick={() => {
+              setShowLegalResearch(true);
+              setUseEnhancedWizard(false);
+              setShowAnalytics(false);
+              setShowPlainEnglishCreator(false);
+              setShowLegalQA(false);
+              setShowVoiceAgent(false);
+              setShowLitigationAnalytics(false);
+            }}
+            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <Search className="h-5 w-5 mr-2" />
+            Legal Research
+            <Badge variant="secondary" className="ml-2 bg-emerald-400 text-emerald-900 text-xs">
+              AI-POWERED
             </Badge>
           </Button>
           <Button
