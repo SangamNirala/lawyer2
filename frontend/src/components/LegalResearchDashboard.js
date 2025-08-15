@@ -207,6 +207,10 @@ const LegalResearchDashboard = ({ onBack }) => {
     setResearchQuery(e.target.value);
   }, []);
 
+  const handleClearQuery = useCallback(() => {
+    setResearchQuery('');
+  }, []);
+
   const ResearchInterface = () => (
     <Card className="w-full">
       <CardHeader>
