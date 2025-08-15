@@ -52,43 +52,6 @@ const LegalResearchDashboard = ({ onBack }) => {
     }
   };
 
-  const handleResearch = useCallback(async () => {
-    if (!researchQuery.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      const response = await axios.post(`${API}/legal-research-engine/research`, {
-        query: researchQuery,
-        research_type: 'comprehensive',
-        jurisdiction: 'US',
-        include_citations: true,
-        include_precedents: true,
-        max_results: 50
-      });
-      
-      setSearchResults(response.data);
-      setCurrentResearchId(response.data.research_id);
-      
-      // Refresh history
-      await loadResearchHistory();
-      
-      // Switch to results tab
-      setActiveTab('results');
-      
-    } catch (error) {
-      console.error('Error performing research:', error);
-      alert('Failed to perform research. Please try again.');
-    } finally {
-      setIsSearching(false);
-    }
-  }, [researchQuery]);
-
-  const handleQuickSearch = useCallback((query) => {
-    setResearchQuery(query);
-    // Use the query directly instead of relying on state
-    performResearchWithQuery(query);
-  }, []);
-
   const performResearchWithQuery = useCallback(async (query) => {
     if (!query.trim()) return;
     
@@ -123,6 +86,12 @@ const LegalResearchDashboard = ({ onBack }) => {
   const handleResearch = useCallback(async () => {
     performResearchWithQuery(researchQuery);
   }, [researchQuery, performResearchWithQuery]);
+
+  const handleQuickSearch = useCallback((query) => {
+    setResearchQuery(query);
+    // Use the query directly instead of relying on state
+    performResearchWithQuery(query);
+  }, [performResearchWithQuery]);
 
   const ResearchInterface = React.useMemo(() => (
     <Card className="w-full">
