@@ -5827,22 +5827,40 @@ async def structure_legal_arguments(request: LegalArgumentRequest):
         structurer = LegalArgumentStructurer()
         await structurer.initialize()
         
-        # Structure arguments
-        argument_result = await structurer.structure_legal_arguments(
+        # Structure arguments (structurer returns a list of items; aggregate into response)
+        argument_list = await structurer.structure_legal_arguments(
             argument_data=request.argument_data,
             argument_strength=request.argument_strength,
             include_counterarguments=request.include_counterarguments
         )
-        
+
+        # Aggregate into a single cohesive structure
+        structure = {
+            "primary": [a for a in argument_list if a.get("type") == "primary"],
+            "supporting": [a for a in argument_list if a.get("type") == "supporting"],
+            "counterarguments": [a for a in argument_list if a.get("type") == "counterargument"],
+            "mitigation": [a for a in argument_list if a.get("type") == "mitigation"],
+            "summary": next((a for a in argument_list if a.get("type") == "structure_summary"), {})
+        }
+
+        # Flatten supporting precedents from summary
+        summary = structure.get("summary", {})
+        supporting_precedents = summary.get("key_precedents", [])
+
+        # Compute simple scores if present
+        argument_strength_score = summary.get("overall_strength", 0.0)
+        persuasiveness_rating = summary.get("persuasiveness_rating", 0.0)
+        confidence_score = min(1.0, max(0.0, (argument_strength_score + persuasiveness_rating) / 2.0)) if (argument_strength_score or persuasiveness_rating) else 0.0
+
         return LegalArgumentResponse(
-            id=argument_result.get("id", str(uuid.uuid4())),
+            id=summary.get("structure_id", str(uuid.uuid4())),
             legal_question=request.argument_data.get("legal_question", ""),
-            argument_structure=argument_result.get("structure", {}),
-            supporting_precedents=argument_result.get("supporting_precedents", []),
-            counterarguments=argument_result.get("counterarguments", []),
-            argument_strength_score=argument_result.get("strength_score", 0.0),
-            persuasiveness_rating=argument_result.get("persuasiveness_rating", 0.0),
-            confidence_score=argument_result.get("confidence_score", 0.0),
+            argument_structure=structure,
+            supporting_precedents=supporting_precedents,
+            counterarguments=[a for a in structure.get("counterarguments", [])],
+            argument_strength_score=argument_strength_score,
+            persuasiveness_rating=persuasiveness_rating,
+            confidence_score=confidence_score,
             jurisdiction=request.argument_data.get("jurisdiction", "US"),
             case_type=request.argument_data.get("case_type", ""),
             created_at=datetime.utcnow()
