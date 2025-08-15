@@ -1479,7 +1479,7 @@ function App() {
           )}
           
           {/* Litigation Analytics */}
-          {showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && (
+          {showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && !showLegalResearch && (
             <LitigationAnalytics onBack={() => setShowLitigationAnalytics(false)} />
           )}
           
