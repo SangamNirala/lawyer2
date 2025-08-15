@@ -288,7 +288,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
   };
 
   const moveArgument = useCallback((dragIndex, hoverIndex) => {
-    setArguments((prevArguments) => {
+    setArgumentsList((prevArguments) => {
       const newArguments = [...prevArguments];
       const draggedArgument = newArguments[dragIndex];
       newArguments.splice(dragIndex, 1);
