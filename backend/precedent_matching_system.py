@@ -693,22 +693,37 @@ class PrecedentMatchingSystem:
                     self.case_id_mapping[len(case_ids) - 1] = case_id
             
             if case_texts and self.faiss_index:
-                # Generate enhanced embeddings
+                # Generate enhanced embeddings with timeout protection
                 logger.info("🧠 Generating enhanced semantic embeddings...")
-                embeddings = self.embeddings_model.encode(
-                    case_texts, 
-                    convert_to_numpy=True,
-                    show_progress_bar=True,
-                    batch_size=32
-                )
-                
-                # Normalize for cosine similarity
-                faiss.normalize_L2(embeddings)
-                
-                # Add to enhanced FAISS index
-                self.faiss_index.add(embeddings)
-                
-                logger.info(f"✅ Enhanced indexing completed - {len(case_texts)} cases indexed")
+                try:
+                    # Run embeddings generation in executor to avoid blocking
+                    loop = asyncio.get_event_loop()
+                    embeddings = await asyncio.wait_for(
+                        loop.run_in_executor(
+                            None,
+                            lambda: self.embeddings_model.encode(
+                                case_texts, 
+                                convert_to_numpy=True,
+                                show_progress_bar=False,  # Disable progress bar for background processing
+                                batch_size=16  # Smaller batch size for better responsiveness
+                            )
+                        ),
+                        timeout=15.0  # 15 second timeout for embeddings generation
+                    )
+                    
+                    # Normalize for cosine similarity
+                    faiss.normalize_L2(embeddings)
+                    
+                    # Add to enhanced FAISS index
+                    self.faiss_index.add(embeddings)
+                    
+                    logger.info(f"✅ Enhanced indexing completed - {len(case_texts)} cases indexed")
+                    
+                except asyncio.TimeoutError:
+                    logger.warning("⚠️ Embeddings generation timed out - using partial index")
+                except Exception as e:
+                    logger.error(f"❌ Error generating embeddings: {e}")
+                    logger.info("⚡ Continuing without enhanced embeddings")
             
         except Exception as e:
             logger.error(f"❌ Error in enhanced case processing: {e}")
