@@ -640,7 +640,7 @@ class AdvancedLegalResearchEngine:
     async def _store_research_session(self, query: ResearchQuery, result: ResearchResult):
         """Store research session in database"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
             
             session_data = {
