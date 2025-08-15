@@ -5897,19 +5897,22 @@ async def structure_legal_arguments(request: LegalArgumentRequest):
         persuasiveness_rating = summary.get("persuasiveness_rating", 0.0)
         confidence_score = min(1.0, max(0.0, (argument_strength_score + persuasiveness_rating) / 2.0)) if (argument_strength_score or persuasiveness_rating) else 0.0
 
-        return LegalArgumentResponse(
-            id=summary.get("structure_id", str(uuid.uuid4())),
-            legal_question=request.argument_data.get("legal_question", ""),
-            argument_structure=structure,
-            supporting_precedents=supporting_precedents,
-            counterarguments=[a for a in structure.get("counterarguments", [])],
-            argument_strength_score=argument_strength_score,
-            persuasiveness_rating=persuasiveness_rating,
-            confidence_score=confidence_score,
-            jurisdiction=request.argument_data.get("jurisdiction", "US"),
-            case_type=request.argument_data.get("case_type", ""),
-            created_at=datetime.utcnow()
-        )
+        # Serialize enum values for proper API response
+        response_data = {
+            "id": summary.get("structure_id", str(uuid.uuid4())),
+            "legal_question": request.argument_data.get("legal_question", ""),
+            "argument_structure": serialize_enums_for_mongodb(structure),
+            "supporting_precedents": serialize_enums_for_mongodb(supporting_precedents),
+            "counterarguments": serialize_enums_for_mongodb([a for a in structure.get("counterarguments", [])]),
+            "argument_strength_score": argument_strength_score,
+            "persuasiveness_rating": persuasiveness_rating,
+            "confidence_score": confidence_score,
+            "jurisdiction": request.argument_data.get("jurisdiction", "US"),
+            "case_type": request.argument_data.get("case_type", ""),
+            "created_at": datetime.utcnow()
+        }
+        
+        return LegalArgumentResponse(**response_data)
         
     except HTTPException:
         raise
