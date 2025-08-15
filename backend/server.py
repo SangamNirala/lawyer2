@@ -5305,7 +5305,12 @@ async def search_legal_cases(request: LegalCaseSearchRequest):
         
         # Store search result in database
         result_dict = result.dict()
-        await db.legal_research_results.insert_one(result_dict)
+        result_dict["_id"] = result_dict.get("id", str(uuid.uuid4()))
+        await db.legal_research_results.replace_one(
+            {"_id": result_dict["_id"]},
+            result_dict,
+            upsert=True
+        )
         
         return result
         
