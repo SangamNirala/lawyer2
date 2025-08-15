@@ -88,7 +88,7 @@ const LegalResearchDashboard = ({ onBack }) => {
     handleResearch();
   };
 
-  const ResearchInterface = () => (
+  const ResearchInterface = React.useMemo(() => (
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
