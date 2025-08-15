@@ -94,6 +94,10 @@ const LegalResearchDashboard = ({ onBack }) => {
     performResearchWithQuery(query);
   }, [performResearchWithQuery]);
 
+  const handleTextareaChange = useCallback((e) => {
+    setResearchQuery(e.target.value);
+  }, []);
+
   const ResearchInterface = () => (
     <Card className="w-full">
       <CardHeader>
