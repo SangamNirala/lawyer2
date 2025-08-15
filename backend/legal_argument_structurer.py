@@ -1200,6 +1200,89 @@ class LegalArgumentStructurer:
             
         except Exception as e:
             logger.error(f"❌ Error updating performance metrics: {e}")
+
+    async def create_basic_structure(self, argument_data: Dict[str, Any]):
+        """Create basic argument structure as fallback when full processing times out"""
+        try:
+            logger.info("🔧 Creating basic argument structure...")
+            
+            structure_id = str(uuid.uuid4())
+            legal_question = argument_data.get("legal_question", "Legal question to be analyzed")
+            position = argument_data.get("position", "legal position")
+            
+            # Create basic argument list structure
+            basic_arguments = [
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "primary",
+                    "content": f"Primary argument supporting the position that {position}",
+                    "strength_score": 0.6,
+                    "confidence": 0.5,
+                    "precedent_support": [],
+                    "legal_principles": ["Basic legal principle applicable to the case"]
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "supporting", 
+                    "content": f"Supporting argument for {legal_question}",
+                    "strength_score": 0.5,
+                    "confidence": 0.4,
+                    "precedent_support": [],
+                    "legal_principles": []
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "counterargument",
+                    "content": "Potential opposing argument to be addressed",
+                    "strength_score": 0.4,
+                    "confidence": 0.4,
+                    "response": "Basic response to counterargument",
+                    "mitigation_strategies": ["Address opposing concerns directly"]
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "mitigation",
+                    "content": "Mitigation strategy for potential weaknesses",
+                    "strength_score": 0.5,
+                    "confidence": 0.4
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "structure_summary",
+                    "structure_id": structure_id,
+                    "key_precedents": [],
+                    "argument_count": 4,
+                    "overall_strength": 0.5,
+                    "confidence_score": 0.4,
+                    "generation_method": "fallback_basic"
+                }
+            ]
+            
+            logger.info("✅ Basic argument structure created successfully")
+            return basic_arguments
+            
+        except Exception as e:
+            logger.error(f"❌ Error creating basic argument structure: {e}")
+            # Return minimal structure even on error
+            return [
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "primary",
+                    "content": "Basic argument generation failed",
+                    "strength_score": 0.2,
+                    "confidence": 0.1
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "type": "structure_summary",
+                    "structure_id": str(uuid.uuid4()),
+                    "key_precedents": [],
+                    "argument_count": 1,
+                    "overall_strength": 0.2,
+                    "confidence_score": 0.1,
+                    "generation_method": "error_fallback"
+                }
+            ]
     
     async def get_system_stats(self) -> Dict[str, Any]:
         """Get comprehensive system statistics"""
