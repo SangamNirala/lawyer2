@@ -359,7 +359,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
     const exportData = {
       title: argumentTitle || `Argument Structure - ${new Date().toLocaleDateString()}`,
       created_at: new Date().toISOString(),
-      arguments: arguments,
+      arguments: argumentsList,
       analysis: argumentAnalysis
     };
 
