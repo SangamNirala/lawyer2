@@ -1278,68 +1278,6 @@ async def get_memo_generator() -> ResearchMemoGenerator:
     
     return _memo_generator
 
-    async def generate_basic_memo(self, memo_data: Dict[str, Any], memo_type: str = "brief"):
-        """Generate a basic memo as fallback when full generation times out"""
-        try:
-            logger.info("🔧 Generating basic fallback memo...")
-            
-            memo_id = str(uuid.uuid4())
-            timestamp = datetime.utcnow()
-            
-            # Create basic memo structure
-            basic_memo = {
-                "memo_id": memo_id,
-                "title": f"Legal Memo: {memo_data.get('topic', 'Legal Research')}",
-                "executive_summary": f"This is a basic memo regarding {memo_data.get('topic', 'legal research')} in {memo_data.get('jurisdiction', 'applicable jurisdiction')}.",
-                "memo_sections": [
-                    {
-                        "title": "Issue",
-                        "content": f"Legal issues related to: {', '.join(memo_data.get('legal_issues', ['general legal matter']))}"
-                    },
-                    {
-                        "title": "Brief Analysis", 
-                        "content": f"Basic analysis of {memo_data.get('topic', 'the matter')} based on provided facts: {memo_data.get('client_facts', 'Client situation requires legal analysis.')}"
-                    },
-                    {
-                        "title": "Conclusion",
-                        "content": "Further detailed research recommended for comprehensive analysis."
-                    }
-                ],
-                "conclusion": "This basic memo provides initial analysis. Full research memo generation timed out.",
-                "quality_metrics": {
-                    "completeness_score": 0.4,
-                    "accuracy_score": 0.5,
-                    "confidence_rating": 0.3,
-                    "citation_count": 0,
-                    "analysis_depth": "basic"
-                },
-                "metadata": {
-                    "word_count": 150,
-                    "estimated_reading_time": "1 minute",
-                    "memo_type": memo_type,
-                    "format_style": "basic",
-                    "jurisdiction": memo_data.get('jurisdiction', 'US'),
-                    "generated_at": timestamp,
-                    "generation_method": "fallback_basic"
-                }
-            }
-            
-            logger.info("✅ Basic memo generated successfully")
-            return basic_memo
-            
-        except Exception as e:
-            logger.error(f"❌ Error generating basic memo: {e}")
-            # Return minimal memo even on error
-            return {
-                "memo_id": str(uuid.uuid4()),
-                "title": "Basic Legal Memo",
-                "executive_summary": "Basic memo generation failed",
-                "memo_sections": [],
-                "conclusion": "Error occurred during memo generation",
-                "quality_metrics": {"confidence_rating": 0.1},
-                "metadata": {"generation_method": "error_fallback"}
-            }
-
 
 if __name__ == "__main__":
     # Test the research memo generator
