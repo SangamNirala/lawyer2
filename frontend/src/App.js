@@ -1317,6 +1317,26 @@ function App() {
               COMPLIANCE
             </Badge>
           </Button>
+          <Button
+            onClick={() => {
+              setShowAIAgentHub(true);
+              setUseEnhancedWizard(false);
+              setShowPlainEnglishCreator(false);
+              setShowLegalQA(false);
+              setShowVoiceAgent(false);
+              setShowAnalytics(false);
+              setShowLitigationAnalytics(false);
+              setShowLegalResearch(false);
+              setShowAttorneyDashboard(false);
+            }}
+            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <Bot className="h-5 w-5 mr-2" />
+            AI Agent Hub
+            <Badge variant="secondary" className="ml-2 bg-teal-400 text-teal-900 text-xs">
+              PHASE 1.3
+            </Badge>
+          </Button>
         </div>
         
         <div className="flex flex-wrap justify-center gap-4 text-sm">
