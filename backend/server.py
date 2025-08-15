@@ -63,6 +63,22 @@ def convert_objectid_to_str(doc):
         return [convert_objectid_to_str(item) if isinstance(item, dict) else item for item in doc]
     return doc
 
+def serialize_enums_for_mongodb(obj):
+    """Recursively convert enum objects to strings for MongoDB serialization"""
+    if isinstance(obj, dict):
+        return {key: serialize_enums_for_mongodb(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [serialize_enums_for_mongodb(item) for item in obj]
+    elif isinstance(obj, Enum):
+        return obj.value
+    elif hasattr(obj, '__dict__'):
+        try:
+            return serialize_enums_for_mongodb(asdict(obj))
+        except Exception:
+            return obj.__dict__
+    else:
+        return obj
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
