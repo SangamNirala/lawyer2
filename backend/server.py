@@ -5479,12 +5479,25 @@ async def coordinate_legal_research(request: ResearchQueryRequest):
         # Create research query from request
         from advanced_legal_research_engine import ResearchQuery, ResearchType, ResearchPriority
         
+        # Validate and convert enums with fallbacks
+        try:
+            research_type = ResearchType(request.research_type)
+        except ValueError:
+            logger.warning(f"Invalid research_type '{request.research_type}', using 'comprehensive'")
+            research_type = ResearchType.COMPREHENSIVE
+            
+        try:
+            priority = ResearchPriority(request.priority)
+        except ValueError:
+            logger.warning(f"Invalid priority '{request.priority}', using 'medium'")
+            priority = ResearchPriority.MEDIUM
+        
         research_query = ResearchQuery(
             query_text=request.query_text,
-            research_type=ResearchType(request.research_type),
+            research_type=research_type,
             jurisdiction=request.jurisdiction,
             legal_domain=request.legal_domain,
-            priority=ResearchPriority(request.priority),
+            priority=priority,
             court_level=request.court_level,
             date_range=request.date_range,
             case_type=request.case_type,
