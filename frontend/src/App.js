@@ -1465,7 +1465,7 @@ function App() {
           )}
           
           {/* Plain English Creator */}
-          {showPlainEnglishCreator && !showAnalytics && !useEnhancedWizard && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && (
+          {showPlainEnglishCreator && !showAnalytics && !useEnhancedWizard && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
             <PlainEnglishContractCreator
               contractTypes={contractTypes}
               jurisdictions={jurisdictions}
