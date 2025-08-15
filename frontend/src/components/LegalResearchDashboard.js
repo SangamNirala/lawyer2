@@ -52,7 +52,7 @@ const LegalResearchDashboard = ({ onBack }) => {
     }
   };
 
-  const handleResearch = async () => {
+  const handleResearch = useCallback(async () => {
     if (!researchQuery.trim()) return;
     
     setIsSearching(true);
@@ -81,12 +81,12 @@ const LegalResearchDashboard = ({ onBack }) => {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [researchQuery]);
 
-  const handleQuickSearch = (query) => {
+  const handleQuickSearch = useCallback((query) => {
     setResearchQuery(query);
     handleResearch();
-  };
+  }, [handleResearch]);
 
   const ResearchInterface = React.useMemo(() => (
     <Card className="w-full">
