@@ -277,10 +277,10 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
   };
 
   const updateArgument = (index, updatedArgument) => {
-    const updatedArguments = arguments.map((arg, idx) => 
+    const updatedArguments = argumentsList.map((arg, idx) => 
       idx === index ? updatedArgument : arg
     );
-    setArguments(updatedArguments);
+    setArgumentsList(updatedArguments);
   };
 
   const deleteArgument = (index) => {
