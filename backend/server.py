@@ -5968,7 +5968,8 @@ async def multi_jurisdiction_search(request: MultiJurisdictionRequest):
             comparison_analysis = {}
             jurisdiction_recommendations = []
 
-        return {
+        # Serialize response to handle any enum values in results
+        response_data = {
             "query": request.query,
             "jurisdictions_searched": request.jurisdictions,
             "results": results if isinstance(results, list) else results.get("results", []),
@@ -5977,6 +5978,8 @@ async def multi_jurisdiction_search(request: MultiJurisdictionRequest):
             "total_results": total_results,
             "search_timestamp": datetime.utcnow()
         }
+        
+        return serialize_enums_for_mongodb(response_data)
         
     except HTTPException:
         raise
