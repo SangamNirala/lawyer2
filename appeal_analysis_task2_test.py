@@ -32,7 +32,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://testing-fixes.preview.emergentagent.com/api"
+BACKEND_URL = "https://verdict-analytics.preview.emergentagent.com/api"
 
 def test_appeal_analysis_evidence_complexity_correlation():
     """Test Appeal Analysis Task 2 - Evidence/Complexity Correlation Fix"""

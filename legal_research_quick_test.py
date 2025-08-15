@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://testing-fixes.preview.emergentagent.com/api"
+BACKEND_URL = "https://verdict-analytics.preview.emergentagent.com/api"
 
 def test_endpoint(endpoint_path, method="GET", data=None, timeout=10):
     """Test a single endpoint with timeout"""
