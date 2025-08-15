@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Tuple
 
 # Use production URL from frontend .env
-BASE_URL = "https://5668a51a-d0f3-41cc-8324-5dbfeb541569.preview.emergentagent.com"
+BASE_URL = "https://lawtech-testing.preview.emergentagent.com"
 
 class LegalResearchEngineTest:
     def __init__(self):

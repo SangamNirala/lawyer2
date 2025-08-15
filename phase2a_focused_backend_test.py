@@ -14,7 +14,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://lawcite-network.preview.emergentagent.com/api"
+BACKEND_URL = "https://lawtech-testing.preview.emergentagent.com/api"
 
 def test_legal_qa_is_voice_session_validation():
     """Test POST /api/legal-qa/ask for is_voice_session Pydantic boolean validation"""

@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://lawcite-network.preview.emergentagent.com/api"
+BACKEND_URL = "https://lawtech-testing.preview.emergentagent.com/api"
 
 def test_litigation_strategy_transparent_calculations():
     """Test litigation strategy endpoint with transparent calculations and bounds checking"""
