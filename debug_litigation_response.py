@@ -10,7 +10,7 @@ import aiohttp
 import json
 import os
 
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://endpoint-repair-1.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://legal-timeout-fix.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 async def debug_response_structure():

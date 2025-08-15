@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 
 def test_progress_issue():
-    base_url = "https://endpoint-repair-1.preview.emergentagent.com"
+    base_url = "https://legal-timeout-fix.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🔍 QUICK PROGRESS PERCENTAGE TEST")
