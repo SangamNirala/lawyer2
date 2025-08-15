@@ -5893,13 +5893,27 @@ async def multi_jurisdiction_search(request: MultiJurisdictionRequest):
             comparison_mode=request.comparison_mode
         )
         
+        # Normalize results (searcher returns a list of results with optional per-item comparison_data)
+        if isinstance(results, list):
+            total_results = len(results)
+            comparison_analysis = {}
+            jurisdiction_recommendations = []
+        elif isinstance(results, dict):
+            total_results = len(results.get("results", []))
+            comparison_analysis = results.get("comparison", {})
+            jurisdiction_recommendations = results.get("recommendations", [])
+        else:
+            total_results = 0
+            comparison_analysis = {}
+            jurisdiction_recommendations = []
+
         return {
             "query": request.query,
             "jurisdictions_searched": request.jurisdictions,
-            "results": results,
-            "comparison_analysis": results.get("comparison", {}),
-            "jurisdiction_recommendations": results.get("recommendations", []),
-            "total_results": len(results.get("results", [])),
+            "results": results if isinstance(results, list) else results.get("results", []),
+            "comparison_analysis": comparison_analysis,
+            "jurisdiction_recommendations": jurisdiction_recommendations,
+            "total_results": total_results,
             "search_timestamp": datetime.utcnow()
         }
         
