@@ -42,3 +42,76 @@ Max Results: 15
 Min Similarity: 0.6
 
 Request URL: https://legal-timeout-fix.preview.emergentagent.com/api/legal-research-engine/precedent-search
+❌ Exception occurred: HTTPSConnectionPool(host='legal-timeout-fix.preview.emergentagent.com', port=443): Read timed out. (read timeout=90)
+--------------------------------------------------
+
+📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊 TEST 4 📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊
+📊 TESTING CITATION ANALYSIS ENDPOINT
+======================================================================
+
+📋 Test Case: Citation Network Analysis
+Cases to analyze: 2
+Analysis depth: 2
+Jurisdiction filter: US
+  Case 1: Smith v. Jones Commercial Contract Dispute
+  Case 2: ABC Corp v. XYZ Ltd Force Majeure Case
+
+Request URL: https://legal-timeout-fix.preview.emergentagent.com/api/legal-research-engine/citation-analysis
+Status Code: 502
+❌ Request failed with status 502
+--------------------------------------------------
+
+📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚 TEST 5 📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚
+📚 TESTING RESEARCH QUERIES ENDPOINT
+======================================================================
+Request URL: https://legal-timeout-fix.preview.emergentagent.com/api/legal-research-engine/research-queries
+Status Code: 502
+❌ Request failed with status 502
+--------------------------------------------------
+
+📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝 TEST 6 📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝
+📝 TESTING RESEARCH MEMOS ENDPOINT
+======================================================================
+Request URL: https://legal-timeout-fix.preview.emergentagent.com/api/legal-research-engine/research-memos
+Status Code: 502
+❌ Request failed with status 502
+--------------------------------------------------
+
+================================================================================
+🎯 ADVANCED LEGAL RESEARCH ENGINE TEST RESULTS SUMMARY
+================================================================================
+📊 Total Tests: 6
+✅ Passed: 0
+❌ Failed: 6
+📈 Success Rate: 0.0%
+
+📋 Test Suite Breakdown:
+  System Health Check: 0/1 passed
+  Main Research Endpoint: 0/1 passed
+  Precedent Search: 0/1 passed
+  Citation Analysis: 0/1 passed
+  Research Queries: 0/1 passed
+  Research Memos: 0/1 passed
+
+🕒 Test Completion Time: 2025-08-15 08:46:43
+
+🔍 MEMOFORMAT FIX ASSESSMENT:
+❌ MEMOFORMAT FIX NEEDS ATTENTION: Main endpoint has issues
+🚨 MemoFormat validation errors may still be present
+
+🏗️ PHASE 1A IMPLEMENTATION ASSESSMENT:
+❌ PHASE 1A NEEDS WORK: Several core modules have issues
+🚨 Multiple endpoints require attention
+
+🎯 EXPECTED BEHAVIOR VERIFICATION:
+✅ No MemoFormat validation errors with 'traditional' format
+✅ Main research endpoint returns comprehensive results
+✅ All 7 core modules loaded and operational
+✅ Database collections properly utilized
+✅ AI integration (Gemini/Groq) working correctly
+✅ All 6 endpoints return proper responses
+✅ Precedent matching and citation analysis functional
+
+📊 MEMOFORMAT FIX STATUS: NEEDS_ATTENTION
+📊 PHASE 1A STATUS: NEEDS_WORK
+================================================================================

@@ -37,6 +37,17 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from dataclasses import asdict
 from enum import Enum
 
+
+# Async timeout helper
+async def run_with_timeout(coro, seconds: float):
+    try:
+        return True, await asyncio.wait_for(coro, timeout=seconds)
+    except asyncio.TimeoutError:
+        return False, "timeout"
+    except Exception as e:
+        return False, f"error: {e}"
+
+
 # Helper function to handle MongoDB ObjectId serialization
 def convert_objectid_to_str(doc):
     """Convert MongoDB ObjectId to string for JSON serialization"""
