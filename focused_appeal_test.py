@@ -13,7 +13,7 @@ import requests
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://legal-timeout-fix.preview.emergentagent.com/api"
+BACKEND_URL = "https://api-performance.preview.emergentagent.com/api"
 
 def test_cost_estimation_fix():
     """Test TASK 3: Cost estimation fixes"""

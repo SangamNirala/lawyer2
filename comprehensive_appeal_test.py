@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 # Backend URL
-API_BASE_URL = "https://legal-timeout-fix.preview.emergentagent.com/api"
+API_BASE_URL = "https://api-performance.preview.emergentagent.com/api"
 
 def test_scenario(name, test_data, expected_behavior=""):
     """Test a specific scenario"""

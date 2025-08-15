@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://legal-timeout-fix.preview.emergentagent.com/api"
+BACKEND_URL = "https://api-performance.preview.emergentagent.com/api"
 
 class Phase2ALegalResearchTester:
     def __init__(self):

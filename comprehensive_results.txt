@@ -1,6 +1,6 @@
 🎯 LEGAL RESEARCH ENGINE COMPREHENSIVE TESTING - POST-FIX VERIFICATION
 ================================================================================
-Backend URL: https://legal-timeout-fix.preview.emergentagent.com/api
+Backend URL: https://api-performance.preview.emergentagent.com/api
 Test Start Time: 2025-08-15T08:44:46.661626
 Testing all 8 Legal Research Engine endpoints after comprehensive fixes:
 1. GET /api/legal-research-engine/stats
