@@ -551,7 +551,7 @@ class AdvancedLegalResearchEngine:
                 }
             
             # Check database for completed research
-            if self.db:
+            if self.db is not None:
                 stored_result = await self.db.research_sessions.find_one({"research_id": research_id})
                 if stored_result:
                     return {
