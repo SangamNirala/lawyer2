@@ -6156,9 +6156,28 @@ async def get_research_engine_stats():
 
 @api_router.get("/legal-research-engine/research-queries")
 async def get_research_queries(limit: int = 50, skip: int = 0):
-    """Get recent legal research queries"""
+    """Get recent legal research queries with optimized timeout"""
     try:
-        queries = await db.legal_research_queries.find().sort("created_at", -1).skip(skip).limit(limit).to_list(length=limit)
+        # Limit the query scope and add timeout
+        effective_limit = min(limit, 20)  # Limit to 20 for performance
+        
+        queries_task = db.legal_research_queries.find().sort("created_at", -1).skip(skip).limit(effective_limit).to_list(length=effective_limit)
+        count_task = db.legal_research_queries.count_documents({})
+        
+        try:
+            queries, total = await asyncio.wait_for(
+                asyncio.gather(queries_task, count_task), 
+                timeout=3.0
+            )
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Research queries timeout, returning partial results")
+            return {
+                "queries": [],
+                "count": 0,
+                "total": 0,
+                "status": "timeout",
+                "message": "Query timeout - database may be busy"
+            }
         
         # Convert ObjectId to string for JSON serialization
         queries = [convert_objectid_to_str(q) for q in queries]
@@ -6166,7 +6185,7 @@ async def get_research_queries(limit: int = 50, skip: int = 0):
         return {
             "queries": queries,
             "count": len(queries),
-            "total": await db.legal_research_queries.count_documents({})
+            "total": total
         }
         
     except Exception as e:
@@ -6175,9 +6194,28 @@ async def get_research_queries(limit: int = 50, skip: int = 0):
 
 @api_router.get("/legal-research-engine/research-memos")
 async def get_research_memos(limit: int = 50, skip: int = 0):
-    """Get recent research memos"""
+    """Get recent research memos with optimized timeout"""
     try:
-        memos = await db.research_memos.find().sort("created_at", -1).skip(skip).limit(limit).to_list(length=limit)
+        # Limit the query scope and add timeout
+        effective_limit = min(limit, 20)  # Limit to 20 for performance
+        
+        memos_task = db.research_memos.find().sort("created_at", -1).skip(skip).limit(effective_limit).to_list(length=effective_limit)
+        count_task = db.research_memos.count_documents({})
+        
+        try:
+            memos, total = await asyncio.wait_for(
+                asyncio.gather(memos_task, count_task),
+                timeout=3.0
+            )
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Research memos timeout, returning partial results")
+            return {
+                "memos": [],
+                "count": 0,
+                "total": 0,
+                "status": "timeout",
+                "message": "Query timeout - database may be busy"
+            }
         
         # Convert ObjectId to string for JSON serialization
         memos = [convert_objectid_to_str(m) for m in memos]
@@ -6185,7 +6223,7 @@ async def get_research_memos(limit: int = 50, skip: int = 0):
         return {
             "memos": memos,
             "count": len(memos),
-            "total": await db.research_memos.count_documents({})
+            "total": total
         }
         
     except Exception as e:
