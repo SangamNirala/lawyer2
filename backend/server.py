@@ -5785,18 +5785,23 @@ async def generate_research_memo(request: MemoGenerationRequest):
         generator = ResearchMemoGenerator()
         await generator.initialize()
         
-        # Generate memo
-        ok, info = await run_with_timeout(generator.generate_research_memo(
-            memo_data=request.memo_data,
-            memo_type=request.memo_type,
-            format_style=request.format_style
-        ), 30.0)
-        
-        if not ok:
-            logger.error(f"❌ Research memo generation failed: {info}")
-            raise HTTPException(status_code=500, detail=f"Memo generation failed: {info}")
-        
-        memo_result = info
+        # Generate memo with optimized timeout handling
+        try:
+            memo_result = await asyncio.wait_for(
+                generator.generate_research_memo(
+                    memo_data=request.memo_data,
+                    memo_type=request.memo_type,
+                    format_style=request.format_style
+                ), timeout=12.0
+            )
+            logger.info(f"✅ Memo generated successfully")
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Memo generation timed out, creating basic memo")
+            # Generate basic memo as fallback
+            memo_result = await generator.generate_basic_memo(
+                memo_data=request.memo_data,
+                memo_type=request.memo_type
+            )
         
         # Extract content from memo result structure 
         # The memo generator returns a nested structure, we need to flatten it for the API response
