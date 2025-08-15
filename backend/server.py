@@ -6042,7 +6042,10 @@ async def assess_research_quality(request: QualityAssessmentRequest):
                 "assessment_timestamp": datetime.utcnow()
             }
         
-        return QualityAssessmentResponse(**assessment)
+        # Serialize the assessment result to handle enum values properly
+        serialized_assessment = serialize_enums_for_mongodb(assessment)
+        
+        return QualityAssessmentResponse(**serialized_assessment)
         
     except HTTPException:
         raise
