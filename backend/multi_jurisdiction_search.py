@@ -634,7 +634,7 @@ class MultiJurisdictionSearch:
                                   search_results: List[JurisdictionalSearchResult]):
         """Store search session in database"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
             
             session_data = {
