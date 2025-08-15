@@ -1509,7 +1509,7 @@ function App() {
           )}
           
           {/* Litigation Analytics */}
-          {showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && !showLegalResearch && (
+          {showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && !showLegalResearch && !showAIAgentHub && (
             <LitigationAnalytics onBack={() => setShowLitigationAnalytics(false)} />
           )}
           
