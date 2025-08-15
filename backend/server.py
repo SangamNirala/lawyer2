@@ -5839,7 +5839,9 @@ async def generate_research_memo(request: MemoGenerationRequest):
             "created_at": datetime.utcnow()
         }
         
-        await db.research_memos.insert_one(memo_doc)
+        # Serialize memo_doc to handle enum values before MongoDB insertion
+        memo_doc_serialized = serialize_enums_for_mongodb(memo_doc)
+        await db.research_memos.insert_one(memo_doc_serialized)
         
         return ResearchMemoResponse(**memo_doc)
         
