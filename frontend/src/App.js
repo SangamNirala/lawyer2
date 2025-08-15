@@ -319,6 +319,7 @@ function App() {
   const [showVoiceAgent, setShowVoiceAgent] = useState(false);
   const [showLitigationAnalytics, setShowLitigationAnalytics] = useState(false);
   const [showLegalResearch, setShowLegalResearch] = useState(false);
+  const [showAIAgentHub, setShowAIAgentHub] = useState(false);
   
   // Compliance System State
   const [showAttorneyDashboard, setShowAttorneyDashboard] = useState(false);
