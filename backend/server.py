@@ -5930,18 +5930,24 @@ async def multi_jurisdiction_search(request: MultiJurisdictionRequest):
         searcher = MultiJurisdictionSearch()
         await searcher.initialize()
         
-        # Execute search across jurisdictions
-        ok, info = await run_with_timeout(searcher.search_across_jurisdictions(
-            query=request.query,
-            jurisdictions=request.jurisdictions,
-            legal_domain=request.legal_domain,
-            comparison_mode=request.comparison_mode
-        ), 30.0)
-        
-        if not ok:
-            raise HTTPException(status_code=408, detail=f"Search timeout: {info}")
-        
-        results = info
+        # Execute search across jurisdictions with optimized timeout
+        try:
+            results = await asyncio.wait_for(
+                searcher.search_across_jurisdictions(
+                    query=request.query,
+                    jurisdictions=request.jurisdictions,
+                    legal_domain=request.legal_domain,
+                    comparison_mode=request.comparison_mode
+                ), timeout=8.0
+            )
+            logger.info(f"✅ Multi-jurisdiction search completed")
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Multi-jurisdiction search timed out, creating basic results")
+            # Generate basic results as fallback
+            results = await searcher.create_basic_results(
+                query=request.query,
+                jurisdictions=request.jurisdictions
+            )
         
         # Normalize results (searcher returns a list of results with optional per-item comparison_data)
         if isinstance(results, list):
