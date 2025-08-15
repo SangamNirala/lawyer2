@@ -1501,7 +1501,7 @@ function App() {
           )}
           
           {/* Legal Question Answering */}
-          {showLegalQA && !showLitigationAnalytics && (
+          {showLegalQA && !showLitigationAnalytics && !showLegalResearch && (
             <LegalQuestionAnswering />
           )}
           
