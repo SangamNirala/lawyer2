@@ -259,7 +259,7 @@ class CitationNetworkAnalyzer:
     async def _load_existing_networks(self):
         """Load existing citation networks and authority data"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
                 
             logger.info("📚 Loading existing citation networks...")
