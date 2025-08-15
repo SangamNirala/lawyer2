@@ -5326,7 +5326,12 @@ async def analyze_precedents(request: PrecedentAnalysisRequest):
         
         # Store precedent analysis in database
         result_dict = result.dict()
-        await db.precedent_analyses.insert_one(result_dict)
+        result_dict["_id"] = result_dict.get("id", str(uuid.uuid4()))
+        await db.precedent_analyses.replace_one(
+            {"_id": result_dict["_id"]},
+            result_dict,
+            upsert=True
+        )
         
         return result
         
