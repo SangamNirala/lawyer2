@@ -663,7 +663,7 @@ class PrecedentMatchingSystem:
     async def _load_database_cases(self):
         """Load additional cases from MongoDB database"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
                 
             logger.info("💾 Loading additional cases from database...")
