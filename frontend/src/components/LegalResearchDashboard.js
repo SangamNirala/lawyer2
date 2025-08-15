@@ -137,7 +137,6 @@ const LegalResearchDashboard = ({ onBack }) => {
   const [researchHistory, setResearchHistory] = useState([]);
   const [currentResearchId, setCurrentResearchId] = useState(null);
   const [dashboardStats, setDashboardStats] = useState(null);
-  const textareaRef = useRef(null);
 
   useEffect(() => {
     loadDashboardStats();
