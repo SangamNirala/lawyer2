@@ -310,6 +310,114 @@ class AdvancedLegalResearchEngine:
             result.processing_time = time.time() - start_time
             raise
     
+    async def coordinate_research_optimized(self, query: ResearchQuery, timeout: float = 12.0) -> ResearchResult:
+        """
+        Optimized research coordination with shorter timeouts and parallel processing.
+        Designed to complete within 12 seconds with fallback mechanisms.
+        """
+        start_time = time.time()
+        result = ResearchResult(query_id=query.id, research_type=query.research_type)
+        
+        try:
+            logger.info(f"🚀 Starting optimized research for query: {query.id}")
+            result.status = ResearchStatus.PROCESSING
+            
+            # Quick cache check with timeout
+            try:
+                cached_result = await asyncio.wait_for(self._check_cache(query), timeout=1.0)
+                if cached_result and query.cache_results:
+                    logger.info(f"📋 Returning cached result for query: {query.id}")
+                    cached_result.status = ResearchStatus.CACHED
+                    return cached_result
+            except asyncio.TimeoutError:
+                logger.info("Cache check timed out, proceeding with fresh research")
+            
+            # Prioritize essential research components with time limits
+            essential_tasks = []
+            
+            # Quick precedent search (4 seconds max)
+            if query.research_type in [ResearchType.PRECEDENT_SEARCH, ResearchType.COMPREHENSIVE]:
+                essential_tasks.append(
+                    asyncio.wait_for(self._execute_precedent_research_fast(query, result), timeout=4.0)
+                )
+            
+            # Basic citation analysis (3 seconds max) 
+            if query.research_type in [ResearchType.CITATION_ANALYSIS, ResearchType.COMPREHENSIVE]:
+                essential_tasks.append(
+                    asyncio.wait_for(self._execute_citation_analysis_fast(query, result), timeout=3.0)
+                )
+            
+            # Execute essential tasks in parallel
+            if essential_tasks:
+                try:
+                    await asyncio.wait_for(
+                        asyncio.gather(*essential_tasks, return_exceptions=True), 
+                        timeout=8.0
+                    )
+                except asyncio.TimeoutError:
+                    logger.warning("Some essential tasks timed out, proceeding with partial results")
+            
+            # Quick quality assessment (2 seconds max)
+            try:
+                await asyncio.wait_for(self._execute_quality_assessment_fast(query, result), timeout=2.0)
+            except asyncio.TimeoutError:
+                logger.warning("Quality assessment timed out")
+            
+            # Finalize results quickly
+            await self._finalize_research_results_fast(query, result)
+            
+            result.status = ResearchStatus.COMPLETED
+            result.processing_time = time.time() - start_time
+            
+            logger.info(f"✅ Optimized research completed in {result.processing_time:.2f}s")
+            return result
+            
+        except Exception as e:
+            logger.error(f"❌ Error in optimized research coordination: {e}")
+            result.status = ResearchStatus.ERROR
+            result.processing_time = time.time() - start_time
+            raise
+
+    async def coordinate_research_basic(self, query: ResearchQuery, timeout: float = 8.0) -> ResearchResult:
+        """
+        Basic research coordination with minimal operations as fallback.
+        Designed to complete within 8 seconds with basic functionality.
+        """
+        start_time = time.time()
+        result = ResearchResult(query_id=query.id, research_type=query.research_type)
+        
+        try:
+            logger.info(f"🔧 Starting basic fallback research for query: {query.id}")
+            result.status = ResearchStatus.PROCESSING
+            
+            # Simple precedent search only (5 seconds max)
+            try:
+                await asyncio.wait_for(self._execute_basic_research(query, result), timeout=5.0)
+            except asyncio.TimeoutError:
+                logger.warning("Basic research timed out, returning minimal results")
+            
+            # Simple quality scoring (1 second max)
+            try:
+                await asyncio.wait_for(self._set_basic_quality_score(result), timeout=1.0)
+            except asyncio.TimeoutError:
+                result.confidence_score = 0.5  # Default score
+            
+            result.status = ResearchStatus.COMPLETED
+            result.processing_time = time.time() - start_time
+            
+            logger.info(f"✅ Basic research completed in {result.processing_time:.2f}s")
+            return result
+            
+        except Exception as e:
+            logger.error(f"❌ Error in basic research coordination: {e}")
+            result.status = ResearchStatus.ERROR
+            result.processing_time = time.time() - start_time
+            # Return partial result even on error
+            result.confidence_score = 0.3
+            result.sources_count = 0
+            return result
+    
+    
     def _determine_research_components(self, query: ResearchQuery) -> List[str]:
         """Determine which research components are needed based on query type"""
         components = []
