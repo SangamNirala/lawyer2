@@ -6056,8 +6056,7 @@ async def get_research_memos(limit: int = 50, skip: int = 0):
         memos = await db.research_memos.find().sort("created_at", -1).skip(skip).limit(limit).to_list(length=limit)
         
         # Convert ObjectId to string for JSON serialization
-        for memo in memos:
-            memo = convert_objectid_to_str(memo)
+        memos = [convert_objectid_to_str(m) for m in memos]
         
         return {
             "memos": memos,
