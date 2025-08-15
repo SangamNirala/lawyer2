@@ -344,7 +344,7 @@ const ArgumentBuilder = ({ researchData, precedents = [] }) => {
     try {
       const response = await axios.post(`${API}/legal-research-engine/save-argument-structure`, {
         title: argumentTitle || `Argument Structure - ${new Date().toLocaleDateString()}`,
-        arguments: arguments,
+        arguments: argumentsList,
         analysis: argumentAnalysis
       });
 
