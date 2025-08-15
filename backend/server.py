@@ -71,11 +71,22 @@ def serialize_enums_for_mongodb(obj):
         return [serialize_enums_for_mongodb(item) for item in obj]
     elif isinstance(obj, Enum):
         return obj.value
+    elif hasattr(obj, '__dataclass_fields__'):
+        # Handle dataclass objects by converting to dict first
+        try:
+            return serialize_enums_for_mongodb(asdict(obj))
+        except Exception:
+            # Fallback to manual conversion if asdict fails
+            result = {}
+            for field_name in obj.__dataclass_fields__:
+                field_value = getattr(obj, field_name)
+                result[field_name] = serialize_enums_for_mongodb(field_value)
+            return result
     elif hasattr(obj, '__dict__'):
         try:
             return serialize_enums_for_mongodb(asdict(obj))
         except Exception:
-            return obj.__dict__
+            return serialize_enums_for_mongodb(obj.__dict__)
     else:
         return obj
 
