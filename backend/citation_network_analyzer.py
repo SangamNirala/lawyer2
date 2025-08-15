@@ -1736,7 +1736,7 @@ class CitationNetworkAnalyzer:
     async def _store_citation_network(self, network: CitationNetwork):
         """Store citation network in MongoDB"""
         try:
-            if not self.db:
+            if self.db is None:
                 return
             
             logger.info("💾 Storing citation network in database...")
