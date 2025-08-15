@@ -6037,8 +6037,7 @@ async def get_research_queries(limit: int = 50, skip: int = 0):
         queries = await db.legal_research_queries.find().sort("created_at", -1).skip(skip).limit(limit).to_list(length=limit)
         
         # Convert ObjectId to string for JSON serialization
-        for query in queries:
-            query = convert_objectid_to_str(query)
+        queries = [convert_objectid_to_str(q) for q in queries]
         
         return {
             "queries": queries,
