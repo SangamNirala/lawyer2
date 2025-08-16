@@ -1465,12 +1465,12 @@ function App() {
           )}
           
           {/* Voice Agent */}
-          {showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
+          {showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileVoiceAgent && (
             <VoiceAgent onClose={() => handleNavigation('home')} />
           )}
           
           {/* AI Agent Hub */}
-          {showAIAgentHub && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
+          {showAIAgentHub && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !useMobileAIAgentHub && (
             <AIAgentHub />
           )}
           
