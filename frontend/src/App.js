@@ -1435,7 +1435,7 @@ function App() {
           )}
           
           {/* Classic Mode Contract Wizard */}
-          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
+          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && (
             <>
               {currentStep === 1 && <ContractTypeStep />}
               {currentStep === 2 && (
