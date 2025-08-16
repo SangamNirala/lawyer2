@@ -120,10 +120,11 @@ const ResponsiveHeader = ({
         <div className="flex items-center justify-between p-4">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <img 
+            <OptimizedImage 
               src="https://images.unsplash.com/photo-1599840448769-f4ac7aac8d8b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxsZWdhbCUyMHRlY2hub2xvZ3l8ZW58MHx8fGJsdWV8MTc1MzgzNzA1NHww&ixlib=rb-4.1.0&q=85"
               alt="LegalMate AI"
               className="w-8 h-8 rounded-lg object-cover"
+              lazy={false}
             />
             <h1 className="text-lg font-bold text-gray-900">LegalMate AI</h1>
           </div>
