@@ -39,7 +39,7 @@ const ResponsiveHeader = ({
       id: 'smart-wizard',
       label: 'Smart Contract Wizard',
       icon: Sparkles,
-      action: () => onNavigate('enhanced-wizard'),
+      action: () => onNavigate('enhanced-wizard', true), // Enable mobile detection
       badge: { text: 'NEW', variant: 'secondary', className: 'bg-yellow-400 text-yellow-900' }
     },
     {
