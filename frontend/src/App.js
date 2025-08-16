@@ -1180,11 +1180,12 @@ function App() {
                               return (
                                 <div key={index} className="my-4">
                                   {firstPartySignature ? (
-                                    <img 
+                                    <OptimizedImage 
                                       src={firstPartySignature} 
                                       alt="First Party Signature" 
                                       className="max-w-full h-auto max-h-16 mb-2"
                                       style={{ maxWidth: '300px' }}
+                                      lazy={true}
                                     />
                                   ) : (
                                     <div className="h-16 border-b-2 border-gray-400 mb-2" style={{ width: '300px' }}>
