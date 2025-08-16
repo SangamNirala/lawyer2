@@ -81,7 +81,7 @@ const ResponsiveHeader = ({
       id: 'analytics',
       label: 'Analytics Dashboard',
       icon: BarChart3,
-      action: () => onNavigate('analytics'),
+      action: () => onNavigate('analytics', true), // Enable mobile detection
       badge: { text: 'NEW', variant: 'secondary', className: 'bg-green-400 text-green-900' }
     },
     {
