@@ -1350,13 +1350,13 @@ const VoiceAgent = ({ onClose }) => {
         recognitionState={recognitionState}
         setRecognitionState={setRecognitionState}
         // Functions
-        initializeVoiceAgent={initializeVoiceAgent}
+        initializeVoiceCapabilities={initializeVoiceCapabilities}
         startListening={startListening}
         stopListening={stopListening}
-        sendVoiceMessage={sendVoiceMessage}
-        interruptSpeech={interruptSpeech}
-        clearConversation={clearConversation}
-        restartRecognition={restartRecognition}
+        processVoiceInput={processVoiceInput}
+        stopSpeaking={stopSpeaking}
+        resetConversation={resetConversation}
+        handleRetry={handleRetry}
         jurisdictions={jurisdictions}
         legalDomains={legalDomains}
         sampleQuestions={sampleQuestions}
