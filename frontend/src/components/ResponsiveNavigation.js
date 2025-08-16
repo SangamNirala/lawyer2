@@ -95,7 +95,7 @@ const ResponsiveHeader = ({
       id: 'ai-agent-hub',
       label: 'AI Agent Hub',
       icon: Bot,
-      action: () => onNavigate('ai-agent-hub'),
+      action: () => onNavigate('ai-agent-hub', true), // Enable mobile detection
       badge: { text: 'PHASE 1.3', variant: 'secondary', className: 'bg-teal-400 text-teal-900' }
     },
     {
