@@ -402,16 +402,28 @@ function App() {
         setShowPlainEnglishCreator(true);
         break;
       case 'legal-qa':
-        setShowLegalQA(true);
+        if (isMobile && window.innerWidth <= 768) {
+          setUseMobileLegalQA(true);
+        } else {
+          setShowLegalQA(true);
+        }
         break;
       case 'voice-agent':
-        setShowVoiceAgent(true);
+        if (isMobile && window.innerWidth <= 768) {
+          setUseMobileVoiceAgent(true);
+        } else {
+          setShowVoiceAgent(true);
+        }
         break;
       case 'legal-research':
         setShowLegalResearch(true);
         break;
       case 'ai-agent-hub':
-        setShowAIAgentHub(true);
+        if (isMobile && window.innerWidth <= 768) {
+          setUseMobileAIAgentHub(true);
+        } else {
+          setShowAIAgentHub(true);
+        }
         break;
       case 'analytics':
         if (isMobile && window.innerWidth <= 768) {
