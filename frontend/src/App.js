@@ -376,6 +376,9 @@ function App() {
     // Reset mobile states
     setUseMobileWizard(false);
     setUseMobileAnalytics(false);
+    setUseMobileLegalQA(false);
+    setUseMobileVoiceAgent(false);
+    setUseMobileAIAgentHub(false);
     
     // Set current view for navigation state
     setCurrentView(view);
