@@ -359,7 +359,7 @@ function App() {
   const performanceMetrics = usePerformanceMonitor();
 
   // Navigation handler for mobile responsive navigation
-  const handleNavigation = (view) => {
+  const handleNavigation = (view, isMobile = false) => {
     // Reset all view states
     setUseEnhancedWizard(false);
     setShowAnalytics(false);
@@ -370,16 +370,27 @@ function App() {
     setShowLegalResearch(false);
     setShowAIAgentHub(false);
     
+    // Reset mobile states
+    setUseMobileWizard(false);
+    setUseMobileAnalytics(false);
+    
     // Set current view for navigation state
     setCurrentView(view);
     
-    // Handle specific view logic
+    // Handle specific view logic with mobile optimization
     switch(view) {
       case 'home':
         // Already reset all states above
         break;
       case 'enhanced-wizard':
-        setUseEnhancedWizard(true);
+        if (isMobile && window.innerWidth <= 768) {
+          setUseMobileWizard(true);
+        } else {
+          setUseEnhancedWizard(true);
+        }
+        break;
+      case 'mobile-wizard':
+        setUseMobileWizard(true);
         break;
       case 'plain-english':
         setShowPlainEnglishCreator(true);
@@ -397,10 +408,20 @@ function App() {
         setShowAIAgentHub(true);
         break;
       case 'analytics':
-        setShowAnalytics(true);
+        if (isMobile && window.innerWidth <= 768) {
+          setUseMobileAnalytics(true);
+        } else {
+          setShowAnalytics(true);
+        }
+        break;
+      case 'mobile-analytics':
+        setUseMobileAnalytics(true);
         break;
       case 'litigation-analytics':
         setShowLitigationAnalytics(true);
+        break;
+      case 'performance-monitor':
+        setShowPerformanceMonitor(true);
         break;
       case 'classic-mode':
         setCurrentStep(1);
