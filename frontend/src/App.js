@@ -1406,7 +1406,7 @@ function App() {
           )}
           
           {/* Enhanced Contract Wizard */}
-          {useEnhancedWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && (
+          {useEnhancedWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && !useMobileLegalQA && !useMobileVoiceAgent && !useMobileAIAgentHub && (
             <ResizeObserverErrorBoundary>
               <EnhancedContractWizard
                 contractTypes={contractTypes}
