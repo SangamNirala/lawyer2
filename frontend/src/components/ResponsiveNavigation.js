@@ -139,10 +139,11 @@ const ResponsiveHeader = ({
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader>
                 <SheetTitle className="flex items-center space-x-2 text-left">
-                  <img 
+                  <OptimizedImage 
                     src="https://images.unsplash.com/photo-1599840448769-f4ac7aac8d8b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxsZWdhbCUyMHRlY2hub2xvZ3l8ZW58MHx8fGJsdWV8MTc1MzgzNzA1NHww&ixlib=rb-4.1.0&q=85"
                     alt="LegalMate AI"
                     className="w-6 h-6 rounded object-cover"
+                    lazy={false}
                   />
                   <span>LegalMate AI</span>
                 </SheetTitle>
