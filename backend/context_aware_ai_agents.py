@@ -322,6 +322,39 @@ class ContractNegotiationAgent(BaseAIAgent):
     async def _generate_specialized_response(self, message: str, context: AgentContext) -> AgentResponse:
         """Generate contract negotiation specific response"""
         try:
+            # Check if this is a simple greeting or short query
+            simple_patterns = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 
+                             'good evening', 'thanks', 'thank you', 'bye', 'goodbye',
+                             'what can you do', 'help', 'how are you']
+            
+            message_lower = message.lower().strip()
+            is_simple = (any(pattern in message_lower for pattern in simple_patterns) or 
+                        len(message_lower) < 20)
+            
+            if is_simple:
+                # Provide brief greeting response
+                brief_responses = [
+                    "Hello! I'm here to help you with contract negotiation strategies. What contract terms would you like to discuss?",
+                    "Hi! I specialize in deal structuring and negotiation tactics. How can I assist you with your contract today?",
+                    "Welcome! I can help you optimize contract terms and develop negotiation strategies. What's your contract situation?"
+                ]
+                
+                content = brief_responses[0]  # Use first one for consistency
+                
+                return AgentResponse(
+                    response_id=str(uuid.uuid4()),
+                    agent_type=self.agent_type,
+                    content=content,
+                    recommendations=[],
+                    action_items=[],
+                    confidence_score=0.95,
+                    follow_up_questions=[
+                        "What type of contract are you working on?",
+                        "Are there specific terms you'd like to negotiate?",
+                        "What's your main concern with the current agreement?"
+                    ]
+                )
+            
             context_summary = self._build_context_summary(context)
             
             prompt = f"""
@@ -351,6 +384,7 @@ class ContractNegotiationAgent(BaseAIAgent):
             6. Potential counteroffers or responses
 
             Focus on practical, actionable advice that considers both legal and business implications.
+            Keep your response concise but comprehensive, focusing on the most important points.
             """
 
             ai_response = await self._get_ai_response(prompt)
