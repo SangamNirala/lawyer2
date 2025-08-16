@@ -251,7 +251,7 @@ const BottomNavigation = ({ onNavigate, currentView }) => {
               key={item.id}
               variant="ghost"
               size="sm"
-              className={`flex flex-col items-center justify-center p-2 h-14 w-full max-w-[80px] ${
+              className={`flex flex-col items-center justify-center p-3 h-16 w-full max-w-[90px] min-h-[44px] min-w-[44px] ${
                 isActive 
                   ? 'text-blue-600 bg-blue-50' 
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
