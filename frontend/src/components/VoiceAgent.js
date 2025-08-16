@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import MobileVoiceAgent from './MobileVoiceAgent';
 
 const VoiceAgent = ({ onClose }) => {
   // Voice states
