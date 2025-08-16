@@ -594,7 +594,109 @@ class LitigationStrategyAgent(BaseAIAgent):
     async def _generate_specialized_response(self, message: str, context: AgentContext) -> AgentResponse:
         """Generate litigation strategy specific response"""
         try:
+            # Get conversation history for context awareness
+            conversation_history = context.conversation_history[-4:] if context.conversation_history else []
+            
+            # Check if this is a simple query but make it context-aware
+            simple_patterns = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 
+                             'good evening', 'thanks', 'thank you', 'bye', 'goodbye',
+                             'what can you do', 'help', 'how are you', 'how can you help',
+                             'what do you know', 'what are you', 'tell me about']
+            
+            message_lower = message.lower().strip()
+            is_simple = (any(pattern in message_lower for pattern in simple_patterns) or 
+                        len(message_lower) < 25)
+            
+            # Check if we've already introduced ourselves in this conversation
+            already_introduced = any(
+                msg.message_type == MessageType.AGENT_RESPONSE and 
+                ("I'm your Litigation Strategy Agent" in str(msg.content) or 
+                 "I specialize in case management" in str(msg.content))
+                for msg in conversation_history
+            )
+            
+            if is_simple:
+                if not already_introduced:
+                    # First interaction - proper introduction
+                    if 'hi' in message_lower or 'hello' in message_lower:
+                        content = "Hello! I'm your Litigation Strategy Agent. I specialize in case management, discovery planning, and trial strategy. I can help you develop winning litigation approaches and navigate complex legal proceedings."
+                        follow_ups = [
+                            "What type of case are you working on?",
+                            "Are you in the early stages of litigation?",
+                            "Do you need help with case strategy?"
+                        ]
+                    elif 'help' in message_lower or 'what can you do' in message_lower:
+                        content = "I'm an expert in litigation strategy with deep knowledge in discovery planning, motion practice, settlement analysis, and trial preparation. I can help you develop case strategies, assess risks, and plan your litigation approach."
+                        follow_ups = [
+                            "What's your current litigation situation?",
+                            "Are there specific strategic challenges you're facing?",
+                            "Would you like help with discovery planning?"
+                        ]
+                    elif 'what do you know' in message_lower or 'tell me about' in message_lower:
+                        content = "I have expertise in all phases of litigation: case assessment, discovery strategy, motion practice, settlement negotiations, trial preparation, and appellate considerations. I stay current with procedural rules and strategic best practices."
+                        follow_ups = [
+                            "Which litigation phase are you focusing on?",
+                            "Do you have a case you'd like me to analyze?",
+                            "What practice area is your case in?"
+                        ]
+                    else:
+                        content = "Great to connect! I'm here to help you develop effective litigation strategies. Whether you're planning discovery, preparing motions, or evaluating settlement, I'll provide strategic guidance."
+                        follow_ups = [
+                            "What's your main litigation challenge?",
+                            "Are you actively in litigation?",
+                            "Would you like help with case planning?"
+                        ]
+                else:
+                    # Continuing conversation - more contextual responses
+                    if 'help' in message_lower:
+                        content = "I can dive deeper into any specific litigation challenges you're facing. Whether it's discovery disputes, motion strategy, settlement leverage, or trial preparation - let me know what's most pressing."
+                        follow_ups = [
+                            "What's the most critical issue in your case?",
+                            "Are you dealing with discovery challenges?",
+                            "Do you need help with motion strategy?"
+                        ]
+                    elif 'what do you know' in message_lower:
+                        content = "Beyond the fundamentals, I can help with advanced litigation tactics like creating discovery leverage, developing motion sequences, building settlement pressure, and identifying case-winning strategies. What interests you most?"
+                        follow_ups = [
+                            "Are you looking for advanced strategic approaches?",
+                            "Do you need help with case positioning?",
+                            "Would you like tactics for difficult opponents?"
+                        ]
+                    elif any(word in message_lower for word in ['thanks', 'thank you']):
+                        content = "You're very welcome! I'm here whenever you need litigation strategy support. Feel free to discuss any case challenges, procedural questions, or strategic decisions."
+                        follow_ups = [
+                            "Is there anything else about your case I can help with?",
+                            "Do you have other litigation questions?",
+                            "Would you like tips for your next case milestone?"
+                        ]
+                    else:
+                        content = "Absolutely! Let's focus on what's most important for your case. I can provide targeted strategy once I understand your specific litigation challenges."
+                        follow_ups = [
+                            "What's your biggest case challenge right now?",
+                            "Are you dealing with difficult procedural issues?",
+                            "What would success look like in this litigation?"
+                        ]
+                
+                return AgentResponse(
+                    response_id=str(uuid.uuid4()),
+                    agent_type=self.agent_type,
+                    content=content,
+                    recommendations=[],
+                    action_items=[],
+                    confidence_score=0.95,
+                    follow_up_questions=follow_ups
+                )
+            
+            # For detailed queries, build context-aware prompt
             context_summary = self._build_context_summary(context)
+            
+            # Include recent conversation context
+            conversation_context = ""
+            if conversation_history:
+                conversation_context = "\n\nRECENT CONVERSATION:\n"
+                for msg in conversation_history[-3:]:  # Last 3 messages
+                    role = "User" if msg.message_type == MessageType.USER_QUERY else "Assistant"
+                    conversation_context += f"{role}: {str(msg.content)[:200]}...\n"
             
             prompt = f"""
             You are a specialized Litigation Strategy AI Agent with expertise in case management,
@@ -603,6 +705,7 @@ class LitigationStrategyAgent(BaseAIAgent):
 
             CURRENT CONTEXT:
             {context_summary}
+            {conversation_context}
 
             SPECIALIZATION FOCUS:
             - Case strategy development
@@ -615,15 +718,9 @@ class LitigationStrategyAgent(BaseAIAgent):
 
             USER MESSAGE: {message}
 
-            Provide expert litigation guidance including:
-            1. Strategic recommendations for case positioning
-            2. Discovery strategy and priorities
-            3. Motion practice opportunities
-            4. Settlement leverage analysis
-            5. Risk factors and mitigation strategies
-            6. Timeline and milestone planning
-
-            Consider procedural requirements, evidence standards, and practical litigation realities.
+            Provide expert litigation guidance that builds on our conversation. Be strategic, practical, and insightful.
+            Focus on actionable recommendations and consider procedural requirements and litigation realities.
+            Keep responses focused and valuable - aim for 200-400 words unless more detail is needed.
             """
 
             ai_response = await self._get_ai_response(prompt)
@@ -634,6 +731,9 @@ class LitigationStrategyAgent(BaseAIAgent):
             priority_alerts = self._extract_priority_alerts(ai_response)
             confidence_score = self._calculate_litigation_confidence(ai_response, context)
             
+            # Generate contextual follow-ups
+            contextual_follow_ups = self._generate_litigation_follow_ups(message, ai_response, context)
+            
             return AgentResponse(
                 response_id=str(uuid.uuid4()),
                 agent_type=self.agent_type,
@@ -642,17 +742,55 @@ class LitigationStrategyAgent(BaseAIAgent):
                 action_items=action_items,
                 confidence_score=confidence_score,
                 priority_alerts=priority_alerts,
-                follow_up_questions=[
-                    "Do you need help with discovery strategy planning?",
-                    "Should I analyze potential motions for this case?",
-                    "Would you like a settlement vs. trial analysis?",
-                    "Do you need timeline planning for key milestones?"
-                ]
+                follow_up_questions=contextual_follow_ups
             )
             
         except Exception as e:
             logger.error(f"❌ Litigation strategy response failed: {e}")
             raise
+
+    def _generate_litigation_follow_ups(self, user_message: str, ai_response: str, context: AgentContext) -> List[str]:
+        """Generate contextual follow-up questions for litigation strategy"""
+        message_lower = user_message.lower()
+        
+        if any(term in message_lower for term in ['discovery', 'documents', 'interrogatories', 'depositions']):
+            return [
+                "Should we discuss discovery scheduling and priorities?",
+                "Do you need help with discovery dispute strategy?",
+                "Would you like templates for discovery requests?"
+            ]
+        elif any(term in message_lower for term in ['motion', 'summary judgment', 'dismiss']):
+            return [
+                "Should we explore other motion opportunities?",
+                "Do you need help with motion timing strategy?",
+                "Would you like to discuss opposition strategies?"
+            ]
+        elif any(term in message_lower for term in ['settlement', 'negotiate', 'mediation']):
+            return [
+                "Should we analyze your settlement leverage?",
+                "Do you need help with negotiation strategy?",
+                "Would you like to discuss mediation preparation?"
+            ]
+        elif any(term in message_lower for term in ['trial', 'jury', 'evidence']):
+            return [
+                "Should we discuss trial preparation strategy?",
+                "Do you need help with evidence presentation?",
+                "Would you like jury selection insights?"
+            ]
+        else:
+            conversation_length = len(context.conversation_history) if context.conversation_history else 0
+            if conversation_length < 4:
+                return [
+                    "What's your primary goal for this litigation?",
+                    "Are there critical deadlines we should plan around?",
+                    "Would you like me to assess your case strengths?"
+                ]
+            else:
+                return [
+                    "Should we explore alternative strategic approaches?",
+                    "Are there other case aspects you'd like to discuss?",
+                    "What would make this litigation most successful?"
+                ]
 
     def _extract_litigation_recommendations(self, response_text: str) -> List[str]:
         """Extract litigation-specific recommendations"""
