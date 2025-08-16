@@ -29,6 +29,17 @@ import AIAgentHub from './components/AIAgentHub';
 // Mobile Responsive Components
 import { ResponsiveHeader, BottomNavigation } from './components/ResponsiveNavigation';
 import MobileOptimizedHero from './components/MobileOptimizedHero';
+import MobileContractWizard from './components/MobileContractWizard';
+import MobileAnalyticsDashboard from './components/MobileAnalyticsDashboard';
+import { 
+  MobileModal, 
+  MobileBottomSheet, 
+  MobileActionSheet,
+  MobileConfirmDialog,
+  MobileLoadingModal,
+  MobileToastModal 
+} from './components/MobileModalSystem';
+import { usePerformanceMonitor, MobilePerformanceDashboard } from './components/MobilePerformanceOptimizer';
 import { FileText, Zap, Shield, Users, CheckCircle, AlertTriangle, Download, Eye, Calendar, Sparkles, Wand2, Clock, BarChart3, MessageSquare, Scale, Mic, Search, Bot } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
