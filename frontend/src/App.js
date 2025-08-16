@@ -1479,6 +1479,25 @@ function App() {
       <div className="pb-20 lg:pb-0">
         <LegalDisclaimerFooter />
       </div>
+
+      {/* Mobile Performance Monitor */}
+      {showPerformanceMonitor && (
+        <MobilePerformanceDashboard 
+          onClose={() => setShowPerformanceMonitor(false)} 
+        />
+      )}
+
+      {/* Mobile Toast Notifications */}
+      {mobileToast && (
+        <MobileToastModal
+          isOpen={!!mobileToast}
+          onClose={() => setMobileToast(null)}
+          type={mobileToast.type}
+          title={mobileToast.title}
+          message={mobileToast.message}
+          duration={mobileToast.duration}
+        />
+      )}
     </div>
   );
 }
