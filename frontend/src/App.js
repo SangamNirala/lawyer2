@@ -31,6 +31,9 @@ import { ResponsiveHeader, BottomNavigation } from './components/ResponsiveNavig
 import MobileOptimizedHero from './components/MobileOptimizedHero';
 import MobileContractWizard from './components/MobileContractWizard';
 import MobileAnalyticsDashboard from './components/MobileAnalyticsDashboard';
+import MobileLegalQA from './components/MobileLegalQA';
+import MobileVoiceAgent from './components/MobileVoiceAgent';
+import MobileAIAgentHub from './components/MobileAIAgentHub';
 import { 
   MobileModal, 
   MobileBottomSheet, 
