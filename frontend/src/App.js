@@ -26,6 +26,9 @@ import AttorneyDashboard from './components/AttorneyDashboard';
 import { AttorneySupervisionNotice, ComplianceModeIndicator, LegalDisclaimerFooter } from './components/ComplianceNotices';
 import ConsentManager from './components/ConsentManager';
 import AIAgentHub from './components/AIAgentHub';
+// Mobile Responsive Components
+import { ResponsiveHeader, BottomNavigation } from './components/ResponsiveNavigation';
+import MobileOptimizedHero from './components/MobileOptimizedHero';
 import { FileText, Zap, Shield, Users, CheckCircle, AlertTriangle, Download, Eye, Calendar, Sparkles, Wand2, Clock, BarChart3, MessageSquare, Scale, Mic, Search, Bot } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
