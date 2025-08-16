@@ -84,6 +84,11 @@ const MobileContractWizard = ({
   const [showHelp, setShowHelp] = useState(false);
   const [currentFieldHelp, setCurrentFieldHelp] = useState('');
   const [touchFeedback, setTouchFeedback] = useState(null);
+  
+  // Swipe gesture state
+  const [swipeStartX, setSwipeStartX] = useState(0);
+  const [swipeStartY, setSwipeStartY] = useState(0);
+  const [isSwipeEnabled, setIsSwipeEnabled] = useState(true);
 
   useEffect(() => {
     // Update progress based on current step
