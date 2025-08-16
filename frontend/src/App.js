@@ -1440,8 +1440,23 @@ function App() {
           )}
 
           {/* Mobile Analytics Dashboard */}
-          {useMobileAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && (
+          {useMobileAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileLegalQA && !useMobileVoiceAgent && !useMobileAIAgentHub && (
             <MobileAnalyticsDashboard onBack={() => handleNavigation('home')} />
+          )}
+
+          {/* Mobile Legal Q&A */}
+          {useMobileLegalQA && !showAnalytics && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && !useMobileVoiceAgent && !useMobileAIAgentHub && (
+            <MobileLegalQA onBack={() => handleNavigation('home')} />
+          )}
+
+          {/* Mobile Voice Agent */}
+          {useMobileVoiceAgent && !showAnalytics && !showLegalQA && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && !useMobileLegalQA && !useMobileAIAgentHub && (
+            <MobileVoiceAgent onBack={() => handleNavigation('home')} />
+          )}
+
+          {/* Mobile AI Agent Hub */}
+          {useMobileAIAgentHub && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !useMobileWizard && !useMobileAnalytics && !useMobileLegalQA && !useMobileVoiceAgent && (
+            <MobileAIAgentHub onBack={() => handleNavigation('home')} />
           )}
           
           {/* Legal Question Answering */}
