@@ -322,24 +322,88 @@ class ContractNegotiationAgent(BaseAIAgent):
     async def _generate_specialized_response(self, message: str, context: AgentContext) -> AgentResponse:
         """Generate contract negotiation specific response"""
         try:
-            # Check if this is a simple greeting or short query
+            # Get conversation history for context awareness
+            conversation_history = context.conversation_history[-4:] if context.conversation_history else []
+            
+            # Check if this is a simple query but make it context-aware
             simple_patterns = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 
                              'good evening', 'thanks', 'thank you', 'bye', 'goodbye',
-                             'what can you do', 'help', 'how are you']
+                             'what can you do', 'help', 'how are you', 'how can you help',
+                             'what do you know', 'what are you', 'tell me about']
             
             message_lower = message.lower().strip()
             is_simple = (any(pattern in message_lower for pattern in simple_patterns) or 
-                        len(message_lower) < 20)
+                        len(message_lower) < 25)
+            
+            # Check if we've already introduced ourselves in this conversation
+            already_introduced = any(
+                msg.message_type == MessageType.AGENT_RESPONSE and 
+                ("I'm here to help you with contract negotiation" in str(msg.content) or 
+                 "I specialize in" in str(msg.content))
+                for msg in conversation_history
+            )
             
             if is_simple:
-                # Provide brief greeting response
-                brief_responses = [
-                    "Hello! I'm here to help you with contract negotiation strategies. What contract terms would you like to discuss?",
-                    "Hi! I specialize in deal structuring and negotiation tactics. How can I assist you with your contract today?",
-                    "Welcome! I can help you optimize contract terms and develop negotiation strategies. What's your contract situation?"
-                ]
-                
-                content = brief_responses[0]  # Use first one for consistency
+                if not already_introduced:
+                    # First interaction - proper introduction
+                    if 'hi' in message_lower or 'hello' in message_lower:
+                        content = "Hello! I'm your Contract Negotiation Agent. I specialize in deal structuring, risk assessment, and negotiation tactics. I can help you optimize contract terms and develop winning negotiation strategies."
+                        follow_ups = [
+                            "What type of contract are you working on?",
+                            "Do you have a specific negotiation challenge?",
+                            "Are you preparing for upcoming contract discussions?"
+                        ]
+                    elif 'help' in message_lower or 'what can you do' in message_lower:
+                        content = "I'm an expert in contract negotiation with deep knowledge in commercial terms, risk allocation, and strategic positioning. I can assist with term optimization, clause analysis, negotiation tactics, and deal structuring."
+                        follow_ups = [
+                            "What's your current contract situation?",
+                            "Are there specific terms giving you trouble?",
+                            "Would you like help with a particular negotiation strategy?"
+                        ]
+                    elif 'what do you know' in message_lower or 'tell me about' in message_lower:
+                        content = "I have expertise across all aspects of contract negotiation: payment terms, liability clauses, termination conditions, intellectual property provisions, service level agreements, and risk mitigation strategies. I stay current with market standards and best practices."
+                        follow_ups = [
+                            "Which area interests you most?",
+                            "Do you have a contract clause you'd like me to review?",
+                            "What industry are you working in?"
+                        ]
+                    else:
+                        content = "Great to connect! I'm here to help you navigate contract negotiations with confidence. Whether you're reviewing terms, preparing strategies, or analyzing risks, I'll provide expert guidance."
+                        follow_ups = [
+                            "What's your main contract concern?",
+                            "Are you in active negotiations?",
+                            "Would you like me to review specific terms?"
+                        ]
+                else:
+                    # Continuing conversation - more contextual responses
+                    if 'help' in message_lower:
+                        content = "I can dive deeper into any specific contract issues you're facing. Whether it's payment terms, liability allocation, termination clauses, or negotiation positioning - just share what's on your mind."
+                        follow_ups = [
+                            "What specific terms are you concerned about?",
+                            "Are you reviewing a contract right now?",
+                            "What's the most challenging part of your negotiation?"
+                        ]
+                    elif 'what do you know' in message_lower:
+                        content = "Beyond the basics, I can help with advanced strategies like creating negotiation leverage, structuring win-win proposals, identifying hidden risks, and developing fallback positions. What aspect interests you?"
+                        follow_ups = [
+                            "Are you looking for advanced negotiation tactics?",
+                            "Do you need help with risk assessment?",
+                            "Would you like strategies for difficult negotiations?"
+                        ]
+                    elif any(word in message_lower for word in ['thanks', 'thank you']):
+                        content = "You're very welcome! I'm here whenever you need contract negotiation support. Feel free to ask about any specific terms, strategies, or challenges."
+                        follow_ups = [
+                            "Is there anything else I can help clarify?",
+                            "Do you have other contract questions?",
+                            "Would you like tips for your next negotiation?"
+                        ]
+                    else:
+                        content = "Absolutely! Let's focus on what matters most for your contract situation. I can provide targeted advice once I understand your specific needs."
+                        follow_ups = [
+                            "What's your biggest contract challenge right now?",
+                            "Are you dealing with difficult terms?",
+                            "What would success look like for this negotiation?"
+                        ]
                 
                 return AgentResponse(
                     response_id=str(uuid.uuid4()),
@@ -348,14 +412,19 @@ class ContractNegotiationAgent(BaseAIAgent):
                     recommendations=[],
                     action_items=[],
                     confidence_score=0.95,
-                    follow_up_questions=[
-                        "What type of contract are you working on?",
-                        "Are there specific terms you'd like to negotiate?",
-                        "What's your main concern with the current agreement?"
-                    ]
+                    follow_up_questions=follow_ups
                 )
             
+            # For detailed queries, build context-aware prompt
             context_summary = self._build_context_summary(context)
+            
+            # Include recent conversation context
+            conversation_context = ""
+            if conversation_history:
+                conversation_context = "\n\nRECENT CONVERSATION:\n"
+                for msg in conversation_history[-3:]:  # Last 3 messages
+                    role = "User" if msg.message_type == MessageType.USER_QUERY else "Assistant"
+                    conversation_context += f"{role}: {str(msg.content)[:200]}...\n"
             
             prompt = f"""
             You are a specialized Contract Negotiation AI Agent with expertise in deal structuring, 
@@ -364,6 +433,7 @@ class ContractNegotiationAgent(BaseAIAgent):
 
             CURRENT CONTEXT:
             {context_summary}
+            {conversation_context}
 
             SPECIALIZATION FOCUS:
             - Contract term optimization
@@ -375,16 +445,9 @@ class ContractNegotiationAgent(BaseAIAgent):
 
             USER MESSAGE: {message}
 
-            Provide expert guidance on contract negotiation including:
-            1. Specific recommendations for the current situation
-            2. Risk assessment of proposed terms
-            3. Alternative clause suggestions
-            4. Strategic negotiation positioning
-            5. Action items for moving forward
-            6. Potential counteroffers or responses
-
-            Focus on practical, actionable advice that considers both legal and business implications.
-            Keep your response concise but comprehensive, focusing on the most important points.
+            Provide expert guidance that builds on our conversation. Be conversational, insightful, and practical.
+            Offer specific recommendations, risk assessments, and actionable next steps.
+            Keep responses focused and valuable - aim for 200-400 words unless the query requires more detail.
             """
 
             ai_response = await self._get_ai_response(prompt)
@@ -394,6 +457,9 @@ class ContractNegotiationAgent(BaseAIAgent):
             action_items = self._extract_action_items(ai_response)
             confidence_score = self._calculate_confidence(ai_response, context)
             
+            # Generate contextual follow-up questions based on the response content
+            contextual_follow_ups = self._generate_contextual_follow_ups(message, ai_response, context)
+            
             return AgentResponse(
                 response_id=str(uuid.uuid4()),
                 agent_type=self.agent_type,
@@ -401,16 +467,64 @@ class ContractNegotiationAgent(BaseAIAgent):
                 recommendations=recommendations,
                 action_items=action_items,
                 confidence_score=confidence_score,
-                follow_up_questions=[
-                    "Would you like me to analyze specific contract clauses?",
-                    "Do you need help with negotiation strategy for upcoming discussions?",
-                    "Should I review the risk allocation in these terms?"
-                ]
+                follow_up_questions=contextual_follow_ups
             )
             
         except Exception as e:
             logger.error(f"❌ Contract negotiation response failed: {e}")
             raise
+
+    def _generate_contextual_follow_ups(self, user_message: str, ai_response: str, context: AgentContext) -> List[str]:
+        """Generate contextual follow-up questions based on the conversation"""
+        message_lower = user_message.lower()
+        response_lower = ai_response.lower() if ai_response else ""
+        
+        # Analyze the topics discussed to generate relevant follow-ups
+        if any(term in message_lower for term in ['payment', 'money', 'fee', 'cost']):
+            return [
+                "Would you like me to review specific payment terms?",
+                "Should we discuss payment security mechanisms?",
+                "Are there milestone-based payment options to consider?"
+            ]
+        elif any(term in message_lower for term in ['risk', 'liability', 'insurance']):
+            return [
+                "Should we explore liability cap strategies?",
+                "Would indemnification clauses be relevant here?",
+                "Are there specific risks you're most concerned about?"
+            ]
+        elif any(term in message_lower for term in ['termination', 'end', 'cancel', 'exit']):
+            return [
+                "Do you need help with termination notice periods?",
+                "Should we discuss post-termination obligations?",
+                "Are there specific exit scenarios to plan for?"
+            ]
+        elif any(term in message_lower for term in ['ip', 'intellectual property', 'ownership']):
+            return [
+                "Should we clarify IP ownership and licensing terms?",
+                "Are there work-for-hire provisions to review?",
+                "Do you need protection for existing IP?"
+            ]
+        elif any(term in message_lower for term in ['service', 'performance', 'delivery']):
+            return [
+                "Should we define service level agreements?",
+                "Are there performance metrics to establish?",
+                "Would delivery milestones be beneficial?"
+            ]
+        else:
+            # General contextual follow-ups based on conversation stage
+            conversation_length = len(context.conversation_history) if context.conversation_history else 0
+            if conversation_length < 4:
+                return [
+                    "What's the most important outcome for this negotiation?",
+                    "Are there any deal-breaker terms we should address?",
+                    "Would you like me to analyze specific contract language?"
+                ]
+            else:
+                return [
+                    "Should we explore alternative approaches to this?",
+                    "Are there other contract areas you'd like to optimize?",
+                    "What would make this negotiation successful for you?"
+                ]
 
     def _extract_recommendations(self, response_text: str) -> List[str]:
         """Extract specific recommendations from AI response"""
