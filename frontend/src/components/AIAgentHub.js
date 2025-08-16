@@ -301,8 +301,8 @@ const AIAgentHub = () => {
     const isError = message.type === 'error';
 
     return (
-      <div key={message.id} className={`mb-4 ${isUser ? 'text-right' : 'text-left'}`}>
-        <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+      <div key={message.id} className={`mb-6 ${isUser ? 'text-right' : 'text-left'}`}>
+        <div className={`inline-block max-w-[85%] p-4 rounded-lg ${
           isUser 
             ? 'bg-blue-500 text-white ml-auto' 
             : isError 
@@ -310,7 +310,7 @@ const AIAgentHub = () => {
               : 'bg-gray-100 text-gray-800'
         }`}>
           {!isUser && !isError && (
-            <div className="flex items-center mb-2">
+            <div className="flex items-center mb-3">
               <Bot className="w-4 h-4 mr-2" />
               <span className="font-semibold text-sm">
                 {agents[activeAgent].name}
@@ -318,10 +318,15 @@ const AIAgentHub = () => {
             </div>
           )}
           
-          <div className="whitespace-pre-wrap">{message.content}</div>
+          <div 
+            className="whitespace-pre-wrap break-words leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: renderMarkdown(message.content || '')
+            }}
+          />
           
           {message.confidence_score && (
-            <div className="mt-2 flex items-center">
+            <div className="mt-3 flex items-center">
               <span className="text-xs opacity-75 mr-2">Confidence:</span>
               <Progress value={message.confidence_score * 100} className="w-20 h-2" />
               <span className="text-xs ml-2 opacity-75">
@@ -331,33 +336,41 @@ const AIAgentHub = () => {
           )}
           
           {message.recommendations && message.recommendations.length > 0 && (
-            <div className="mt-3">
-              <div className="text-sm font-semibold mb-1">Recommendations:</div>
-              <ul className="text-sm space-y-1">
+            <div className="mt-4">
+              <div className="text-sm font-semibold mb-2">Recommendations:</div>
+              <div className="text-sm space-y-1">
                 {message.recommendations.map((rec, index) => (
-                  <li key={index} className="flex items-start">
-                    <CheckCircle className="w-3 h-3 mr-1 mt-0.5 text-green-500 flex-shrink-0" />
-                    <span>{rec}</span>
-                  </li>
+                  <div key={index} className="flex items-start">
+                    <CheckCircle className="w-3 h-3 mr-2 mt-0.5 text-green-500 flex-shrink-0" />
+                    <span 
+                      dangerouslySetInnerHTML={{
+                        __html: renderMarkdown(rec)
+                      }}
+                    />
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
           
           {message.action_items && message.action_items.length > 0 && (
-            <div className="mt-3">
-              <div className="text-sm font-semibold mb-1">Action Items:</div>
-              <div className="space-y-1">
+            <div className="mt-4">
+              <div className="text-sm font-semibold mb-2">Action Items:</div>
+              <div className="space-y-2">
                 {message.action_items.map((item, index) => (
-                  <div key={index} className="flex items-center text-sm">
+                  <div key={index} className="flex items-start text-sm">
                     <Badge 
                       variant={item.priority === 'high' ? 'destructive' : 
                               item.priority === 'urgent' ? 'destructive' : 'secondary'}
-                      className="mr-2 text-xs"
+                      className="mr-2 text-xs flex-shrink-0"
                     >
                       {item.priority}
                     </Badge>
-                    <span>{item.description}</span>
+                    <span 
+                      dangerouslySetInnerHTML={{
+                        __html: renderMarkdown(item.description || item)
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -365,12 +378,14 @@ const AIAgentHub = () => {
           )}
           
           {message.priority_alerts && message.priority_alerts.length > 0 && (
-            <div className="mt-3">
+            <div className="mt-4">
               <Alert className="border-orange-200 bg-orange-50">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   {message.priority_alerts.map((alert, index) => (
-                    <div key={index}>{alert.message}</div>
+                    <div key={index} dangerouslySetInnerHTML={{
+                      __html: renderMarkdown(alert.message || alert)
+                    }} />
                   ))}
                 </AlertDescription>
               </Alert>
@@ -378,15 +393,15 @@ const AIAgentHub = () => {
           )}
           
           {message.follow_up_questions && message.follow_up_questions.length > 0 && (
-            <div className="mt-3">
-              <div className="text-sm font-semibold mb-1">Follow-up Questions:</div>
-              <div className="space-y-1">
+            <div className="mt-4">
+              <div className="text-sm font-semibold mb-2">Follow-up Questions:</div>
+              <div className="flex flex-wrap gap-2">
                 {message.follow_up_questions.map((question, index) => (
                   <Button
                     key={index}
                     variant="outline"
                     size="sm"
-                    className="mr-2 mb-1 text-xs h-auto py-1 px-2"
+                    className="text-xs h-auto py-1.5 px-3 whitespace-normal text-left"
                     onClick={() => setCurrentMessage(question)}
                   >
                     {question}
