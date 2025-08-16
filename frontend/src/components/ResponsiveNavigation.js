@@ -165,7 +165,7 @@ const ResponsiveHeader = ({
                       }`}
                       onClick={() => handleItemClick(item)}
                     >
-                      <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <Icon className="h-6 w-6 mr-3 flex-shrink-0" />
                       <span className="flex-1 text-left truncate">{item.label}</span>
                       {item.badge && (
                         <Badge 
