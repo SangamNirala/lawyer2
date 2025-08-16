@@ -60,7 +60,7 @@ const ResponsiveHeader = ({
       id: 'voice-agent',
       label: 'AI Voice Agent',
       icon: Mic,
-      action: () => onNavigate('voice-agent'),
+      action: () => onNavigate('voice-agent', true), // Enable mobile detection
       badge: { text: 'VOICE-POWERED', variant: 'secondary', className: 'bg-cyan-400 text-cyan-900' }
     },
     {
