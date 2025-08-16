@@ -16,7 +16,23 @@ code {
         monospace;
 }
 
-
+/* Mobile-first responsive design utilities */
+@layer base {
+  html {
+    /* Support for safe areas (iPhone notches, etc.) */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  
+  /* Ensure touch targets are at least 44px on mobile */
+  button, [role="button"], input, select, textarea {
+    min-height: 44px;
+  }
+  
+  /* Prevent horizontal scrolling on mobile */
+  body {
+    overflow-x: hidden;
+  }
+}
 
 @layer base {
   :root {
@@ -74,8 +90,6 @@ code {
     }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -83,4 +97,39 @@ code {
   body {
     @apply bg-background text-foreground;
     }
+}
+
+/* Mobile-specific optimizations */
+@layer components {
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .mobile-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mobile-scroll-container {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Responsive text sizing for mobile */
+@layer utilities {
+  .text-mobile-xs { font-size: 0.75rem; line-height: 1rem; }
+  .text-mobile-sm { font-size: 0.875rem; line-height: 1.25rem; }
+  .text-mobile-base { font-size: 1rem; line-height: 1.5rem; }
+  .text-mobile-lg { font-size: 1.125rem; line-height: 1.75rem; }
+  .text-mobile-xl { font-size: 1.25rem; line-height: 1.75rem; }
+}
+
+/* Smooth animations for mobile interactions */
+@layer utilities {
+  .mobile-transition {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .mobile-scale-press {
+    @apply active:scale-95 transition-transform duration-100;
+  }
 }
