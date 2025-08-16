@@ -1376,7 +1376,7 @@ function App() {
           )}
           
           {/* Enhanced Contract Wizard */}
-          {useEnhancedWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
+          {useEnhancedWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && (
             <ResizeObserverErrorBoundary>
               <EnhancedContractWizard
                 contractTypes={contractTypes}
@@ -1386,10 +1386,32 @@ function App() {
                   setCurrentStep(4);
                   setUseEnhancedWizard(false);
                   loadContracts();
+                  showMobileToast('success', 'Contract Generated', 'Your contract has been created successfully!');
                 }}
                 onBack={() => handleNavigation('home')}
               />
             </ResizeObserverErrorBoundary>
+          )}
+          
+          {/* Mobile Contract Wizard */}
+          {useMobileWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileAnalytics && (
+            <MobileContractWizard
+              contractTypes={contractTypes}
+              jurisdictions={jurisdictions}
+              onContractGenerated={(contract) => {
+                setGeneratedContract(contract);
+                setCurrentStep(4);
+                setUseMobileWizard(false);
+                loadContracts();
+                showMobileToast('success', 'Contract Generated', 'Your mobile-optimized contract has been created!');
+              }}
+              onBack={() => handleNavigation('home')}
+            />
+          )}
+
+          {/* Mobile Analytics Dashboard */}
+          {useMobileAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && (
+            <MobileAnalyticsDashboard onBack={() => handleNavigation('home')} />
           )}
           
           {/* Legal Question Answering */}
