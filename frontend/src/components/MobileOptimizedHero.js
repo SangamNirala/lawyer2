@@ -135,10 +135,11 @@ const MobileOptimizedHero = ({
           {/* Logo and Title - Mobile Optimized */}
           <div className="text-center mb-8 lg:mb-12">
             <div className="mb-4 lg:mb-6">
-              <img 
+              <OptimizedImage 
                 src="https://images.unsplash.com/photo-1599840448769-f4ac7aac8d8b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxsZWdhbCUyMHRlY2hub2xvZ3l8ZW58MHx8fGJsdWV8MTc1MzgzNzA1NHww&ixlib=rb-4.1.0&q=85"
                 alt="LegalMate AI"
                 className="w-20 h-12 sm:w-24 sm:h-16 lg:w-32 lg:h-20 mx-auto rounded-lg shadow-2xl object-cover"
+                lazy={true}
               />
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 lg:mb-4">
