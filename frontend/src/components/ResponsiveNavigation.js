@@ -229,7 +229,7 @@ const BottomNavigation = ({ onNavigate, currentView }) => {
       id: 'ai-agent-hub',
       label: 'Agents',
       icon: Bot,
-      action: () => onNavigate('ai-agent-hub')
+      action: () => onNavigate('ai-agent-hub', true) // Enable mobile detection
     },
     {
       id: 'analytics',
