@@ -258,7 +258,7 @@ const BottomNavigation = ({ onNavigate, currentView }) => {
               }`}
               onClick={item.action}
             >
-              <Icon className={`h-5 w-5 mb-1 ${isActive ? 'text-blue-600' : ''}`} />
+              <Icon className={`h-6 w-6 mb-1 ${isActive ? 'text-blue-600' : ''}`} />
               <span className={`text-xs truncate ${isActive ? 'text-blue-600 font-medium' : ''}`}>
                 {item.label}
               </span>
