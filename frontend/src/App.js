@@ -351,6 +351,9 @@ function App() {
   // Mobile-specific State
   const [useMobileWizard, setUseMobileWizard] = useState(false);
   const [useMobileAnalytics, setUseMobileAnalytics] = useState(false);
+  const [useMobileLegalQA, setUseMobileLegalQA] = useState(false);
+  const [useMobileVoiceAgent, setUseMobileVoiceAgent] = useState(false);
+  const [useMobileAIAgentHub, setUseMobileAIAgentHub] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
   const [mobileToast, setMobileToast] = useState(null);
