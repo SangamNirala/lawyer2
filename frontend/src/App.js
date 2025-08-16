@@ -435,6 +435,15 @@ function App() {
       case 'mobile-analytics':
         setUseMobileAnalytics(true);
         break;
+      case 'mobile-legal-qa':
+        setUseMobileLegalQA(true);
+        break;
+      case 'mobile-voice-agent':
+        setUseMobileVoiceAgent(true);
+        break;
+      case 'mobile-ai-agent-hub':
+        setUseMobileAIAgentHub(true);
+        break;
       case 'litigation-analytics':
         setShowLitigationAnalytics(true);
         break;
