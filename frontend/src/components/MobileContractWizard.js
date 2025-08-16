@@ -158,7 +158,7 @@ const MobileContractWizard = ({
       case 1:
         return stepData.step1.contract_type && stepData.step1.jurisdiction;
       case 2:
-        return stepData.step2.first_party_name && stepData.step2.second_party_name;
+        return stepData.step2.party1_name && stepData.step2.party2_name;
       case 3:
         return stepData.step3.payment_amount;
       case 4:
