@@ -25,6 +25,7 @@ const LegalQuestionAnswering = () => {
   
   // Mobile detection hook
   const [isMobile, setIsMobile] = useState(false);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => {
