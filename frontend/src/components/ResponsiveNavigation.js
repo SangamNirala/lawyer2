@@ -235,7 +235,7 @@ const BottomNavigation = ({ onNavigate, currentView }) => {
       id: 'analytics',
       label: 'Analytics',
       icon: BarChart3,
-      action: () => onNavigate('analytics')
+      action: () => onNavigate('analytics', true) // Enable mobile detection
     }
   ];
 
