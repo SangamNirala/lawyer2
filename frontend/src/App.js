@@ -1480,7 +1480,7 @@ function App() {
           )}
           
           {/* Classic Mode Contract Wizard */}
-          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && (
+          {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && !useMobileLegalQA && !useMobileVoiceAgent && !useMobileAIAgentHub && (
             <>
               {currentStep === 1 && <ContractTypeStep />}
               {currentStep === 2 && (
