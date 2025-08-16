@@ -758,6 +758,36 @@ const LegalQuestionAnswering = () => {
     }
   };
 
+  // If mobile, use mobile-optimized component
+  if (isMobile) {
+    return (
+      <MobileLegalQA
+        messages={messages}
+        currentQuestion={currentQuestion}
+        isLoading={isLoading}
+        selectedJurisdiction={selectedJurisdiction}
+        selectedDomain={selectedDomain}
+        communicationMode={communicationMode}
+        handleSubmit={handleSubmit}
+        handleSampleQuestion={handleSampleQuestion}
+        setCurrentQuestion={setCurrentQuestion}
+        setSelectedJurisdiction={setSelectedJurisdiction}
+        setSelectedDomain={setSelectedDomain}
+        setCommunicationMode={setCommunicationMode}
+        formatConfidence={formatConfidence}
+        convertMarkdownToHtml={convertMarkdownToHtml}
+        shouldShowMetadata={shouldShowMetadata}
+        sampleQuestions={sampleQuestions}
+        getCurrentSampleQuestions={getCurrentSampleQuestions}
+        communicationModes={communicationModes}
+        legalDomains={legalDomains}
+        jurisdictions={jurisdictions}
+        ragStats={ragStats}
+        knowledgeBaseStats={knowledgeBaseStats}
+      />
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Enhanced Header with Communication Modes */}
