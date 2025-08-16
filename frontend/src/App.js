@@ -334,6 +334,61 @@ function App() {
   const [currentReviewId, setCurrentReviewId] = useState(null);
   const [complianceStatus, setComplianceStatus] = useState(null);
 
+  // Mobile Navigation State
+  const [currentView, setCurrentView] = useState('home');
+
+  // Navigation handler for mobile responsive navigation
+  const handleNavigation = (view) => {
+    // Reset all view states
+    setUseEnhancedWizard(false);
+    setShowAnalytics(false);
+    setShowPlainEnglishCreator(false);
+    setShowLegalQA(false);
+    setShowVoiceAgent(false);
+    setShowLitigationAnalytics(false);
+    setShowLegalResearch(false);
+    setShowAIAgentHub(false);
+    
+    // Set current view for navigation state
+    setCurrentView(view);
+    
+    // Handle specific view logic
+    switch(view) {
+      case 'home':
+        // Already reset all states above
+        break;
+      case 'enhanced-wizard':
+        setUseEnhancedWizard(true);
+        break;
+      case 'plain-english':
+        setShowPlainEnglishCreator(true);
+        break;
+      case 'legal-qa':
+        setShowLegalQA(true);
+        break;
+      case 'voice-agent':
+        setShowVoiceAgent(true);
+        break;
+      case 'legal-research':
+        setShowLegalResearch(true);
+        break;
+      case 'ai-agent-hub':
+        setShowAIAgentHub(true);
+        break;
+      case 'analytics':
+        setShowAnalytics(true);
+        break;
+      case 'litigation-analytics':
+        setShowLitigationAnalytics(true);
+        break;
+      case 'classic-mode':
+        setCurrentStep(1);
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     loadContractTypes();
     loadJurisdictions();
