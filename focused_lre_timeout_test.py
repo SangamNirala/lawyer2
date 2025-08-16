@@ -18,7 +18,7 @@ import sys
 from datetime import datetime
 
 # Use production URL from frontend .env
-BASE_URL = "https://verdict-analytics.preview.emergentagent.com"
+BASE_URL = "https://legal-multimodal-ai.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""

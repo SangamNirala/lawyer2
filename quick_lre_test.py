@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://verdict-analytics.preview.emergentagent.com/api"
+BACKEND_URL = "https://legal-multimodal-ai.preview.emergentagent.com/api"
 
 def quick_test(method, endpoint, data=None, timeout=10):
     """Quick test with short timeout"""

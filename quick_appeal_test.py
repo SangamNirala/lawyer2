@@ -7,7 +7,7 @@ import requests
 import json
 import time
 
-BACKEND_URL = "https://verdict-analytics.preview.emergentagent.com/api"
+BACKEND_URL = "https://legal-multimodal-ai.preview.emergentagent.com/api"
 
 def test_basic_appeal_analysis():
     """Test basic appeal analysis functionality"""
