@@ -24,6 +24,35 @@ import {
   TrendingUp
 } from 'lucide-react';
 
+// Simple markdown renderer for basic formatting
+const renderMarkdown = (text) => {
+  if (!text) return text;
+  
+  return text
+    // Bold text **bold** -> <strong>
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    // Italic text *italic* -> <em>
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    // Simple bullet points
+    .replace(/^- (.*$)/gim, '• $1')
+    // Numbered lists (basic)
+    .replace(/^\d+\.\s/gim, '• ');
+};
+
+// Check if message is a simple greeting or short query
+const isSimpleQuery = (message) => {
+  const simple = message.toLowerCase().trim();
+  const simplePatterns = [
+    'hi', 'hello', 'hey', 'good morning', 'good afternoon', 
+    'good evening', 'thanks', 'thank you', 'bye', 'goodbye',
+    'what can you do', 'help', 'how are you'
+  ];
+  
+  return simplePatterns.some(pattern => 
+    simple === pattern || simple.startsWith(pattern + ' ') || simple.endsWith(' ' + pattern)
+  ) || simple.length < 20;
+};
+
 const AIAgentHub = () => {
   const [activeAgent, setActiveAgent] = useState('contract-negotiation');
   const [sessions, setSessions] = useState({});
