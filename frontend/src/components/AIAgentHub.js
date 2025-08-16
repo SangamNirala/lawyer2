@@ -551,8 +551,8 @@ const AIAgentHub = () => {
 
         {/* Chat Interface */}
         <div className="lg:col-span-2">
-          <Card className="h-[600px] flex flex-col">
-            <CardHeader className="pb-3">
+          <Card className="h-[700px] flex flex-col">
+            <CardHeader className="pb-3 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className={`p-2 rounded-lg ${currentAgent.color} mr-3`}>
@@ -574,56 +574,58 @@ const AIAgentHub = () => {
               </div>
             </CardHeader>
             
-            <CardContent className="flex-1 flex flex-col p-0">
+            <CardContent className="flex-1 flex flex-col p-0 min-h-0">
               {/* Messages Area */}
-              <ScrollArea className="flex-1 p-4">
-                {currentSession.messages.length === 0 ? (
-                  <div className="text-center text-gray-500 mt-8">
-                    <currentAgent.icon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-lg font-semibold mb-2">
-                      Welcome to {currentAgent.name}
-                    </p>
-                    <p className="text-sm">
-                      Start a conversation to get expert assistance with {currentAgent.description.toLowerCase()}
-                    </p>
-                    
-                    <div className="mt-6 space-y-2">
-                      <p className="text-sm font-semibold">Try asking about:</p>
-                      {currentAgent.capabilities.map((capability, index) => (
-                        <Button
-                          key={index}
-                          variant="ghost"
-                          size="sm"
-                          className="block mx-auto text-xs"
-                          onClick={() => setCurrentMessage(`Help me with ${capability.toLowerCase()}`)}
-                        >
-                          {capability}
-                        </Button>
-                      ))}
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full p-4">
+                  {currentSession.messages.length === 0 ? (
+                    <div className="text-center text-gray-500 mt-8">
+                      <currentAgent.icon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p className="text-lg font-semibold mb-2">
+                        Welcome to {currentAgent.name}
+                      </p>
+                      <p className="text-sm">
+                        Start a conversation to get expert assistance with {currentAgent.description.toLowerCase()}
+                      </p>
+                      
+                      <div className="mt-6 space-y-2">
+                        <p className="text-sm font-semibold">Try asking about:</p>
+                        {currentAgent.capabilities.map((capability, index) => (
+                          <Button
+                            key={index}
+                            variant="ghost"
+                            size="sm"
+                            className="block mx-auto text-xs"
+                            onClick={() => setCurrentMessage(`Help me with ${capability.toLowerCase()}`)}
+                          >
+                            {capability}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    {currentSession.messages.map(renderMessage)}
-                    {isLoading && (
-                      <div className="text-left mb-4">
-                        <div className="inline-block bg-gray-100 p-3 rounded-lg">
-                          <div className="flex items-center">
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            <span className="text-sm text-gray-600">
-                              {currentAgent.name} is thinking...
-                            </span>
+                  ) : (
+                    <div className="space-y-2">
+                      {currentSession.messages.map(renderMessage)}
+                      {isLoading && (
+                        <div className="text-left mb-4">
+                          <div className="inline-block bg-gray-100 p-3 rounded-lg">
+                            <div className="flex items-center">
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              <span className="text-sm text-gray-600">
+                                {currentAgent.name} is thinking...
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
-                )}
-              </ScrollArea>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
               
               {/* Input Area */}
-              <div className="border-t p-4">
+              <div className="border-t p-4 flex-shrink-0">
                 <div className="flex space-x-2">
                   <Textarea
                     value={currentMessage}
