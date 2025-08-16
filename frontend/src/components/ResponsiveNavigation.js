@@ -217,7 +217,7 @@ const BottomNavigation = ({ onNavigate, currentView }) => {
       id: 'legal-qa',
       label: 'Chat',
       icon: MessageSquare,
-      action: () => onNavigate('legal-qa')
+      action: () => onNavigate('legal-qa', true) // Enable mobile detection
     },
     {
       id: 'search',
