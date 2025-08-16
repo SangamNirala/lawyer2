@@ -15737,6 +15737,8 @@ class AIAgentRequest(BaseModel):
     contract_type: Optional[str] = None
     current_phase: Optional[str] = None
     key_facts: List[str] = Field(default_factory=list)
+    response_length: Optional[str] = "detailed"  # "brief" or "detailed"
+    query_context: Optional[str] = "detailed_inquiry"  # "greeting_or_simple" or "detailed_inquiry"
     context_metadata: Dict[str, Any] = Field(default_factory=dict)
 
 class AIAgentResponseModel(BaseModel):
