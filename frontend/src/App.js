@@ -1248,6 +1248,15 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Responsive Header - Mobile/Tablet Navigation */}
+      <ResponsiveHeader 
+        onNavigate={handleNavigation}
+        currentView={currentView}
+        complianceMode={complianceMode}
+        setShowAttorneyDashboard={setShowAttorneyDashboard}
+      />
+      
+      {/* Hero Section - Mobile Optimized */}
       <Hero />
       
       {/* Compliance System Components */}
@@ -1276,7 +1285,8 @@ function App() {
         </div>
       )}
       
-      <div className="py-12 px-6">
+      {/* Main Content Area - Mobile Responsive */}
+      <div className="py-6 px-4 sm:py-8 sm:px-6 lg:py-12 lg:px-8 pb-20 lg:pb-8">
         <div className="max-w-6xl mx-auto">
           {/* Attorney Supervision Notice */}
           {complianceMode && (
@@ -1286,13 +1296,11 @@ function App() {
             />
           )}
           
-          {/* Review Status Display - REMOVED per user request */}
-          {/* Users will see generated document directly instead of progress tracking */}
-          
           {/* Debug info for development */}
           {process.env.NODE_ENV === 'development' && (
             <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
               <strong>Debug Info:</strong>
+              <div>Current View: {currentView}</div>
               <div>Current Step: {currentStep}</div>
               <div>Current Review ID: {currentReviewId || 'None'}</div>
               <div>Is Generating: {isGenerating ? 'Yes' : 'No'}</div>
@@ -1306,18 +1314,18 @@ function App() {
             <PlainEnglishContractCreator
               contractTypes={contractTypes}
               jurisdictions={jurisdictions}
-              onBack={() => setShowPlainEnglishCreator(false)}
+              onBack={() => handleNavigation('home')}
             />
           )}
           
           {/* Analytics Dashboard */}
           {showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
-            <AnalyticsDashboard onBack={() => setShowAnalytics(false)} />
+            <AnalyticsDashboard onBack={() => handleNavigation('home')} />
           )}
           
           {/* Litigation Analytics */}
           {showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && !showLegalResearch && !showAIAgentHub && (
-            <LitigationAnalytics onBack={() => setShowLitigationAnalytics(false)} />
+            <LitigationAnalytics onBack={() => handleNavigation('home')} />
           )}
           
           {/* Enhanced Contract Wizard */}
@@ -1332,7 +1340,7 @@ function App() {
                   setUseEnhancedWizard(false);
                   loadContracts();
                 }}
-                onBack={() => setUseEnhancedWizard(false)}
+                onBack={() => handleNavigation('home')}
               />
             </ResizeObserverErrorBoundary>
           )}
@@ -1344,63 +1352,64 @@ function App() {
           
           {/* Voice Agent */}
           {showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
-            <VoiceAgent onClose={() => setShowVoiceAgent(false)} />
+            <VoiceAgent onClose={() => handleNavigation('home')} />
           )}
           
           {/* AI Agent Hub */}
-          {showAIAgentHub && !showLitigationAnalytics && !showLegalResearch && !showVoiceAgent && !showAnalytics && !showLegalQA && !useEnhancedWizard && !showPlainEnglishCreator && (
-            <AIAgentHub onBack={() => setShowAIAgentHub(false)} />
+          {showAIAgentHub && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && (
+            <AIAgentHub />
           )}
           
           {/* Legal Research Dashboard */}
-          {showLegalResearch && !showLitigationAnalytics && !showAnalytics && !showLegalQA && !showVoiceAgent && !useEnhancedWizard && !showPlainEnglishCreator && !showAIAgentHub && (
-            <LegalResearchDashboard onBack={() => setShowLegalResearch(false)} />
+          {showLegalResearch && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showAIAgentHub && (
+            <LegalResearchDashboard />
           )}
           
-          {/* Classic Mode */}
+          {/* Classic Mode Contract Wizard */}
           {!useEnhancedWizard && !showAnalytics && !showPlainEnglishCreator && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
             <>
-              {currentStep < 4 && (
-                <div className="mb-8">
-                  <div className="flex items-center justify-center space-x-8 mb-6">
-                    {[1, 2, 3].map((step) => (
-                      <div key={step} className="flex items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                          currentStep >= step ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
-                        }`}>
-                          {currentStep > step ? <CheckCircle className="h-5 w-5" /> : step}
-                        </div>
-                        <span className="ml-2 text-sm font-medium">
-                          {step === 1 && 'Contract Type'}
-                          {step === 2 && 'Parties'}
-                          {step === 3 && 'Terms'}
-                        </span>
-                        {step < 3 && <div className="w-16 h-px bg-gray-300 ml-4"></div>}
-                      </div>
-                    ))}
-                  </div>
+              {currentStep === 1 && <ContractTypeStep />}
+              {currentStep === 2 && (
+                <PartiesStep 
+                  contractData={contractData} 
+                  updateParties={updateParties} 
+                  setCurrentStep={setCurrentStep} 
+                />
+              )}
+              {currentStep === 3 && (
+                <TermsStep 
+                  contractData={contractData} 
+                  contractTypes={contractTypes}
+                  updateTerms={updateTerms} 
+                  setContractData={setContractData}
+                  generateContract={generateContract} 
+                  isGenerating={isGenerating} 
+                  setCurrentStep={setCurrentStep}
+                />
+              )}
+              {currentStep === 4 && generatedContract && <ContractResult />}
+              
+              {/* Contract Library - Show when on step 1 */}
+              {currentStep === 1 && (
+                <div className="mt-8">
+                  <ContractLibrary />
                 </div>
               )}
-
-              {currentStep === 1 && <ContractTypeStep />}
-              {currentStep === 2 && <PartiesStep contractData={contractData} updateParties={updateParties} setCurrentStep={setCurrentStep} />}
-              {currentStep === 3 && <TermsStep contractData={contractData} contractTypes={contractTypes} updateTerms={updateTerms} setContractData={setContractData} generateContract={generateContract} isGenerating={isGenerating} setCurrentStep={setCurrentStep} />}
-              {currentStep === 4 && <ContractResult />}
-
-              {currentStep === 1 && <div className="mt-12"><ContractLibrary /></div>}
             </>
           )}
         </div>
       </div>
-      
-      {/* Legal Disclaimer Footer */}
-      <LegalDisclaimerFooter 
-        isVisible={complianceMode}
-        disclaimerText={complianceMode ? 
-          "This application provides informational content only and does not constitute legal advice. All content requires attorney supervision and review before use. Consult with a qualified attorney licensed in your jurisdiction for advice specific to your situation. Use of this service does not create an attorney-client relationship." 
-          : undefined
-        }
+
+      {/* Bottom Navigation - Mobile Only */}
+      <BottomNavigation 
+        onNavigate={handleNavigation}
+        currentView={currentView}
       />
+
+      {/* Legal Disclaimer Footer - Mobile Responsive */}
+      <div className="pb-20 lg:pb-0">
+        <LegalDisclaimerFooter />
+      </div>
     </div>
   );
 }
