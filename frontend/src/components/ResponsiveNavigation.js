@@ -53,7 +53,7 @@ const ResponsiveHeader = ({
       id: 'legal-qa',
       label: 'Legal Q&A Assistant',
       icon: Scale,
-      action: () => onNavigate('legal-qa'),
+      action: () => onNavigate('legal-qa', true), // Enable mobile detection
       badge: { text: 'RAG-POWERED', variant: 'secondary', className: 'bg-purple-400 text-purple-900' }
     },
     {
