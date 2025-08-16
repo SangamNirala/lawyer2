@@ -23,6 +23,7 @@ import {
   Users,
   TrendingUp
 } from 'lucide-react';
+import MobileAIAgentHub from './MobileAIAgentHub';
 
 // Simple markdown renderer for basic formatting
 const renderMarkdown = (text) => {
