@@ -160,7 +160,7 @@ const ResponsiveHeader = ({
                     <Button
                       key={item.id}
                       variant={isActive ? "secondary" : "ghost"}
-                      className={`w-full justify-start h-12 px-3 ${
+                      className={`w-full justify-start h-14 px-4 min-h-[44px] ${
                         isActive ? 'bg-blue-100 text-blue-900 border border-blue-200' : 'hover:bg-gray-100'
                       }`}
                       onClick={() => handleItemClick(item)}
