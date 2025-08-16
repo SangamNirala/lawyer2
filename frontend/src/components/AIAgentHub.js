@@ -188,6 +188,9 @@ const AIAgentHub = () => {
     setIsLoading(true);
 
     try {
+      // Check if it's a simple query and provide appropriate response length guidance
+      const isSimple = isSimpleQuery(messageToSend);
+      
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/ai-agents/${activeAgent}`, {
         method: 'POST',
         headers: {
@@ -196,6 +199,8 @@ const AIAgentHub = () => {
         body: JSON.stringify({
           message: messageToSend,
           session_id: session.sessionId,
+          response_length: isSimple ? 'brief' : 'detailed',
+          query_context: isSimple ? 'greeting_or_simple' : 'detailed_inquiry',
           ...session.context
         }),
       });
@@ -204,7 +209,28 @@ const AIAgentHub = () => {
         throw new Error(`Agent request failed: ${response.status}`);
       }
 
-      const agentResponse = await response.json();
+      let agentResponse = await response.json();
+      
+      // If backend doesn't support length adjustment, do it on frontend for simple queries
+      if (isSimple && agentResponse.content && agentResponse.content.length > 200) {
+        const greetingResponses = {
+          'contract-negotiation': 'Hello! I\'m here to help you with contract negotiation strategies. What contract terms would you like to discuss?',
+          'litigation-strategy': 'Hi! I can help you develop effective litigation strategies. What case are you working on?',
+          'compliance-monitoring': 'Hello! I specialize in regulatory compliance and risk assessment. How can I assist you today?',
+          'client-communication': 'Hi! I can help you craft professional client communications. What type of message do you need help with?'
+        };
+        
+        if (greetingResponses[activeAgent]) {
+          agentResponse.content = greetingResponses[activeAgent];
+          agentResponse.confidence_score = 0.95;
+          agentResponse.recommendations = [];
+          agentResponse.action_items = [];
+          agentResponse.follow_up_questions = [
+            'What specific area would you like help with?',
+            'Do you have a particular case or contract in mind?'
+          ];
+        }
+      }
 
       // Add agent response
       const agentMessage = {
