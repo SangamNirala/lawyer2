@@ -1424,7 +1424,7 @@ function App() {
           )}
           
           {/* Mobile Contract Wizard */}
-          {useMobileWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileAnalytics && (
+          {useMobileWizard && !showAnalytics && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileAnalytics && !useMobileLegalQA && !useMobileVoiceAgent && !useMobileAIAgentHub && (
             <MobileContractWizard
               contractTypes={contractTypes}
               jurisdictions={jurisdictions}
