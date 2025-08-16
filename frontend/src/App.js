@@ -42,7 +42,7 @@ import {
   MobileLoadingModal,
   MobileToastModal 
 } from './components/MobileModalSystem';
-import { usePerformanceMonitor, MobilePerformanceDashboard } from './components/MobilePerformanceOptimizer';
+import { usePerformanceMonitor, MobilePerformanceDashboard, OptimizedImage } from './components/MobilePerformanceOptimizer';
 import { FileText, Zap, Shield, Users, CheckCircle, AlertTriangle, Download, Eye, Calendar, Sparkles, Wand2, Clock, BarChart3, MessageSquare, Scale, Mic, Search, Bot } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
