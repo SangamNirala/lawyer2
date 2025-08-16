@@ -34,7 +34,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://key-rotation-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://responsive-legal.preview.emergentagent.com/api"
 
 def test_appeal_analysis_ai_fallback_fix():
     """Test the Appeal Analysis AI fallback issue fix with user's exact scenario"""
