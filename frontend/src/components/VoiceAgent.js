@@ -1287,6 +1287,83 @@ const VoiceAgent = ({ onClose }) => {
     }
   };
 
+  // If mobile, use mobile-optimized component
+  if (isMobile) {
+    return (
+      <MobileVoiceAgent
+        onClose={onClose}
+        // Voice states
+        isListening={isListening}
+        setIsListening={setIsListening}
+        isSpeaking={isSpeaking}
+        setIsSpeaking={setIsSpeaking}
+        transcript={transcript}
+        setTranscript={setTranscript}
+        currentSpeech={currentSpeech}
+        setCurrentSpeech={setCurrentSpeech}
+        conversation={conversation}
+        setConversation={setConversation}
+        isProcessing={isProcessing}
+        setIsProcessing={setIsProcessing}
+        voiceError={voiceError}
+        setVoiceError={setVoiceError}
+        // Voice settings
+        selectedVoice={selectedVoice}
+        setSelectedVoice={setSelectedVoice}
+        speechRate={speechRate}
+        setSpeechRate={setSpeechRate}
+        speechPitch={speechPitch}
+        setSpeechPitch={setSpeechPitch}
+        voiceVolume={voiceVolume}
+        setVoiceVolume={setVoiceVolume}
+        availableVoices={availableVoices}
+        setAvailableVoices={setAvailableVoices}
+        autoListen={autoListen}
+        setAutoListen={setAutoListen}
+        // Legal Q&A settings
+        sessionId={sessionId}
+        setSessionId={setSessionId}
+        selectedJurisdiction={selectedJurisdiction}
+        setSelectedJurisdiction={setSelectedJurisdiction}
+        selectedDomain={selectedDomain}
+        setSelectedDomain={setSelectedDomain}
+        // Enhanced states
+        interimTranscript={interimTranscript}
+        setInterimTranscript={setInterimTranscript}
+        isUserSpeaking={isUserSpeaking}
+        setIsUserSpeaking={setIsUserSpeaking}
+        conversationContext={conversationContext}
+        setConversationContext={setConversationContext}
+        suggestedFollowUps={suggestedFollowUps}
+        setSuggestedFollowUps={setSuggestedFollowUps}
+        isInterrupted={isInterrupted}
+        setIsInterrupted={setIsInterrupted}
+        conversationSummary={conversationSummary}
+        setConversationSummary={setConversationSummary}
+        lastUserIntent={lastUserIntent}
+        setLastUserIntent={setLastUserIntent}
+        // Enhanced error handling
+        retryCount={retryCount}
+        setRetryCount={setRetryCount}
+        isInitializing={isInitializing}
+        setIsInitializing={setIsInitializing}
+        recognitionState={recognitionState}
+        setRecognitionState={setRecognitionState}
+        // Functions
+        initializeVoiceAgent={initializeVoiceAgent}
+        startListening={startListening}
+        stopListening={stopListening}
+        sendVoiceMessage={sendVoiceMessage}
+        interruptSpeech={interruptSpeech}
+        clearConversation={clearConversation}
+        restartRecognition={restartRecognition}
+        jurisdictions={jurisdictions}
+        legalDomains={legalDomains}
+        sampleQuestions={sampleQuestions}
+      />
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-4xl h-[90vh] flex flex-col bg-white"
