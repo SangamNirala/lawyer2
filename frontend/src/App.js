@@ -1377,18 +1377,7 @@ function App() {
             />
           )}
           
-          {/* Debug info for development */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
-              <strong>Debug Info:</strong>
-              <div>Current View: {currentView}</div>
-              <div>Current Step: {currentStep}</div>
-              <div>Current Review ID: {currentReviewId || 'None'}</div>
-              <div>Is Generating: {isGenerating ? 'Yes' : 'No'}</div>
-              <div>Generated Contract: {generatedContract ? 'Yes' : 'No'}</div>
-              <div>Compliance Mode: {complianceMode ? 'Yes' : 'No'}</div>
-            </div>
-          )}
+
           
           {/* Plain English Creator */}
           {showPlainEnglishCreator && !showAnalytics && !useEnhancedWizard && !showLegalQA && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && (
