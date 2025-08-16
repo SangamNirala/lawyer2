@@ -434,6 +434,28 @@ const AIAgentHub = () => {
   const currentSession = getCurrentSession(activeAgent);
   const currentAgent = agents[activeAgent];
 
+  // If mobile, use mobile-optimized component
+  if (isMobile) {
+    return (
+      <MobileAIAgentHub
+        agents={agents}
+        activeAgent={activeAgent}
+        setActiveAgent={setActiveAgent}
+        sessions={sessions}
+        setSessions={setSessions}
+        currentMessage={currentMessage}
+        setCurrentMessage={setCurrentMessage}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        agentStats={agentStats}
+        sendMessage={sendMessage}
+        handleKeyPress={handleKeyPress}
+        clearSession={clearSession}
+        loadAgentStatistics={loadAgentStatistics}
+      />
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-6">
