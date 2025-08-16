@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Send, Bot, User, Clock, ChevronDown, Scale, Search, FileText, AlertCircle, CheckCircle, Loader2, ExternalLink, Gavel, Shield, Briefcase, GraduationCap, Users, Settings, Lightbulb, TrendingUp, BookOpen, Zap } from 'lucide-react';
+import MobileLegalQA from './MobileLegalQA';
 
 const LegalQuestionAnswering = () => {
   const [messages, setMessages] = useState([]);
