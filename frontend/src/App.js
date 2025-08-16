@@ -1107,11 +1107,12 @@ function App() {
                               {firstPartySignature && (
                                 <div className="mt-2 p-2 border rounded">
                                   <p className="text-sm text-green-600 mb-2">✓ First Party signature uploaded</p>
-                                  <img 
+                                  <OptimizedImage 
                                     src={firstPartySignature} 
                                     alt="First Party Signature" 
                                     className="max-w-full h-auto max-h-20 border"
                                     style={{ maxWidth: '300px' }}
+                                    lazy={true}
                                   />
                                 </div>
                               )}
