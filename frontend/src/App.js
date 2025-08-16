@@ -348,6 +348,16 @@ function App() {
   // Mobile Navigation State
   const [currentView, setCurrentView] = useState('home');
 
+  // Mobile-specific State
+  const [useMobileWizard, setUseMobileWizard] = useState(false);
+  const [useMobileAnalytics, setUseMobileAnalytics] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
+  const [mobileToast, setMobileToast] = useState(null);
+  
+  // Performance monitoring
+  const performanceMetrics = usePerformanceMonitor();
+
   // Navigation handler for mobile responsive navigation
   const handleNavigation = (view) => {
     // Reset all view states
