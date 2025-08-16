@@ -972,11 +972,18 @@ const MobileContractWizard = ({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div 
+      className="min-h-screen bg-gray-50 flex flex-col"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <TouchFeedback />
       <MobileHeader />
       
       <div className="flex-1 overflow-y-auto">
+        <div className="px-2 pb-2 text-center text-xs text-gray-500">
+          💡 Tip: Swipe left/right to navigate between steps
+        </div>
         {currentStep === 1 && <Step1ContractType />}
         {currentStep === 2 && <Step2PartyInfo />}
         {currentStep === 3 && <Step3Terms />}
