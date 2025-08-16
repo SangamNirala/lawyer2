@@ -30,7 +30,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://mobile-test-complete.preview.emergentagent.com/api"
+BACKEND_URL = "https://legal-mobile-test.preview.emergentagent.com/api"
 
 def test_analytics_dashboard_endpoint():
     """Test analytics dashboard endpoint - was returning 404"""

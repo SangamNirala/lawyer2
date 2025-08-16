@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://mobile-test-complete.preview.emergentagent.com/api"
+BACKEND_URL = "https://legal-mobile-test.preview.emergentagent.com/api"
 
 def test_endpoint_detailed(method, endpoint, data=None, timeout=30, expected_fields=None):
     """Detailed endpoint test with validation"""

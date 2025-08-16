@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 
 # Use production URL from frontend .env
-BASE_URL = "https://mobile-test-complete.preview.emergentagent.com"
+BASE_URL = "https://legal-mobile-test.preview.emergentagent.com"
 
 class AlternativeLegalResearchTest:
     def __init__(self):

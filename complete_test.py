@@ -3,7 +3,7 @@ import json
 
 def test_complete_edited_pdf():
     """Test edited PDF with complete contract structure"""
-    base_url = "https://mobile-test-complete.preview.emergentagent.com"
+    base_url = "https://legal-mobile-test.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     # First generate a real contract to get the complete structure

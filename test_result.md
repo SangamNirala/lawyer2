@@ -434,7 +434,7 @@ Execute comprehensive Phase 2A backend testing focusing on async background enri
 - Verify any performance improvements or data enrichment
 
 **TECHNICAL REQUIREMENTS:**
-- Backend URL: https://mobile-test-complete.preview.emergentagent.com/api
+- Backend URL: https://legal-mobile-test.preview.emergentagent.com/api
 - MongoDB and AI services are configured and operational
 - Legal Research Engine endpoints are available in server.py
 - CourtListener integration exists through rebuild functionality
