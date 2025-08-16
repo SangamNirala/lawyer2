@@ -116,6 +116,58 @@ const MobileContractWizard = ({
     }));
   }, []);
 
+  // Swipe gesture handlers
+  const handleTouchStart = useCallback((e) => {
+    if (!isSwipeEnabled) return;
+    setSwipeStartX(e.touches[0].clientX);
+    setSwipeStartY(e.touches[0].clientY);
+  }, [isSwipeEnabled]);
+
+  const handleTouchEnd = useCallback((e) => {
+    if (!isSwipeEnabled) return;
+    
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const deltaX = endX - swipeStartX;
+    const deltaY = endY - swipeStartY;
+    
+    // Check if horizontal swipe is more dominant than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+      if (deltaX > 0 && currentStep > 1) {
+        // Swipe right - previous step
+        setCurrentStep(prev => prev - 1);
+        setTouchFeedback({ type: 'success', message: 'Previous step' });
+        setTimeout(() => setTouchFeedback(null), 1500);
+      } else if (deltaX < 0 && currentStep < 5) {
+        // Swipe left - next step (only if current step is valid)
+        if (isStepValid(currentStep)) {
+          setCurrentStep(prev => prev + 1);
+          setTouchFeedback({ type: 'success', message: 'Next step' });
+          setTimeout(() => setTouchFeedback(null), 1500);
+        } else {
+          setTouchFeedback({ type: 'error', message: 'Please complete required fields' });
+          setTimeout(() => setTouchFeedback(null), 2500);
+        }
+      }
+    }
+  }, [isSwipeEnabled, swipeStartX, swipeStartY, currentStep]);
+
+  // Simple validation for swipe navigation
+  const isStepValid = (step) => {
+    switch (step) {
+      case 1:
+        return stepData.step1.contract_type && stepData.step1.jurisdiction;
+      case 2:
+        return stepData.step2.first_party_name && stepData.step2.second_party_name;
+      case 3:
+        return stepData.step3.payment_amount;
+      case 4:
+        return true; // Optional step
+      default:
+        return true;
+    }
+  };
+
   const nextStep = () => {
     if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
