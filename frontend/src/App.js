@@ -1450,7 +1450,7 @@ function App() {
 
           {/* Mobile Legal Q&A */}
           {useMobileLegalQA && !showAnalytics && !showVoiceAgent && !showLitigationAnalytics && !showLegalResearch && !showAIAgentHub && !useMobileWizard && !useMobileAnalytics && !useMobileVoiceAgent && !useMobileAIAgentHub && (
-            <MobileLegalQA onBack={() => handleNavigation('home')} />
+            <LegalQuestionAnswering />
           )}
 
           {/* Mobile Voice Agent */}
