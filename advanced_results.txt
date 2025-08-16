@@ -1,6 +1,6 @@
 🎯 ADVANCED LEGAL RESEARCH ENGINE API ENDPOINTS TESTING
 ================================================================================
-Backend URL: https://legal-multimodal-ai.preview.emergentagent.com/api
+Backend URL: https://key-rotation-1.preview.emergentagent.com/api
 Test Start Time: 2025-08-15 08:42:32
 
 🎯 FOCUS: Verifying MemoFormat fix and Phase 1A implementation
@@ -11,7 +11,7 @@ PHASE 1A: Testing all 7 core modules and 6 API endpoints
 🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥 TEST 1 🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥🏥
 🏥 TESTING LEGAL RESEARCH ENGINE STATS - SYSTEM HEALTH CHECK
 ======================================================================
-Request URL: https://legal-multimodal-ai.preview.emergentagent.com/api/legal-research-engine/stats
+Request URL: https://key-rotation-1.preview.emergentagent.com/api/legal-research-engine/stats
 ❌ Exception occurred: HTTPSConnectionPool(host='legal-timeout-fix.preview.emergentagent.com', port=443): Read timed out. (read timeout=30)
 --------------------------------------------------
 
@@ -27,7 +27,7 @@ Legal Domain: contract_law
 Priority: high
 Legal Issues: breach_of_contract, force_majeure, damages
 
-Request URL: https://legal-multimodal-ai.preview.emergentagent.com/api/legal-research-engine/research
+Request URL: https://key-rotation-1.preview.emergentagent.com/api/legal-research-engine/research
 ❌ Exception occurred: HTTPSConnectionPool(host='legal-timeout-fix.preview.emergentagent.com', port=443): Read timed out. (read timeout=120)
 --------------------------------------------------
 
@@ -41,7 +41,7 @@ Legal Issues: breach_of_contract, force_majeure, commercial_damages
 Max Results: 15
 Min Similarity: 0.6
 
-Request URL: https://legal-multimodal-ai.preview.emergentagent.com/api/legal-research-engine/precedent-search
+Request URL: https://key-rotation-1.preview.emergentagent.com/api/legal-research-engine/precedent-search
 ❌ Exception occurred: HTTPSConnectionPool(host='legal-timeout-fix.preview.emergentagent.com', port=443): Read timed out. (read timeout=90)
 --------------------------------------------------
 
@@ -56,7 +56,7 @@ Jurisdiction filter: US
   Case 1: Smith v. Jones Commercial Contract Dispute
   Case 2: ABC Corp v. XYZ Ltd Force Majeure Case
 
-Request URL: https://legal-multimodal-ai.preview.emergentagent.com/api/legal-research-engine/citation-analysis
+Request URL: https://key-rotation-1.preview.emergentagent.com/api/legal-research-engine/citation-analysis
 Status Code: 502
 ❌ Request failed with status 502
 --------------------------------------------------
@@ -64,7 +64,7 @@ Status Code: 502
 📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚 TEST 5 📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚📚
 📚 TESTING RESEARCH QUERIES ENDPOINT
 ======================================================================
-Request URL: https://legal-multimodal-ai.preview.emergentagent.com/api/legal-research-engine/research-queries
+Request URL: https://key-rotation-1.preview.emergentagent.com/api/legal-research-engine/research-queries
 Status Code: 502
 ❌ Request failed with status 502
 --------------------------------------------------
@@ -72,7 +72,7 @@ Status Code: 502
 📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝 TEST 6 📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝📝
 📝 TESTING RESEARCH MEMOS ENDPOINT
 ======================================================================
-Request URL: https://legal-multimodal-ai.preview.emergentagent.com/api/legal-research-engine/research-memos
+Request URL: https://key-rotation-1.preview.emergentagent.com/api/legal-research-engine/research-memos
 Status Code: 502
 ❌ Request failed with status 502
 --------------------------------------------------
