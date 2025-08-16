@@ -52,6 +52,19 @@ const VoiceAgent = ({ onClose }) => {
   const restartTimeoutRef = useRef(null);
   const interruptTimeoutRef = useRef(null);
   const currentUtteranceRef = useRef(null);
+  
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const jurisdictions = [
     { value: 'US', label: 'United States' },
