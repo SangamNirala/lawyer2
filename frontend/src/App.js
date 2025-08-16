@@ -527,6 +527,11 @@ function App() {
     }));
   };
 
+  // Mobile toast helper
+  const showMobileToast = (type, title, message, duration = 3000) => {
+    setMobileToast({ type, title, message, duration });
+  };
+
   const generateContract = async () => {
     console.log('🔄 Starting generateContract function...');
     console.log('🔍 Current state - isGenerating:', isGenerating, 'consentJustProvided:', consentJustProvided);
