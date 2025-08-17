@@ -596,6 +596,8 @@ const MobileContractWizard = ({
               id="party2_address"
               value={stepData.step2.party2_address}
               onChange={(e) => updateStepData('step2', 'party2_address', e.target.value)}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder="Full address including city, state, and zip"
               rows={3}
               className="text-base resize-none"
