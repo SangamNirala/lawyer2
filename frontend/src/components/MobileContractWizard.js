@@ -516,11 +516,13 @@ const MobileContractWizard = ({
               Name/Company Name *
             </Label>
             <Input
+              key="party2_name_input"
               id="party2_name"
               value={stepData.step2.party2_name}
               onChange={(e) => updateStepData('step2', 'party2_name', e.target.value)}
               placeholder="Other party name or company"
               className="h-12 text-base"
+              autoComplete="name"
             />
           </div>
           
