@@ -563,12 +563,14 @@ const MobileContractWizard = ({
               Address
             </Label>
             <Textarea
+              key="party2_address_input"
               id="party2_address"
               value={stepData.step2.party2_address}
               onChange={(e) => updateStepData('step2', 'party2_address', e.target.value)}
               placeholder="Full address including city, state, and zip"
               rows={3}
               className="text-base resize-none"
+              autoComplete="street-address"
             />
           </div>
         </CardContent>
