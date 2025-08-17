@@ -316,17 +316,96 @@ class BaseAIAgent:
 
 
 class ContractNegotiationAgent(BaseAIAgent):
-    """Specialized agent for contract negotiation assistance"""
+    """Enhanced Contract Negotiation Agent with Legal Analysis capabilities"""
     
     def __init__(self, db_connection):
         super().__init__(AgentType.CONTRACT_NEGOTIATION, db_connection)
-        self.specialization = "contract negotiation and deal structuring"
+        self.specialization = "contract negotiation and deal structuring with advanced legal analysis"
+        self.legal_analyzer = None
+
+    async def get_legal_analyzer(self):
+        """Get legal analyzer instance"""
+        if self.legal_analyzer is None:
+            self.legal_analyzer = await get_legal_analyzer(self.db)
+        return self.legal_analyzer
+
+    async def analyze_document(self, file_content: bytes, filename: str, content_type: str, session_id: str) -> DocumentAnalysisResult:
+        """Analyze uploaded contract document"""
+        try:
+            logger.info(f"🔍 Contract Agent analyzing document: {filename}")
+            analyzer = await self.get_legal_analyzer()
+            
+            # Process document
+            analysis_result = await analyzer.process_document(file_content, filename, content_type)
+            
+            # Store document reference in session context
+            if session_id in self.session_contexts:
+                context = self.session_contexts[session_id]
+                if not hasattr(context, 'analyzed_documents'):
+                    context.analyzed_documents = []
+                context.analyzed_documents.append({
+                    'document_id': analysis_result.document_id,
+                    'filename': filename,
+                    'analysis_timestamp': analysis_result.analysis_timestamp,
+                    'risk_score': analysis_result.overall_risk_score
+                })
+            
+            logger.info(f"✅ Document analysis completed: {analysis_result.document_id}")
+            return analysis_result
+            
+        except Exception as e:
+            logger.error(f"❌ Document analysis failed: {e}")
+            raise
+
+    async def compare_documents(self, document1_id: str, document2_id: str, session_id: str) -> ContractComparison:
+        """Compare two contract documents"""
+        try:
+            logger.info(f"🔄 Contract Agent comparing documents: {document1_id} vs {document2_id}")
+            analyzer = await self.get_legal_analyzer()
+            
+            comparison_result = await analyzer.compare_contracts(document1_id, document2_id)
+            
+            # Store comparison reference in session context
+            if session_id in self.session_contexts:
+                context = self.session_contexts[session_id]
+                if not hasattr(context, 'document_comparisons'):
+                    context.document_comparisons = []
+                context.document_comparisons.append({
+                    'comparison_id': comparison_result.comparison_id,
+                    'document1_id': document1_id,
+                    'document2_id': document2_id,
+                    'comparison_timestamp': comparison_result.comparison_timestamp
+                })
+            
+            logger.info(f"✅ Document comparison completed: {comparison_result.comparison_id}")
+            return comparison_result
+            
+        except Exception as e:
+            logger.error(f"❌ Document comparison failed: {e}")
+            raise
+
+    async def get_document_analysis(self, document_id: str) -> Optional[DocumentAnalysisResult]:
+        """Retrieve document analysis results"""
+        try:
+            analyzer = await self.get_legal_analyzer()
+            return await analyzer.get_document_analysis(document_id)
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve document analysis: {e}")
+            return None
 
     async def _generate_specialized_response(self, message: str, context: AgentContext) -> AgentResponse:
-        """Generate contract negotiation specific response"""
+        """Generate enhanced contract negotiation response with legal analysis integration"""
         try:
             # Get conversation history for context awareness
             conversation_history = context.conversation_history[-4:] if context.conversation_history else []
+            
+            # Check for document analysis commands
+            if any(keyword in message.lower() for keyword in ['analyze', 'upload', 'document', 'contract review']):
+                return await self._handle_document_analysis_request(message, context)
+            
+            # Check for comparison commands
+            if any(keyword in message.lower() for keyword in ['compare', 'comparison', 'versus', 'vs']):
+                return await self._handle_comparison_request(message, context)
             
             # Check if this is a simple query but make it context-aware
             simple_patterns = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 
@@ -348,63 +427,111 @@ class ContractNegotiationAgent(BaseAIAgent):
             
             if is_simple:
                 if not already_introduced:
-                    # First interaction - proper introduction
+                    # First interaction - proper introduction with enhanced capabilities
                     if 'hi' in message_lower or 'hello' in message_lower:
-                        content = "Hello! I'm your Contract Negotiation Agent. I specialize in deal structuring, risk assessment, and negotiation tactics. I can help you optimize contract terms and develop winning negotiation strategies."
+                        content = """Hello! I'm your Enhanced Contract Negotiation Agent. I specialize in deal structuring, risk assessment, and negotiation tactics with advanced legal document analysis capabilities. 
+
+I can help you with:
+• Document upload and clause-by-clause analysis
+• Contract risk assessment and recommendations
+• Side-by-side contract comparisons
+• Negotiation strategy development
+• Legal compliance checking"""
                         follow_ups = [
-                            "What type of contract are you working on?",
-                            "Do you have a specific negotiation challenge?",
-                            "Are you preparing for upcoming contract discussions?"
+                            "Would you like to upload a contract for analysis?",
+                            "Do you have contracts you'd like me to compare?",
+                            "Are you preparing for specific negotiations?"
                         ]
                     elif 'help' in message_lower or 'what can you do' in message_lower:
-                        content = "I'm an expert in contract negotiation with deep knowledge in commercial terms, risk allocation, and strategic positioning. I can assist with term optimization, clause analysis, negotiation tactics, and deal structuring."
+                        content = """I'm an expert in contract negotiation with advanced legal analysis capabilities. I can:
+
+🔍 **Document Analysis:**
+• Upload and analyze contracts (PDF, Word, text)
+• Clause-by-clause risk assessment
+• Identify missing or problematic terms
+
+📊 **Contract Comparison:**
+• Side-by-side contract analysis
+• Gap analysis and risk comparison
+• Preferred clause recommendations
+
+💡 **Negotiation Strategy:**
+• Deal structuring and positioning
+• Risk allocation strategies
+• Market standard comparisons"""
                         follow_ups = [
                             "What's your current contract situation?",
-                            "Are there specific terms giving you trouble?",
-                            "Would you like help with a particular negotiation strategy?"
+                            "Would you like to analyze a specific document?",
+                            "Are there particular terms giving you trouble?"
                         ]
                     elif 'what do you know' in message_lower or 'tell me about' in message_lower:
-                        content = "I have expertise across all aspects of contract negotiation: payment terms, liability clauses, termination conditions, intellectual property provisions, service level agreements, and risk mitigation strategies. I stay current with market standards and best practices."
+                        content = """I have comprehensive expertise in contract law and negotiation, enhanced with AI-powered document analysis:
+
+**Legal Analysis:**
+• Automated clause identification and categorization
+• Risk scoring for individual contract terms
+• Compliance checking and legal precedent analysis
+• Market standard comparisons
+
+**Negotiation Intelligence:**
+• Payment terms and liability optimization
+• Termination and IP protection strategies
+• Dispute resolution and governing law advice
+• Strategic positioning and leverage analysis"""
                         follow_ups = [
                             "Which area interests you most?",
                             "Do you have a contract clause you'd like me to review?",
                             "What industry are you working in?"
                         ]
                     else:
-                        content = "Great to connect! I'm here to help you navigate contract negotiations with confidence. Whether you're reviewing terms, preparing strategies, or analyzing risks, I'll provide expert guidance."
+                        content = """Great to connect! I'm here to help you navigate contract negotiations with confidence and advanced legal analysis. Whether you're reviewing terms, comparing agreements, or developing strategies, I'll provide expert guidance with AI-powered insights."""
                         follow_ups = [
                             "What's your main contract concern?",
-                            "Are you in active negotiations?",
-                            "Would you like me to review specific terms?"
+                            "Would you like to upload a document for analysis?",
+                            "Are you in active negotiations?"
                         ]
                 else:
                     # Continuing conversation - more contextual responses
                     if 'help' in message_lower:
-                        content = "I can dive deeper into any specific contract issues you're facing. Whether it's payment terms, liability allocation, termination clauses, or negotiation positioning - just share what's on your mind."
+                        content = """I can dive deeper into any specific contract issues you're facing. My enhanced capabilities include:
+
+• **Document Analysis:** Upload contracts for automated clause analysis
+• **Risk Assessment:** Detailed scoring and recommendations
+• **Contract Comparison:** Side-by-side analysis with gap identification
+• **Strategic Guidance:** Negotiation positioning and tactics
+
+What would be most helpful for your situation?"""
                         follow_ups = [
-                            "What specific terms are you concerned about?",
-                            "Are you reviewing a contract right now?",
+                            "Do you have a contract to analyze?",
+                            "Would you like to compare multiple agreements?",
                             "What's the most challenging part of your negotiation?"
                         ]
                     elif 'what do you know' in message_lower:
-                        content = "Beyond the basics, I can help with advanced strategies like creating negotiation leverage, structuring win-win proposals, identifying hidden risks, and developing fallback positions. What aspect interests you?"
+                        content = """Beyond basic contract advice, I offer advanced AI-powered analysis:
+
+• **Automated Risk Scoring:** Each clause analyzed for potential issues
+• **Intelligent Recommendations:** Market-standard alternatives and improvements
+• **Comprehensive Comparisons:** Gap analysis between multiple contracts
+• **Strategic Intelligence:** Leverage assessment and negotiation priorities
+
+I can help transform complex legal documents into clear, actionable insights."""
                         follow_ups = [
-                            "Are you looking for advanced negotiation tactics?",
-                            "Do you need help with risk assessment?",
+                            "Are you looking for document analysis capabilities?",
+                            "Do you need help with contract comparison?",
                             "Would you like strategies for difficult negotiations?"
                         ]
                     elif any(word in message_lower for word in ['thanks', 'thank you']):
-                        content = "You're very welcome! I'm here whenever you need contract negotiation support. Feel free to ask about any specific terms, strategies, or challenges."
+                        content = """You're very welcome! I'm here whenever you need advanced contract analysis or negotiation support. Feel free to upload documents for analysis or ask about any specific terms, strategies, or challenges."""
                         follow_ups = [
-                            "Is there anything else I can help clarify?",
-                            "Do you have other contract questions?",
-                            "Would you like tips for your next negotiation?"
+                            "Is there a contract you'd like me to analyze?",
+                            "Do you have other negotiation questions?",
+                            "Would you like tips for your next contract review?"
                         ]
                     else:
-                        content = "Absolutely! Let's focus on what matters most for your contract situation. I can provide targeted advice once I understand your specific needs."
+                        content = """Absolutely! Let's focus on what matters most for your contract situation. I can provide targeted advice, document analysis, or strategic guidance once I understand your specific needs."""
                         follow_ups = [
                             "What's your biggest contract challenge right now?",
-                            "Are you dealing with difficult terms?",
+                            "Would document analysis be helpful?",
                             "What would success look like for this negotiation?"
                         ]
                 
@@ -418,8 +545,8 @@ class ContractNegotiationAgent(BaseAIAgent):
                     follow_up_questions=follow_ups
                 )
             
-            # For detailed queries, build context-aware prompt
-            context_summary = self._build_context_summary(context)
+            # For detailed queries, build enhanced context-aware prompt
+            context_summary = self._build_enhanced_context_summary(context)
             
             # Include recent conversation context
             conversation_context = ""
@@ -430,26 +557,34 @@ class ContractNegotiationAgent(BaseAIAgent):
                     conversation_context += f"{role}: {str(msg.content)[:200]}...\n"
             
             prompt = f"""
-            You are a specialized Contract Negotiation AI Agent with expertise in deal structuring, 
-            risk mitigation, and strategic negotiation tactics. You have deep knowledge of contract law,
-            commercial terms, and negotiation psychology.
+            You are an Enhanced Contract Negotiation AI Agent with advanced legal analysis capabilities. 
+            You combine expert knowledge of contract law, negotiation tactics, and AI-powered document analysis.
 
             CURRENT CONTEXT:
             {context_summary}
             {conversation_context}
 
+            ENHANCED CAPABILITIES:
+            - Advanced document analysis and clause identification
+            - Risk assessment with automated scoring
+            - Contract comparison and gap analysis  
+            - Market standard benchmarking
+            - Legal compliance checking
+            - Strategic negotiation positioning
+
             SPECIALIZATION FOCUS:
-            - Contract term optimization
-            - Risk allocation strategies  
-            - Negotiation tactics and positioning
-            - Deal structure recommendations
-            - Clause analysis and alternatives
-            - Commercial term benchmarking
+            - Contract term optimization with AI insights
+            - Risk allocation strategies based on analysis
+            - Negotiation tactics and positioning with leverage assessment
+            - Deal structure recommendations with precedent analysis
+            - Clause analysis and intelligent alternatives
+            - Commercial term benchmarking with market data
 
             USER MESSAGE: {message}
 
-            Provide expert guidance that builds on our conversation. Be conversational, insightful, and practical.
-            Offer specific recommendations, risk assessments, and actionable next steps.
+            Provide expert guidance that builds on our conversation and leverages advanced analysis capabilities. 
+            Be conversational, insightful, and practical. Offer specific recommendations, risk assessments, 
+            and actionable next steps. Mention document analysis capabilities when relevant.
             Keep responses focused and valuable - aim for 200-400 words unless the query requires more detail.
             """
 
@@ -461,7 +596,7 @@ class ContractNegotiationAgent(BaseAIAgent):
             confidence_score = self._calculate_confidence(ai_response, context)
             
             # Generate contextual follow-up questions based on the response content
-            contextual_follow_ups = self._generate_contextual_follow_ups(message, ai_response, context)
+            contextual_follow_ups = self._generate_enhanced_follow_ups(message, ai_response, context)
             
             return AgentResponse(
                 response_id=str(uuid.uuid4()),
@@ -474,8 +609,221 @@ class ContractNegotiationAgent(BaseAIAgent):
             )
             
         except Exception as e:
-            logger.error(f"❌ Contract negotiation response failed: {e}")
+            logger.error(f"❌ Enhanced contract negotiation response failed: {e}")
             raise
+
+    async def _handle_document_analysis_request(self, message: str, context: AgentContext) -> AgentResponse:
+        """Handle requests for document analysis"""
+        content = """📄 **Document Analysis Ready**
+
+I can analyze your contract documents to provide:
+
+🔍 **Comprehensive Analysis:**
+• Clause-by-clause risk assessment
+• Automated issue identification
+• Legal compliance checking
+• Market standard comparisons
+
+📊 **Detailed Reports:**
+• Overall risk scoring
+• Specific recommendations for each clause
+• Missing clause identification
+• Negotiation priority guidance
+
+**To get started:** Upload your contract document (PDF, Word, or text format) and I'll provide a complete analysis with actionable insights.
+
+Would you like to upload a document now, or do you have questions about the analysis process?"""
+
+        follow_ups = [
+            "What type of contract would you like to analyze?",
+            "Do you have specific concerns about certain clauses?",
+            "Would you like to know more about the analysis features?"
+        ]
+
+        return AgentResponse(
+            response_id=str(uuid.uuid4()),
+            agent_type=self.agent_type,
+            content=content,
+            recommendations=[
+                "Upload contract documents in PDF, Word, or text format",
+                "Focus on high-risk clauses identified in the analysis",
+                "Use analysis results to prioritize negotiation points"
+            ],
+            action_items=[
+                {
+                    'description': 'Prepare contract documents for upload and analysis',
+                    'priority': 'medium',
+                    'category': 'document_analysis'
+                }
+            ],
+            confidence_score=0.95,
+            follow_up_questions=follow_ups
+        )
+
+    async def _handle_comparison_request(self, message: str, context: AgentContext) -> AgentResponse:
+        """Handle requests for contract comparison"""
+        # Check if user has analyzed documents
+        analyzed_docs = getattr(context, 'analyzed_documents', [])
+        
+        if len(analyzed_docs) >= 2:
+            content = f"""📊 **Contract Comparison Available**
+
+I can compare your analyzed documents:
+
+**Available Documents:**
+{chr(10).join(f"• {doc['filename']} (Risk Score: {doc['risk_score']:.2f})" for doc in analyzed_docs[:5])}
+
+🔍 **Comparison Features:**
+• Side-by-side clause analysis
+• Gap identification and risk assessment
+• Preferred clause recommendations
+• Detailed difference explanations
+
+Would you like me to compare specific documents? Just let me know which ones."""
+
+            follow_ups = [
+                "Which documents would you like me to compare?",
+                "Are you looking for specific clause comparisons?",
+                "Do you need help choosing the better contract?"
+            ]
+        else:
+            content = """📊 **Contract Comparison Service**
+
+I can provide detailed side-by-side contract comparisons including:
+
+🔍 **Comprehensive Analysis:**
+• Clause-by-clause comparison
+• Risk differential assessment
+• Gap analysis and missing terms
+• Preferred clause recommendations
+
+**To compare contracts:** First upload and analyze at least two contract documents, then I can provide detailed comparisons with specific recommendations.
+
+Would you like to upload documents for analysis first?"""
+
+            follow_ups = [
+                "Would you like to upload contracts for analysis?",
+                "What types of contracts do you need to compare?",
+                "Do you have specific comparison criteria in mind?"
+            ]
+
+        return AgentResponse(
+            response_id=str(uuid.uuid4()),
+            agent_type=self.agent_type,
+            content=content,
+            recommendations=[
+                "Upload multiple contracts for comprehensive comparison",
+                "Focus on high-risk differences identified in comparisons",
+                "Use comparison results to negotiate better terms"
+            ],
+            action_items=[
+                {
+                    'description': 'Prepare multiple contract documents for comparison analysis',
+                    'priority': 'medium',
+                    'category': 'contract_comparison'
+                }
+            ],
+            confidence_score=0.95,
+            follow_up_questions=follow_ups
+        )
+
+    def _build_enhanced_context_summary(self, context: AgentContext) -> str:
+        """Build enhanced context summary including document analysis history"""
+        summary = self._build_context_summary(context)
+        
+        # Add document analysis information
+        analyzed_docs = getattr(context, 'analyzed_documents', [])
+        if analyzed_docs:
+            summary += f"\nANALYZED DOCUMENTS:\n"
+            for doc in analyzed_docs[-3:]:  # Last 3 documents
+                summary += f"- {doc['filename']} (Risk: {doc['risk_score']:.2f})\n"
+        
+        # Add comparison information  
+        comparisons = getattr(context, 'document_comparisons', [])
+        if comparisons:
+            summary += f"\nRECENT COMPARISONS: {len(comparisons)} completed\n"
+        
+        return summary
+
+    def _generate_enhanced_follow_ups(self, user_message: str, ai_response: str, context: AgentContext) -> List[str]:
+        """Generate enhanced contextual follow-up questions including document analysis options"""
+        message_lower = user_message.lower()
+        response_lower = ai_response.lower() if ai_response else ""
+        
+        # Check if user has analyzed documents
+        analyzed_docs = getattr(context, 'analyzed_documents', [])
+        has_documents = len(analyzed_docs) > 0
+        
+        # Document analysis related follow-ups
+        if any(term in message_lower for term in ['document', 'contract', 'analyze', 'upload']):
+            if has_documents:
+                return [
+                    "Would you like to analyze additional documents?",
+                    "Should I compare this with your other contracts?",
+                    "Do you need help with specific clauses from the analysis?"
+                ]
+            else:
+                return [
+                    "Would you like to upload a contract for analysis?",
+                    "What type of document analysis would be most helpful?",
+                    "Do you have contracts ready for review?"
+                ]
+        
+        # Standard topic-based follow-ups with enhanced options
+        if any(term in message_lower for term in ['payment', 'money', 'fee', 'cost']):
+            base_follow_ups = [
+                "Would you like me to review specific payment terms?",
+                "Should we discuss payment security mechanisms?",
+                "Are there milestone-based payment options to consider?"
+            ]
+            if has_documents:
+                base_follow_ups.append("Should I analyze payment clauses in your uploaded contracts?")
+            return base_follow_ups
+            
+        elif any(term in message_lower for term in ['risk', 'liability', 'insurance']):
+            base_follow_ups = [
+                "Should we explore liability cap strategies?",
+                "Would indemnification clauses be relevant here?",
+                "Are there specific risks you're most concerned about?"
+            ]
+            if has_documents:
+                base_follow_ups.append("Would you like detailed risk analysis of your contracts?")
+            return base_follow_ups
+            
+        elif any(term in message_lower for term in ['termination', 'end', 'cancel', 'exit']):
+            base_follow_ups = [
+                "Do you need help with termination notice periods?",
+                "Should we discuss post-termination obligations?",
+                "Are there specific exit scenarios to plan for?"
+            ]
+            if has_documents:
+                base_follow_ups.append("Should I review termination clauses in your contracts?")
+            return base_follow_ups
+            
+        else:
+            # General contextual follow-ups based on conversation stage and available features
+            conversation_length = len(context.conversation_history) if context.conversation_history else 0
+            
+            if conversation_length < 4:
+                base_follow_ups = [
+                    "What's the most important outcome for this negotiation?",
+                    "Are there any deal-breaker terms we should address?",
+                    "Would document analysis help with your contract review?"
+                ]
+            else:
+                base_follow_ups = [
+                    "Should we explore alternative approaches to this?",
+                    "Are there other contract areas you'd like to optimize?",
+                    "What would make this negotiation successful for you?"
+                ]
+            
+            # Add document-specific options based on context
+            if has_documents and len(analyzed_docs) >= 2:
+                base_follow_ups.append("Would you like me to compare your analyzed contracts?")
+            elif not has_documents:
+                base_follow_ups.append("Would contract document analysis be helpful?")
+            
+            return base_follow_ups
 
     def _generate_contextual_follow_ups(self, user_message: str, ai_response: str, context: AgentContext) -> List[str]:
         """Generate contextual follow-up questions based on the conversation"""
