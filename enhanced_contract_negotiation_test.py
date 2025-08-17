@@ -612,7 +612,7 @@ Client: _________________""",
                 "endpoint": "/ai-agents/contract-negotiation/upload-document",
                 "method": "POST",
                 "data": {"session_id": self.test_session_id},
-                "expected_status": 400
+                "expected_status": 422  # Changed from 400 to 422 for validation errors
             },
             {
                 "name": "Invalid Document ID - Analysis Retrieval",
