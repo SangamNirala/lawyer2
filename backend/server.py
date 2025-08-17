@@ -16109,6 +16109,374 @@ else:
             detail="Client Communication Agent is currently unavailable. Please check system configuration."
         )
 
+# ====================================================================================================
+# ENHANCED LEGAL ANALYSIS ENDPOINTS (Contract Negotiation Agent Extensions)
+# ====================================================================================================
+
+# Pydantic models for enhanced legal analysis
+class DocumentUploadRequest(BaseModel):
+    session_id: str
+    filename: str
+    content_type: str
+    user_id: Optional[str] = None
+
+class DocumentAnalysisResponse(BaseModel):
+    document_id: str
+    filename: str
+    document_type: str
+    overall_risk_score: float
+    analysis_summary: Dict[str, Any]
+    key_issues: List[str]
+    recommendations: List[str]
+    negotiation_priorities: List[str]
+    missing_clauses: List[str]
+    metadata: Dict[str, Any]
+
+class ContractComparisonRequest(BaseModel):
+    session_id: str
+    document1_id: str
+    document2_id: str
+    user_id: Optional[str] = None
+
+class ContractComparisonResponse(BaseModel):
+    comparison_id: str
+    document1_id: str
+    document2_id: str
+    differences: List[Dict[str, Any]]
+    gap_analysis: List[str]
+    risk_comparison: Dict[str, Any]
+    recommendations: List[str]
+    preferred_clauses: List[Dict[str, Any]]
+
+class ClauseAnalysisResponse(BaseModel):
+    clause_id: str
+    clause_type: str
+    content: str
+    risk_level: str
+    risk_score: float
+    issues: List[str]
+    recommendations: List[str]
+    suggested_alternatives: List[str]
+
+class DocumentListResponse(BaseModel):
+    documents: List[Dict[str, Any]]
+    total_count: int
+
+if ai_agents_available:
+    
+    @api_router.post("/ai-agents/contract-negotiation/upload-document", response_model=DocumentAnalysisResponse)
+    async def upload_and_analyze_contract(
+        session_id: str = Form(...),
+        user_id: Optional[str] = Form(None),
+        file: UploadFile = File(...)
+    ):
+        """
+        Enhanced Contract Analysis - Upload and Analyze Documents
+        
+        Upload a contract document for comprehensive AI-powered analysis including:
+        - Clause-by-clause risk assessment
+        - Automated issue identification
+        - Legal compliance checking
+        - Market standard comparisons
+        - Negotiation priority guidance
+        
+        Supported formats: PDF, DOCX, TXT
+        """
+        try:
+            logger.info(f"📄 Processing document upload: {file.filename}")
+            
+            # Validate file
+            if not file.filename:
+                raise HTTPException(status_code=400, detail="No file provided")
+            
+            # Check file size (10MB limit)
+            content = await file.read()
+            if len(content) > 10 * 1024 * 1024:  # 10MB
+                raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB")
+            
+            # Get contract negotiation agent
+            agent_manager = await get_ai_agent_manager(db)
+            contract_agent = agent_manager.agents[AgentType.CONTRACT_NEGOTIATION]
+            
+            # Process document
+            analysis_result = await contract_agent.analyze_document(
+                file_content=content,
+                filename=file.filename,
+                content_type=file.content_type or 'application/octet-stream',
+                session_id=session_id
+            )
+            
+            # Prepare response
+            response = DocumentAnalysisResponse(
+                document_id=analysis_result.document_id,
+                filename=analysis_result.metadata.filename,
+                document_type=analysis_result.metadata.document_type.value,
+                overall_risk_score=analysis_result.overall_risk_score,
+                analysis_summary={
+                    'total_clauses': len(analysis_result.clause_analyses),
+                    'high_risk_clauses': len([c for c in analysis_result.clause_analyses if c.risk_level.value in ['high', 'critical']]),
+                    'word_count': analysis_result.metadata.word_count,
+                    'parties': analysis_result.metadata.parties,
+                    'jurisdiction': analysis_result.metadata.jurisdiction,
+                    'processing_time': (analysis_result.analysis_timestamp - analysis_result.metadata.upload_timestamp).total_seconds()
+                },
+                key_issues=analysis_result.key_issues,
+                recommendations=analysis_result.recommendations,
+                negotiation_priorities=analysis_result.negotiation_priorities,
+                missing_clauses=analysis_result.missing_clauses,
+                metadata={
+                    'document_type': analysis_result.metadata.document_type.value,
+                    'file_size': analysis_result.metadata.file_size,
+                    'upload_timestamp': analysis_result.metadata.upload_timestamp.isoformat(),
+                    'processing_timestamp': analysis_result.metadata.processing_timestamp.isoformat() if analysis_result.metadata.processing_timestamp else None,
+                    'effective_date': analysis_result.metadata.effective_date,
+                    'expiration_date': analysis_result.metadata.expiration_date
+                }
+            )
+            
+            logger.info(f"✅ Document analysis completed: {analysis_result.document_id}")
+            return response
+            
+        except Exception as e:
+            logger.error(f"❌ Document upload and analysis failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Document analysis failed: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/document/{document_id}/clauses", response_model=List[ClauseAnalysisResponse])
+    async def get_document_clause_analysis(document_id: str):
+        """
+        Get Detailed Clause Analysis
+        
+        Retrieve detailed clause-by-clause analysis for a previously analyzed document.
+        Includes risk scoring, recommendations, and suggested alternatives for each clause.
+        """
+        try:
+            logger.info(f"📋 Retrieving clause analysis for document: {document_id}")
+            
+            # Get contract negotiation agent
+            agent_manager = await get_ai_agent_manager(db)
+            contract_agent = agent_manager.agents[AgentType.CONTRACT_NEGOTIATION]
+            
+            # Retrieve document analysis
+            analysis_result = await contract_agent.get_document_analysis(document_id)
+            if not analysis_result:
+                raise HTTPException(status_code=404, detail="Document analysis not found")
+            
+            # Prepare clause analysis response
+            clause_responses = []
+            for clause in analysis_result.clause_analyses:
+                clause_responses.append(ClauseAnalysisResponse(
+                    clause_id=clause.clause_id,
+                    clause_type=clause.clause_type.value,
+                    content=clause.content,
+                    risk_level=clause.risk_level.value,
+                    risk_score=clause.risk_score,
+                    issues=clause.issues,
+                    recommendations=clause.recommendations,
+                    suggested_alternatives=clause.suggested_alternatives
+                ))
+            
+            logger.info(f"✅ Retrieved {len(clause_responses)} clause analyses")
+            return clause_responses
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve clause analysis: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve analysis: {str(e)}")
+    
+    @api_router.post("/ai-agents/contract-negotiation/compare-documents", response_model=ContractComparisonResponse)
+    async def compare_contract_documents(request: ContractComparisonRequest):
+        """
+        Enhanced Contract Comparison
+        
+        Compare two previously analyzed contract documents with:
+        - Side-by-side clause analysis
+        - Gap identification and risk assessment
+        - Preferred clause recommendations
+        - Detailed difference explanations
+        """
+        try:
+            logger.info(f"🔄 Comparing documents: {request.document1_id} vs {request.document2_id}")
+            
+            # Get contract negotiation agent
+            agent_manager = await get_ai_agent_manager(db)
+            contract_agent = agent_manager.agents[AgentType.CONTRACT_NEGOTIATION]
+            
+            # Perform comparison
+            comparison_result = await contract_agent.compare_documents(
+                document1_id=request.document1_id,
+                document2_id=request.document2_id,
+                session_id=request.session_id
+            )
+            
+            # Prepare response
+            response = ContractComparisonResponse(
+                comparison_id=comparison_result.comparison_id,
+                document1_id=comparison_result.document1_id,
+                document2_id=comparison_result.document2_id,
+                differences=comparison_result.differences,
+                gap_analysis=comparison_result.gap_analysis,
+                risk_comparison=comparison_result.risk_comparison,
+                recommendations=comparison_result.recommendations,
+                preferred_clauses=comparison_result.preferred_clauses
+            )
+            
+            logger.info(f"✅ Document comparison completed: {comparison_result.comparison_id}")
+            return response
+            
+        except Exception as e:
+            logger.error(f"❌ Document comparison failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Document comparison failed: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/documents", response_model=DocumentListResponse)
+    async def list_analyzed_documents(
+        session_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0
+    ):
+        """
+        List Analyzed Documents
+        
+        Retrieve a list of previously analyzed documents with metadata and analysis summaries.
+        Can be filtered by session_id or user_id.
+        """
+        try:
+            logger.info(f"📚 Listing analyzed documents (limit: {limit}, offset: {offset})")
+            
+            # Build query filter
+            query_filter = {}
+            if session_id:
+                # Need to find documents by session through AI agent conversations
+                conversations = await db.ai_agent_conversations.find({
+                    "session_id": session_id,
+                    "agent_type": "contract_negotiation"
+                }).to_list(length=None)
+                
+                if conversations:
+                    # Get document IDs from conversation context
+                    doc_ids = []
+                    for conv in conversations:
+                        analyzed_docs = conv.get('context_metadata', {}).get('analyzed_documents', [])
+                        doc_ids.extend([doc['document_id'] for doc in analyzed_docs])
+                    
+                    if doc_ids:
+                        query_filter['document_id'] = {'$in': doc_ids}
+                    else:
+                        # No documents found for this session
+                        return DocumentListResponse(documents=[], total_count=0)
+            
+            # Get documents
+            cursor = db.document_analyses.find(query_filter).sort("analysis_timestamp", -1).skip(offset).limit(limit)
+            documents = await cursor.to_list(length=limit)
+            
+            # Get total count
+            total_count = await db.document_analyses.count_documents(query_filter)
+            
+            # Prepare response
+            document_list = []
+            for doc in documents:
+                document_list.append({
+                    'document_id': doc['document_id'],
+                    'filename': doc['metadata']['filename'],
+                    'document_type': doc['metadata']['document_type'],
+                    'overall_risk_score': doc['overall_risk_score'],
+                    'analysis_timestamp': doc['analysis_timestamp'].isoformat(),
+                    'word_count': doc['metadata'].get('word_count'),
+                    'parties': doc['metadata'].get('parties', []),
+                    'jurisdiction': doc['metadata'].get('jurisdiction'),
+                    'key_issues_count': len(doc.get('key_issues', [])),
+                    'clause_count': len(doc.get('clause_analyses', []))
+                })
+            
+            response = DocumentListResponse(
+                documents=document_list,
+                total_count=total_count
+            )
+            
+            logger.info(f"✅ Retrieved {len(document_list)} documents")
+            return response
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to list documents: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to list documents: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/document/{document_id}", response_model=DocumentAnalysisResponse)
+    async def get_document_analysis_summary(document_id: str):
+        """
+        Get Document Analysis Summary
+        
+        Retrieve complete analysis summary for a previously analyzed document including
+        risk scores, recommendations, and metadata.
+        """
+        try:
+            logger.info(f"📊 Retrieving analysis summary for document: {document_id}")
+            
+            # Get contract negotiation agent
+            agent_manager = await get_ai_agent_manager(db)
+            contract_agent = agent_manager.agents[AgentType.CONTRACT_NEGOTIATION]
+            
+            # Retrieve document analysis
+            analysis_result = await contract_agent.get_document_analysis(document_id)
+            if not analysis_result:
+                raise HTTPException(status_code=404, detail="Document analysis not found")
+            
+            # Prepare response
+            response = DocumentAnalysisResponse(
+                document_id=analysis_result.document_id,
+                filename=analysis_result.metadata.filename,
+                document_type=analysis_result.metadata.document_type.value,
+                overall_risk_score=analysis_result.overall_risk_score,
+                analysis_summary={
+                    'total_clauses': len(analysis_result.clause_analyses),
+                    'high_risk_clauses': len([c for c in analysis_result.clause_analyses if c.risk_level.value in ['high', 'critical']]),
+                    'word_count': analysis_result.metadata.word_count,
+                    'parties': analysis_result.metadata.parties,
+                    'jurisdiction': analysis_result.metadata.jurisdiction,
+                    'processing_time': (analysis_result.analysis_timestamp - analysis_result.metadata.upload_timestamp).total_seconds()
+                },
+                key_issues=analysis_result.key_issues,
+                recommendations=analysis_result.recommendations,
+                negotiation_priorities=analysis_result.negotiation_priorities,
+                missing_clauses=analysis_result.missing_clauses,
+                metadata={
+                    'document_type': analysis_result.metadata.document_type.value,
+                    'file_size': analysis_result.metadata.file_size,
+                    'upload_timestamp': analysis_result.metadata.upload_timestamp.isoformat(),
+                    'processing_timestamp': analysis_result.metadata.processing_timestamp.isoformat() if analysis_result.metadata.processing_timestamp else None,
+                    'effective_date': analysis_result.metadata.effective_date,
+                    'expiration_date': analysis_result.metadata.expiration_date
+                }
+            )
+            
+            logger.info(f"✅ Document analysis summary retrieved")
+            return response
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve document analysis: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve analysis: {str(e)}")
+
+else:
+    # Fallback endpoints for enhanced legal analysis when AI agents are not available
+    @api_router.post("/ai-agents/contract-negotiation/upload-document")
+    async def upload_document_fallback():
+        raise HTTPException(
+            status_code=503,
+            detail="Enhanced Legal Analysis is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.post("/ai-agents/contract-negotiation/compare-documents")
+    async def compare_documents_fallback():
+        raise HTTPException(
+            status_code=503,
+            detail="Contract Comparison is currently unavailable. Please check system configuration."
+        )
+
+# END ENHANCED LEGAL ANALYSIS ENDPOINTS
+# ====================================================================================================
+
 # END CONTEXT-AWARE AI AGENTS
 # ====================================================================================================
 
