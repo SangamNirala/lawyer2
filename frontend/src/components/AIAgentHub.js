@@ -610,13 +610,27 @@ const AIAgentHub = () => {
                   </div>
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={clearSession}
-                >
-                  Clear Chat
-                </Button>
+                <div className="flex items-center space-x-2">
+                  {activeAgent === 'contract-negotiation' && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowEnhancedAnalysis(true)}
+                      className="flex items-center space-x-1"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>Analyze Document</span>
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={clearSession}
+                  >
+                    Clear Chat
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             
