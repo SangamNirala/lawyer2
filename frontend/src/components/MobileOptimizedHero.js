@@ -194,7 +194,7 @@ const MobileOptimizedHero = ({
 
           {/* Secondary Actions - Mobile Responsive */}
           <div className="mb-6 lg:mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 max-w-6xl mx-auto">
               {secondaryActions.map((action) => {
                 const Icon = action.icon;
                 return (
