@@ -601,11 +601,11 @@ const MobileContractWizard = ({
             <Label htmlFor="party1_address" className="text-sm font-medium mb-2 block">
               Address
             </Label>
-            <Textarea
-              ref={(el) => inputRefs.current['party1_address'] = el}
+            <StableTextarea
+              inputRef={(el) => inputRefs.current['party1_address'] = el}
               id="party1_address"
               value={stepData.step2.party1_address}
-              onChange={(e) => updateStepData('step2', 'party1_address', e.target.value)}
+              onChange={changeHandlers.party1_address}
               onFocus={() => handleInputFocus('party1_address')}
               onBlur={() => handleInputBlur('party1_address')}
               placeholder="Full address including city, state, and zip"
