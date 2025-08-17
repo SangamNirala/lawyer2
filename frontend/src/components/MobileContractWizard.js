@@ -996,26 +996,27 @@ const MobileContractWizard = ({
     return tipsByStep[currentStep] || [];
   };
 
-  // Validation functions - mobile optimized
-  // Optimized validation function with useCallback to prevent re-renders
+  // Memoized validation functions to prevent re-renders
+  const stepValidation = useMemo(() => ({
+    1: stepData.step1.contract_type && stepData.step1.jurisdiction,
+    2: stepData.step2.party1_name && stepData.step2.party2_name,
+    3: stepData.step3.payment_amount && stepData.step3.payment_schedule,
+    4: true, // All optional
+    5: stepData.step5.review_complete
+  }), [
+    stepData.step1.contract_type, 
+    stepData.step1.jurisdiction,
+    stepData.step2.party1_name, 
+    stepData.step2.party2_name,
+    stepData.step3.payment_amount, 
+    stepData.step3.payment_schedule,
+    stepData.step5.review_complete
+  ]);
+
+  // Optimized validation function with stable memoization
   const isCurrentStepValid = useCallback(() => {
-    switch (currentStep) {
-      case 1: 
-        return stepData.step1.contract_type && stepData.step1.jurisdiction;
-      case 2: 
-        return stepData.step2.party1_name && stepData.step2.party2_name;
-      case 3: 
-        return stepData.step3.payment_amount && stepData.step3.payment_schedule;
-      case 4: 
-        return true; // All optional
-      case 5: 
-        return stepData.step5.review_complete;
-      default: 
-        return false;
-    }
-  }, [currentStep, stepData.step1.contract_type, stepData.step1.jurisdiction, 
-      stepData.step2.party1_name, stepData.step2.party2_name, 
-      stepData.step3.payment_amount, stepData.step3.payment_schedule, stepData.step5.review_complete]);
+    return stepValidation[currentStep] || false;
+  }, [currentStep, stepValidation]);
 
   // Touch feedback component
   const TouchFeedback = () => {
