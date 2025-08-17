@@ -829,7 +829,7 @@ const VoiceAgent = ({ onClose }) => {
         } else if (error.message.includes('microphone') || error.message.includes('audio-capture')) {
           errorMessage = '❌ No microphone detected. Please connect a microphone and try again.';
         } else if (error.message.includes('timeout')) {
-          errorMessage = '❌ Speech recognition start timed out. Please check your microphone and try again.';
+          errorMessage = '❌ Speech recognition start timed out. Please ensure microphone is connected, grant browser permission, and try again.';
         } else if (error.message.includes('network')) {
           errorMessage = '❌ Network error. Please check your internet connection and try again.';
         } else if (error.message.includes('state changed') || error.message.includes('Recognition state')) {
