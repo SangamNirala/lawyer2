@@ -624,9 +624,9 @@ const VoiceAgent = ({ onClose }) => {
             } 
           });
 
-          // Add timeout to prevent hanging
+          // Add timeout to prevent hanging - increase timeout for permission dialog
           const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('getUserMedia timeout')), 5000);
+            setTimeout(() => reject(new Error('getUserMedia timeout')), 10000);
           });
 
           try {
