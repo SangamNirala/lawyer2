@@ -216,21 +216,6 @@ const MobileContractWizard = ({
     }
   }, [isSwipeEnabled, swipeStartX, swipeStartY, currentStep, stepValidation]);
 
-  // Simple validation for swipe navigation
-  const isStepValid = (step) => {
-    switch (step) {
-      case 1:
-        return stepData.step1.contract_type && stepData.step1.jurisdiction;
-      case 2:
-        return stepData.step2.party1_name && stepData.step2.party2_name;
-      case 3:
-        return stepData.step3.payment_amount;
-      case 4:
-        return true; // Optional step
-      default:
-        return true;
-    }
-  };
 
   const nextStep = () => {
     if (currentStep < 5) {
