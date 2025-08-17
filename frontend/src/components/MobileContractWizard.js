@@ -647,12 +647,12 @@ const MobileContractWizard = ({
             <Label htmlFor="party2_email" className="text-sm font-medium mb-2 block">
               Email Address
             </Label>
-            <Input
-              ref={(el) => inputRefs.current['party2_email'] = el}
+            <StableInput
+              inputRef={(el) => inputRefs.current['party2_email'] = el}
               id="party2_email"
               type="email"
               value={stepData.step2.party2_email}
-              onChange={(e) => updateStepData('step2', 'party2_email', e.target.value)}
+              onChange={changeHandlers.party2_email}
               onFocus={() => handleInputFocus('party2_email')}
               onBlur={() => handleInputBlur('party2_email')}
               placeholder="other@email.com"
