@@ -716,6 +716,15 @@ const AIAgentHub = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Enhanced Contract Analysis Modal */}
+      {showEnhancedAnalysis && (
+        <EnhancedContractAnalysis
+          sessionId={getCurrentSession(activeAgent).sessionId}
+          isVisible={showEnhancedAnalysis}
+          onClose={() => setShowEnhancedAnalysis(false)}
+        />
+      )}
     </div>
   );
 };
