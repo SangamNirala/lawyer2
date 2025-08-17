@@ -151,7 +151,7 @@ const MobileContractWizard = ({
 
   // Swipe gesture handlers - Updated to prevent interference with input fields
   const handleTouchStart = useCallback((e) => {
-    if (!isSwipeEnabled) return;
+    if (!isSwipeEnabled || activeInputRef.current) return;
     
     // Ignore touch events on input fields, textareas, and select elements
     const target = e.target;
@@ -173,7 +173,7 @@ const MobileContractWizard = ({
   }, [isSwipeEnabled]);
 
   const handleTouchEnd = useCallback((e) => {
-    if (!isSwipeEnabled) return;
+    if (!isSwipeEnabled || activeInputRef.current) return;
     
     // Ignore touch events on input fields, textareas, and select elements
     const target = e.target;
@@ -204,7 +204,7 @@ const MobileContractWizard = ({
         setTimeout(() => setTouchFeedback(null), 1500);
       } else if (deltaX < 0 && currentStep < 5) {
         // Swipe left - next step (only if current step is valid)
-        if (isStepValid(currentStep)) {
+        if (stepValidation[currentStep]) {
           setCurrentStep(prev => prev + 1);
           setTouchFeedback({ type: 'success', message: 'Next step' });
           setTimeout(() => setTouchFeedback(null), 1500);
@@ -214,7 +214,7 @@ const MobileContractWizard = ({
         }
       }
     }
-  }, [isSwipeEnabled, swipeStartX, swipeStartY, currentStep]);
+  }, [isSwipeEnabled, swipeStartX, swipeStartY, currentStep, stepValidation]);
 
   // Simple validation for swipe navigation
   const isStepValid = (step) => {
