@@ -1585,7 +1585,7 @@ class LegalMateAgents:
 
             **1. SCOPE:** As defined in the attached terms.
             **2. TERMS:** {structured_requirements.get('essential_terms', {})}
-            **3. GOVERNING LAW:** This agreement shall be governed by the laws of {structured_requirements.get('jurisdiction_requirements', ['US'])[0]}.
+            **3. GOVERNING LAW:** This agreement shall be governed by the laws of {structured_requirements.get('jurisdiction_requirements', ['US'])[0] if structured_requirements.get('jurisdiction_requirements') else 'US'}.
 
             [This is a simplified fallback contract. Please review with legal counsel.]
             """
