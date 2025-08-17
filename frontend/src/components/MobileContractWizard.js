@@ -665,12 +665,12 @@ const MobileContractWizard = ({
             <Label htmlFor="party2_phone" className="text-sm font-medium mb-2 block">
               Phone Number
             </Label>
-            <Input
-              ref={(el) => inputRefs.current['party2_phone'] = el}
+            <StableInput
+              inputRef={(el) => inputRefs.current['party2_phone'] = el}
               id="party2_phone"
               type="tel"
               value={stepData.step2.party2_phone}
-              onChange={(e) => updateStepData('step2', 'party2_phone', e.target.value)}
+              onChange={changeHandlers.party2_phone}
               onFocus={() => handleInputFocus('party2_phone')}
               onBlur={() => handleInputBlur('party2_phone')}
               placeholder="+1 (555) 987-6543"
