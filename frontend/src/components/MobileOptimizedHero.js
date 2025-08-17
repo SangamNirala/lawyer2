@@ -49,7 +49,7 @@ const MobileOptimizedHero = ({
     {
       id: 'legal-qa',
       label: 'Legal Q&A',
-      icon: Scale,
+      icon: MessageSquare,
       gradient: 'from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700',
       badge: { text: 'RAG-POWERED', className: 'bg-purple-400 text-purple-900' },
       action: () => onNavigate('legal-qa')
