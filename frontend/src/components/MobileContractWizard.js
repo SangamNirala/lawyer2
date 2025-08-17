@@ -115,26 +115,38 @@ const MobileContractWizard = ({
   // Enhanced input focus management to prevent swipe interference
   const [inputFocused, setInputFocused] = useState(false);
   
-  // Input focus handlers to disable swiping during text input
-  const handleInputFocus = useCallback(() => {
+  // Optimized input focus handlers - prevent re-renders
+  const handleInputFocus = useCallback((fieldName) => {
+    activeInputRef.current = fieldName;
     setInputFocused(true);
     setIsSwipeEnabled(false);
   }, []);
   
-  const handleInputBlur = useCallback(() => {
-    setInputFocused(false);
-    // Re-enable swiping after a brief delay
-    setTimeout(() => setIsSwipeEnabled(true), 100);
+  const handleInputBlur = useCallback((fieldName) => {
+    if (activeInputRef.current === fieldName) {
+      activeInputRef.current = null;
+      setInputFocused(false);
+      // Re-enable swiping after a brief delay
+      setTimeout(() => setIsSwipeEnabled(true), 100);
+    }
   }, []);
 
+  // Optimized updateStepData with better state management
   const updateStepData = useCallback((step, field, value) => {
-    setStepData(prev => ({
-      ...prev,
-      [step]: {
-        ...prev[step],
-        [field]: value
+    setStepData(prevStepData => {
+      // Only update if the value has actually changed
+      if (prevStepData[step][field] === value) {
+        return prevStepData;
       }
-    }));
+      
+      return {
+        ...prevStepData,
+        [step]: {
+          ...prevStepData[step],
+          [field]: value
+        }
+      };
+    });
   }, []);
 
   // Swipe gesture handlers - Updated to prevent interference with input fields
