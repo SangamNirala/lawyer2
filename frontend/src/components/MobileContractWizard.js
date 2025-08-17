@@ -592,13 +592,13 @@ const MobileContractWizard = ({
               Phone Number
             </Label>
             <Input
-              key="party2_phone_input"
+              ref={(el) => inputRefs.current['party2_phone'] = el}
               id="party2_phone"
               type="tel"
               value={stepData.step2.party2_phone}
               onChange={(e) => updateStepData('step2', 'party2_phone', e.target.value)}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
+              onFocus={() => handleInputFocus('party2_phone')}
+              onBlur={() => handleInputBlur('party2_phone')}
               placeholder="+1 (555) 987-6543"
               className="h-12 text-base"
               autoComplete="tel"
