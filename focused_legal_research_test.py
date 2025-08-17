@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BASE_URL = "https://litigation-buttons.preview.emergentagent.com"
+BASE_URL = "https://smooth-input-wizard.preview.emergentagent.com"
 
 def log_test(message):
     timestamp = datetime.now().strftime("%H:%M:%S")

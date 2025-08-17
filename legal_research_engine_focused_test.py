@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://litigation-buttons.preview.emergentagent.com/api"
+BACKEND_URL = "https://smooth-input-wizard.preview.emergentagent.com/api"
 
 class LegalResearchEngineFocusedTester:
     def __init__(self):

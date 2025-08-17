@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://litigation-buttons.preview.emergentagent.com/api"
+BACKEND_URL = "https://smooth-input-wizard.preview.emergentagent.com/api"
 
 def test_legal_research_engine_stats():
     """Test GET /api/legal-research-engine/stats endpoint"""

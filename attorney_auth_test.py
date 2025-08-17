@@ -19,7 +19,7 @@ from datetime import datetime
 import jwt
 
 # Use production URL from frontend .env
-BASE_URL = "https://litigation-buttons.preview.emergentagent.com"
+BASE_URL = "https://smooth-input-wizard.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""

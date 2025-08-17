@@ -8,7 +8,7 @@ import json
 import sys
 
 # Backend URL from environment
-BACKEND_URL = "https://litigation-buttons.preview.emergentagent.com/api"
+BACKEND_URL = "https://smooth-input-wizard.preview.emergentagent.com/api"
 
 def test_with_different_inputs():
     """Test with different user input values"""
