@@ -497,6 +497,8 @@ const MobileContractWizard = ({
               type="tel"
               value={stepData.step2.party1_phone}
               onChange={(e) => updateStepData('step2', 'party1_phone', e.target.value)}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder="+1 (555) 123-4567"
               className="h-12 text-base"
               autoComplete="tel"
