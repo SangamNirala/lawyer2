@@ -628,6 +628,8 @@ const MobileContractWizard = ({
             id="payment_amount"
             value={stepData.step3.payment_amount}
             onChange={(e) => updateStepData('step3', 'payment_amount', e.target.value)}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             placeholder="e.g., $5,000, €3,500, £2,800"
             className="h-12 text-base"
             autoComplete="off"
