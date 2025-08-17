@@ -457,12 +457,14 @@ const MobileContractWizard = ({
               Email Address
             </Label>
             <Input
+              key="party1_email_input"
               id="party1_email"
               type="email"
               value={stepData.step2.party1_email}
               onChange={(e) => updateStepData('step2', 'party1_email', e.target.value)}
               placeholder="your@email.com"
               className="h-12 text-base"
+              autoComplete="email"
             />
           </div>
 
