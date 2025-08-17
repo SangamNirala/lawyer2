@@ -106,3 +106,9 @@ networkx>=3.0
 joblib
 threadpoolctl>=3.6.0
 sgmllib3k>=1.0.0
+
+# Enhanced Legal Analysis Dependencies
+PyMuPDF>=1.23.0  # PDF processing
+python-docx>=1.1.0  # DOCX processing  
+python-magic>=0.4.27  # File type detection
+openpyxl>=3.1.0  # Excel file support
