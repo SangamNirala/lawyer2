@@ -475,12 +475,12 @@ const MobileContractWizard = ({
               Name/Company Name *
             </Label>
             <Input
-              key="party1_name_input"
+              ref={(el) => inputRefs.current['party1_name'] = el}
               id="party1_name"
               value={stepData.step2.party1_name}
               onChange={(e) => updateStepData('step2', 'party1_name', e.target.value)}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
+              onFocus={() => handleInputFocus('party1_name')}
+              onBlur={() => handleInputBlur('party1_name')}
               placeholder="Your name or company name"
               className="h-12 text-base"
               autoComplete="name"
