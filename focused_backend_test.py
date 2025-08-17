@@ -7,7 +7,7 @@ Execute focused testing to verify critical system fixes:
 - Background Enrichment Performance
 - Skip hanging Legal Research Engine endpoint
 
-Backend URL: https://contract-genius-7.preview.emergentagent.com/api
+Backend URL: https://legal-api-testing.preview.emergentagent.com/api
 """
 
 import requests
@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://contract-genius-7.preview.emergentagent.com/api"
+BACKEND_URL = "https://legal-api-testing.preview.emergentagent.com/api"
 
 class FocusedPhase2ATester:
     def __init__(self):

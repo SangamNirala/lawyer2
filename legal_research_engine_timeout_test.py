@@ -25,7 +25,7 @@ import sys
 from datetime import datetime
 
 # Use production URL from frontend .env
-BASE_URL = "https://contract-genius-7.preview.emergentagent.com"
+BASE_URL = "https://legal-api-testing.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""

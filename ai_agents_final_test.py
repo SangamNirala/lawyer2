@@ -12,7 +12,7 @@ import uuid
 import time
 from datetime import datetime
 
-BASE_URL = "https://contract-genius-7.preview.emergentagent.com"
+BASE_URL = "https://legal-api-testing.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""
