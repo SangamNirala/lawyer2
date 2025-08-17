@@ -1282,6 +1282,7 @@ function App() {
       onNavigate={handleNavigation}
       useEnhancedWizard={useEnhancedWizard}
       complianceMode={complianceMode}
+      setShowAttorneyDashboard={setShowAttorneyDashboard}
     />
   );
 
