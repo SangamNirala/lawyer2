@@ -473,12 +473,14 @@ const MobileContractWizard = ({
               Phone Number
             </Label>
             <Input
+              key="party1_phone_input"
               id="party1_phone"
               type="tel"
               value={stepData.step2.party1_phone}
               onChange={(e) => updateStepData('step2', 'party1_phone', e.target.value)}
               placeholder="+1 (555) 123-4567"
               className="h-12 text-base"
+              autoComplete="tel"
             />
           </div>
 
