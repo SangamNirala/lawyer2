@@ -6,7 +6,7 @@ Each agent maintains conversation history, understands current case/contract con
 and provides intelligent recommendations based on their specialization.
 
 Agents:
-- Contract Negotiation Agent
+- Contract Negotiation Agent (Enhanced with Legal Analysis)
 - Litigation Strategy Agent  
 - Compliance Monitoring Agent
 - Client Communication Agent
@@ -24,6 +24,9 @@ import uuid
 import google.generativeai as genai
 from groq import Groq
 from tenacity import retry, stop_after_attempt, wait_exponential
+
+# Import enhanced legal analysis
+from .enhanced_legal_analysis import get_legal_analyzer, DocumentAnalysisResult, ContractComparison
 
 logger = logging.getLogger(__name__)
 
