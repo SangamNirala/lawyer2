@@ -773,11 +773,11 @@ const MobileContractWizard = ({
           <Label htmlFor="deliverables" className="text-base font-medium mb-3 block">
             Deliverables & Scope
           </Label>
-          <Textarea
-            ref={(el) => inputRefs.current['deliverables'] = el}
+          <StableTextarea
+            inputRef={(el) => inputRefs.current['deliverables'] = el}
             id="deliverables"
             value={stepData.step3.deliverables}
-            onChange={(e) => updateStepData('step3', 'deliverables', e.target.value)}
+            onChange={changeHandlers.deliverables}
             onFocus={() => handleInputFocus('deliverables')}
             onBlur={() => handleInputBlur('deliverables')}
             placeholder="Describe what will be delivered, services provided, or work completed..."
