@@ -82,12 +82,20 @@ const AIAgentHub = () => {
       name: 'Contract Negotiation Agent',
       icon: Briefcase,
       color: 'bg-blue-500',
-      description: 'Expert in deal structuring, risk allocation, and negotiation tactics',
+      description: 'Expert in deal structuring, risk allocation, and negotiation tactics with advanced document analysis',
       capabilities: [
         'Contract term optimization',
+        'Document upload & analysis',
         'Risk allocation strategies',
+        'Contract comparison',
         'Negotiation positioning',
         'Deal structure recommendations'
+      ],
+      enhanced_features: [
+        'AI-powered document analysis',
+        'Clause-by-clause risk assessment',
+        'Side-by-side contract comparison',
+        'Automated compliance checking'
       ]
     },
     'litigation-strategy': {
