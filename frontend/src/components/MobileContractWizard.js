@@ -574,13 +574,13 @@ const MobileContractWizard = ({
               Email Address
             </Label>
             <Input
-              key="party2_email_input"
+              ref={(el) => inputRefs.current['party2_email'] = el}
               id="party2_email"
               type="email"
               value={stepData.step2.party2_email}
               onChange={(e) => updateStepData('step2', 'party2_email', e.target.value)}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
+              onFocus={() => handleInputFocus('party2_email')}
+              onBlur={() => handleInputBlur('party2_email')}
               placeholder="other@email.com"
               className="h-12 text-base"
               autoComplete="email"
