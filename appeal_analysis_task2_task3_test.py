@@ -41,7 +41,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://mobile-input-test.preview.emergentagent.com/api"
+BACKEND_URL = "https://contract-genius-7.preview.emergentagent.com/api"
 
 def test_user_exact_scenario_task2_task3():
     """Test the user's exact scenario to verify TASK 2 and TASK 3 fixes"""

@@ -8,7 +8,7 @@ import json
 import sys
 
 # Backend URL from environment
-BACKEND_URL = "https://mobile-input-test.preview.emergentagent.com/api"
+BACKEND_URL = "https://contract-genius-7.preview.emergentagent.com/api"
 
 def debug_ai_analysis():
     """Debug the AI analysis response"""
