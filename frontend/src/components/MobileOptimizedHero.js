@@ -69,6 +69,22 @@ const MobileOptimizedHero = ({
       gradient: 'from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700',
       badge: { text: 'PHASE 1.3', className: 'bg-teal-400 text-teal-900' },
       action: () => onNavigate('ai-agent-hub')
+    },
+    {
+      id: 'litigation-analytics',
+      label: 'Litigation Analytics',
+      icon: Scale,
+      gradient: 'from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700',
+      badge: { text: 'PREMIUM', className: 'bg-red-400 text-red-900' },
+      action: () => onNavigate('litigation-analytics')
+    },
+    {
+      id: 'attorney-dashboard',
+      label: 'Attorney Dashboard',
+      icon: Shield,
+      gradient: 'from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700',
+      badge: { text: 'COMPLIANCE', className: 'bg-orange-400 text-orange-900' },
+      action: () => setShowAttorneyDashboard && setShowAttorneyDashboard(true)
     }
   ];
 
