@@ -1571,8 +1571,12 @@ class LegalMateAgents:
             
         except Exception as e:
             logging.error(f"Contract generator error: {e}")
-            jurisdiction_list = structured_requirements.get('jurisdiction_requirements', ['US'])
-            jurisdiction = jurisdiction_list[0] if jurisdiction_list else 'US'
+            # Extract jurisdiction safely
+            jurisdiction_list = structured_requirements.get('jurisdiction_requirements', [])
+            if isinstance(jurisdiction_list, list) and len(jurisdiction_list) > 0:
+                jurisdiction = jurisdiction_list[0]
+            else:
+                jurisdiction = 'US'
             
             fallback_content = f"""
             **{contract_type.upper()} AGREEMENT**
