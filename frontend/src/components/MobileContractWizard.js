@@ -756,11 +756,11 @@ const MobileContractWizard = ({
           <Label htmlFor="project_duration" className="text-base font-medium mb-3 block">
             Project Duration
           </Label>
-          <Input
-            ref={(el) => inputRefs.current['project_duration'] = el}
+          <StableInput
+            inputRef={(el) => inputRefs.current['project_duration'] = el}
             id="project_duration"
             value={stepData.step3.project_duration}
-            onChange={(e) => updateStepData('step3', 'project_duration', e.target.value)}
+            onChange={changeHandlers.project_duration}
             onFocus={() => handleInputFocus('project_duration')}
             onBlur={() => handleInputBlur('project_duration')}
             placeholder="e.g., 3 months, 6 weeks, 12 days"
