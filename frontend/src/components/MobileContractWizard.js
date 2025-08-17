@@ -479,6 +479,8 @@ const MobileContractWizard = ({
               type="email"
               value={stepData.step2.party1_email}
               onChange={(e) => updateStepData('step2', 'party1_email', e.target.value)}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder="your@email.com"
               className="h-12 text-base"
               autoComplete="email"
