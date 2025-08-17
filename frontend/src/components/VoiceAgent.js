@@ -742,18 +742,15 @@ const VoiceAgent = ({ onClose }) => {
             return;
           }
 
-          // Double-check state before proceeding
-          if (recognitionState !== 'starting') {
-            reject(new Error('Recognition state changed during initialization'));
-            return;
-          }
-
           // Set up one-time event listeners for start result
           const onStart = () => {
             console.log('🎤 ✅ Speech recognition started successfully');
             if (recognitionRef.current) {
               recognitionRef.current.removeEventListener('error', onError);
             }
+            // Update state on successful start
+            setRecognitionState('active');
+            setIsListening(true);
             resolve();
           };
 
