@@ -21,7 +21,8 @@ import {
 const MobileOptimizedHero = ({ 
   onNavigate, 
   useEnhancedWizard, 
-  complianceMode 
+  complianceMode,
+  setShowAttorneyDashboard 
 }) => {
   // Primary action buttons (most important features)
   const primaryActions = [
