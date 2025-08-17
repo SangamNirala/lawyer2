@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://smooth-input-wizard.preview.emergentagent.com/api"
+BACKEND_URL = "https://mobile-input-test.preview.emergentagent.com/api"
 
 def quick_test(method, endpoint, data=None, timeout=10):
     """Quick test with short timeout"""

@@ -19,7 +19,7 @@ from datetime import datetime
 import uuid
 
 # Use production URL from frontend .env
-BASE_URL = "https://smooth-input-wizard.preview.emergentagent.com"
+BASE_URL = "https://mobile-input-test.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""

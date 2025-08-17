@@ -26,7 +26,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://smooth-input-wizard.preview.emergentagent.com/api"
+BACKEND_URL = "https://mobile-input-test.preview.emergentagent.com/api"
 
 def test_litigation_strategy_risk_factors():
     """Test litigation strategy endpoint with exact user parameters focusing on risk factors"""
