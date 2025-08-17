@@ -543,6 +543,8 @@ const MobileContractWizard = ({
               id="party2_name"
               value={stepData.step2.party2_name}
               onChange={(e) => updateStepData('step2', 'party2_name', e.target.value)}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder="Other party name or company"
               className="h-12 text-base"
               autoComplete="name"
