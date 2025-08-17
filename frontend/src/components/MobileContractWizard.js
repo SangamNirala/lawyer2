@@ -715,11 +715,11 @@ const MobileContractWizard = ({
           <Label htmlFor="payment_amount" className="text-base font-medium mb-3 block">
             Payment Amount *
           </Label>
-          <Input
-            ref={(el) => inputRefs.current['payment_amount'] = el}
+          <StableInput
+            inputRef={(el) => inputRefs.current['payment_amount'] = el}
             id="payment_amount"
             value={stepData.step3.payment_amount}
-            onChange={(e) => updateStepData('step3', 'payment_amount', e.target.value)}
+            onChange={changeHandlers.payment_amount}
             onFocus={() => handleInputFocus('payment_amount')}
             onBlur={() => handleInputBlur('payment_amount')}
             placeholder="e.g., $5,000, €3,500, £2,800"
