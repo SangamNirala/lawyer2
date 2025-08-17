@@ -642,12 +642,12 @@ const MobileContractWizard = ({
             Payment Amount *
           </Label>
           <Input
-            key="payment_amount_input"
+            ref={(el) => inputRefs.current['payment_amount'] = el}
             id="payment_amount"
             value={stepData.step3.payment_amount}
             onChange={(e) => updateStepData('step3', 'payment_amount', e.target.value)}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
+            onFocus={() => handleInputFocus('payment_amount')}
+            onBlur={() => handleInputBlur('payment_amount')}
             placeholder="e.g., $5,000, €3,500, £2,800"
             className="h-12 text-base"
             autoComplete="off"
