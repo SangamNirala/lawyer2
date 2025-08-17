@@ -632,11 +632,13 @@ const MobileContractWizard = ({
             Project Duration
           </Label>
           <Input
+            key="project_duration_input"
             id="project_duration"
             value={stepData.step3.project_duration}
             onChange={(e) => updateStepData('step3', 'project_duration', e.target.value)}
             placeholder="e.g., 3 months, 6 weeks, 12 days"
             className="h-12 text-base"
+            autoComplete="off"
           />
         </div>
 
