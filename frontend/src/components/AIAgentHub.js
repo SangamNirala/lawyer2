@@ -64,6 +64,7 @@ const AIAgentHub = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [agentStats, setAgentStats] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [showEnhancedAnalysis, setShowEnhancedAnalysis] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
