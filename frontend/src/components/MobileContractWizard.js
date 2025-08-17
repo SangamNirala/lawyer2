@@ -1186,7 +1186,7 @@ const MobileContractWizard = ({
           💡 Tip: Swipe left/right to navigate between steps
         </div>
         {currentStep === 1 && <Step1ContractType />}
-        {currentStep === 2 && <Step2PartyInfo />}
+        {currentStep === 2 && Step2PartyInfoMemo}
         {currentStep === 3 && <Step3Terms />}
         {currentStep === 4 && <Step4SpecialClauses />}
         {currentStep === 5 && <Step5Review />}
