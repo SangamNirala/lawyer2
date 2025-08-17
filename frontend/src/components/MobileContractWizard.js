@@ -526,8 +526,8 @@ const MobileContractWizard = ({
     </div>
   );
 
-  // Step 2: Party Information - Mobile Optimized Vertical Layout
-  const Step2PartyInfo = () => (
+  // Memoized step components to prevent unnecessary re-renders
+  const Step2PartyInfoMemo = useMemo(() => (
     <div className="space-y-6 p-4">
       <div className="text-center mb-6">
         <User className="h-12 w-12 mx-auto mb-3 text-blue-600" />
@@ -699,7 +699,22 @@ const MobileContractWizard = ({
         </CardContent>
       </Card>
     </div>
-  );
+  ), [
+    stepData.step2.party1_name,
+    stepData.step2.party1_email,
+    stepData.step2.party1_phone, 
+    stepData.step2.party1_address,
+    stepData.step2.party2_name,
+    stepData.step2.party2_email,
+    stepData.step2.party2_phone,
+    stepData.step2.party2_address,
+    changeHandlers,
+    handleInputFocus,
+    handleInputBlur
+  ]);
+
+  // Step 2: Party Information - Mobile Optimized Vertical Layout
+  const Step2PartyInfo = useCallback(() => Step2PartyInfoMemo, [Step2PartyInfoMemo]);
 
   // Step 3: Terms & Conditions - Mobile Optimized
   const Step3Terms = () => (
