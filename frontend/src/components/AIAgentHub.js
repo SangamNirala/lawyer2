@@ -21,9 +21,12 @@ import {
   AlertCircle,
   Clock,
   Users,
-  TrendingUp
+  TrendingUp,
+  FileText,
+  Upload
 } from 'lucide-react';
 import MobileAIAgentHub from './MobileAIAgentHub';
+import EnhancedContractAnalysis from './EnhancedContractAnalysis';
 
 // Simple markdown renderer for basic formatting
 const renderMarkdown = (text) => {
