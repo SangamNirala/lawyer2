@@ -942,7 +942,8 @@ const MobileContractWizard = ({
   };
 
   // Validation functions - mobile optimized
-  const isCurrentStepValid = () => {
+  // Optimized validation function with useCallback to prevent re-renders
+  const isCurrentStepValid = useCallback(() => {
     switch (currentStep) {
       case 1: 
         return stepData.step1.contract_type && stepData.step1.jurisdiction;
@@ -957,7 +958,9 @@ const MobileContractWizard = ({
       default: 
         return false;
     }
-  };
+  }, [currentStep, stepData.step1.contract_type, stepData.step1.jurisdiction, 
+      stepData.step2.party1_name, stepData.step2.party2_name, 
+      stepData.step3.payment_amount, stepData.step3.payment_schedule, stepData.step5.review_complete]);
 
   // Touch feedback component
   const TouchFeedback = () => {
