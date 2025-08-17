@@ -181,7 +181,7 @@ const EnhancedContractAnalysis = ({ sessionId, isVisible, onClose }) => {
                 <span>Analysis Results</span>
               </TabsTrigger>
               <TabsTrigger value="comparison" className="flex items-center space-x-2">
-                <Compare className="h-4 w-4" />
+                <GitCompare className="h-4 w-4" />
                 <span>Document Comparison</span>
               </TabsTrigger>
             </TabsList>
