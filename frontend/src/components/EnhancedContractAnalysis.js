@@ -13,7 +13,7 @@ import {
   CheckCircle, 
   Download, 
   Eye,
-  Compare,
+  GitCompare,
   BarChart3,
   Shield,
   Clock,
