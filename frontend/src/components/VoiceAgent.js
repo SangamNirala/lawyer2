@@ -809,42 +809,42 @@ const VoiceAgent = ({ onClose }) => {
         setTimeout(() => reject(new Error('Speech recognition start timeout')), 8000);
       });
 
-      // Add delay to prevent race conditions
-      setTimeout(async () => {
-        try {
-          // Verify state hasn't changed during delay
-          if (recognitionState !== 'starting' || !recognitionRef.current) {
-            throw new Error('Recognition state changed before start');
-          }
-          
-          await Promise.race([startSpeechRecognition(), timeoutPromise]);
-          console.log('🎤 ✅ Speech recognition start completed successfully');
-          
-        } catch (error) {
-          console.error('🎤 ❌ Error starting speech recognition:', error);
-          
-          // Set appropriate error message based on error type
-          let errorMessage = '❌ Could not start voice recognition. ';
-          
-          if (error.message.includes('permission') || error.message.includes('not-allowed')) {
-            errorMessage = '❌ Microphone permission denied. Please allow microphone access in your browser and try again.';
-          } else if (error.message.includes('microphone') || error.message.includes('audio-capture')) {
-            errorMessage = '❌ No microphone detected. Please connect a microphone and try again.';
-          } else if (error.message.includes('timeout')) {
-            errorMessage = '❌ Speech recognition start timed out. Please check your microphone and try again.';
-          } else if (error.message.includes('network')) {
-            errorMessage = '❌ Network error. Please check your internet connection and try again.';
-          } else if (error.message.includes('state changed')) {
-            errorMessage = '❌ Voice recognition startup interrupted. Please try clicking "Start Listening" again.';
-          } else {
-            errorMessage += error.message || 'Please try again or reload the page.';
-          }
-          
-          setVoiceError(errorMessage);
-          setRecognitionState('error');
-          setIsListening(false);
+      // Remove delay and use direct state management to prevent race conditions
+      try {
+        // Use current state directly instead of closure
+        const currentState = recognitionRef.current ? 'ready' : 'not_ready';
+        
+        if (currentState === 'not_ready') {
+          throw new Error('Recognition object not available during start');
         }
-      }, 200); // Small delay to prevent race conditions
+        
+        await Promise.race([startSpeechRecognition(), timeoutPromise]);
+        console.log('🎤 ✅ Speech recognition start completed successfully');
+        
+      } catch (error) {
+        console.error('🎤 ❌ Error starting speech recognition:', error);
+        
+        // Set appropriate error message based on error type
+        let errorMessage = '❌ Could not start voice recognition. ';
+        
+        if (error.message.includes('permission') || error.message.includes('not-allowed')) {
+          errorMessage = '❌ Microphone permission denied. Please allow microphone access in your browser and try again.';
+        } else if (error.message.includes('microphone') || error.message.includes('audio-capture')) {
+          errorMessage = '❌ No microphone detected. Please connect a microphone and try again.';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = '❌ Speech recognition start timed out. Please check your microphone and try again.';
+        } else if (error.message.includes('network')) {
+          errorMessage = '❌ Network error. Please check your internet connection and try again.';
+        } else if (error.message.includes('state changed') || error.message.includes('Recognition state')) {
+          errorMessage = '❌ Voice recognition startup interrupted. Please try clicking "Start Listening" again.';
+        } else {
+          errorMessage += error.message || 'Please try again or reload the page.';
+        }
+        
+        setVoiceError(errorMessage);
+        setRecognitionState('error');
+        setIsListening(false);
+      }
       
     } catch (error) {
       console.error('🎤 ❌ Outer error in startListening:', error);
