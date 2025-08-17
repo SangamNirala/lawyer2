@@ -1659,7 +1659,7 @@ const VoiceAgent = ({ onClose }) => {
                           });
                           
                           const timeoutPromise = new Promise((_, reject) => {
-                            setTimeout(() => reject(new Error('getUserMedia timeout')), 3000);
+                            setTimeout(() => reject(new Error('getUserMedia timeout')), 10000);
                           });
                           
                           const stream = await Promise.race([getUserMediaPromise, timeoutPromise]);
