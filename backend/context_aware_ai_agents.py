@@ -26,7 +26,7 @@ from groq import Groq
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Import enhanced legal analysis
-from .enhanced_legal_analysis import get_legal_analyzer, DocumentAnalysisResult, ContractComparison
+from enhanced_legal_analysis import get_legal_analyzer, DocumentAnalysisResult, ContractComparison
 
 logger = logging.getLogger(__name__)
 
