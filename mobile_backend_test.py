@@ -19,7 +19,7 @@ from datetime import datetime
 import uuid
 
 # Use production URL from frontend .env
-BASE_URL = "https://legal-mobile-test.preview.emergentagent.com"
+BASE_URL = "https://litigation-buttons.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""
