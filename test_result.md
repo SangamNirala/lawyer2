@@ -237,11 +237,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Smart Contract Wizard Input Focus Fix"
-  stuck_tasks:
-    - "Smart Contract Wizard Input Focus Fix"
+    - "Enhanced Contract Negotiation Agent - Document Upload Form Data Fix"
+  stuck_tasks: []
   test_all: false
-  test_priority: "critical_fix_first"
+  test_priority: "enhanced_legal_analysis_first"
 
 agent_communication:
     - agent: "main"
