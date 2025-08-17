@@ -801,9 +801,9 @@ const VoiceAgent = ({ onClose }) => {
         });
       };
 
-      // Try to start with timeout and better state checking
+      // Try to start with timeout (reduced for better UX)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Speech recognition start timeout')), 8000);
+        setTimeout(() => reject(new Error('Speech recognition start timeout')), 5000);
       });
 
       // Remove delay and use direct state management to prevent race conditions
