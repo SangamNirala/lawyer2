@@ -116,15 +116,46 @@ const MobileContractWizard = ({
     }));
   }, []);
 
-  // Swipe gesture handlers
+  // Swipe gesture handlers - Updated to prevent interference with input fields
   const handleTouchStart = useCallback((e) => {
     if (!isSwipeEnabled) return;
+    
+    // Ignore touch events on input fields, textareas, and select elements
+    const target = e.target;
+    if (target && (
+      target.tagName === 'INPUT' || 
+      target.tagName === 'TEXTAREA' || 
+      target.tagName === 'SELECT' ||
+      target.closest('input') ||
+      target.closest('textarea') ||
+      target.closest('select') ||
+      target.closest('[role="combobox"]') ||
+      target.closest('.select-trigger')
+    )) {
+      return;
+    }
+    
     setSwipeStartX(e.touches[0].clientX);
     setSwipeStartY(e.touches[0].clientY);
   }, [isSwipeEnabled]);
 
   const handleTouchEnd = useCallback((e) => {
     if (!isSwipeEnabled) return;
+    
+    // Ignore touch events on input fields, textareas, and select elements
+    const target = e.target;
+    if (target && (
+      target.tagName === 'INPUT' || 
+      target.tagName === 'TEXTAREA' || 
+      target.tagName === 'SELECT' ||
+      target.closest('input') ||
+      target.closest('textarea') ||
+      target.closest('select') ||
+      target.closest('[role="combobox"]') ||
+      target.closest('.select-trigger')
+    )) {
+      return;
+    }
     
     const endX = e.changedTouches[0].clientX;
     const endY = e.changedTouches[0].clientY;
