@@ -241,17 +241,23 @@ Client: _________________""",
             ]
             
             for contract in test_contracts:
-                # Prepare multipart form data
+                # Prepare multipart form data properly
                 data = aiohttp.FormData()
                 data.add_field('session_id', self.test_session_id)
                 data.add_field('user_id', self.test_user_id)
+                
+                # Create a proper file-like object
+                file_content = contract["content"].encode('utf-8')
                 data.add_field('file', 
-                             io.StringIO(contract["content"]), 
+                             io.BytesIO(file_content), 
                              filename=contract["filename"],
                              content_type='text/plain')
                 
+                # Update session headers for multipart form data
+                headers = {'Accept': 'application/json'}
+                
                 async with self.session.post(f"{self.base_url}/ai-agents/contract-negotiation/upload-document", 
-                                           data=data) as response:
+                                           data=data, headers=headers) as response:
                     response_time = time.time() - start_time
                     
                     if response.status == 200:
