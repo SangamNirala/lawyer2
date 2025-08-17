@@ -218,6 +218,26 @@ const MobileContractWizard = ({
     });
   }, []);
 
+  // Create stable change handlers for each field to prevent re-renders
+  const createChangeHandler = useCallback((step, field) => {
+    return (value) => updateStepData(step, field, value);
+  }, [updateStepData]);
+
+  // Memoized change handlers for all inputs
+  const changeHandlers = useMemo(() => ({
+    party1_name: createChangeHandler('step2', 'party1_name'),
+    party1_email: createChangeHandler('step2', 'party1_email'),
+    party1_phone: createChangeHandler('step2', 'party1_phone'),
+    party1_address: createChangeHandler('step2', 'party1_address'),
+    party2_name: createChangeHandler('step2', 'party2_name'),
+    party2_email: createChangeHandler('step2', 'party2_email'),
+    party2_phone: createChangeHandler('step2', 'party2_phone'),
+    party2_address: createChangeHandler('step2', 'party2_address'),
+    payment_amount: createChangeHandler('step3', 'payment_amount'),
+    project_duration: createChangeHandler('step3', 'project_duration'),
+    deliverables: createChangeHandler('step3', 'deliverables'),
+  }), [createChangeHandler]);
+
   // Swipe gesture handlers - Updated to prevent interference with input fields
   const handleTouchStart = useCallback((e) => {
     if (!isSwipeEnabled || activeInputRef.current) return;
