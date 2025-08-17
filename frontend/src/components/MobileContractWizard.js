@@ -686,6 +686,8 @@ const MobileContractWizard = ({
             id="deliverables"
             value={stepData.step3.deliverables}
             onChange={(e) => updateStepData('step3', 'deliverables', e.target.value)}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             placeholder="Describe what will be delivered, services provided, or work completed..."
             rows={4}
             className="text-base resize-none"
