@@ -89,6 +89,12 @@ const MobileContractWizard = ({
   const [swipeStartX, setSwipeStartX] = useState(0);
   const [swipeStartY, setSwipeStartY] = useState(0);
   const [isSwipeEnabled, setIsSwipeEnabled] = useState(true);
+  
+  // Input refs to maintain stable DOM references
+  const inputRefs = useRef({});
+  
+  // Track active input to prevent swipe interference
+  const activeInputRef = useRef(null);
 
   useEffect(() => {
     // Update progress based on current step
