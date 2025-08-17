@@ -30,6 +30,75 @@ import {
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
+// Memoized input component to prevent unnecessary re-renders
+const StableInput = memo(({ 
+  id, 
+  value, 
+  onChange, 
+  onFocus, 
+  onBlur, 
+  placeholder, 
+  className, 
+  type = "text", 
+  autoComplete,
+  inputRef 
+}) => {
+  const handleChange = useCallback((e) => {
+    onChange(e.target.value);
+  }, [onChange]);
+
+  return (
+    <Input
+      ref={inputRef}
+      id={id}
+      type={type}
+      value={value}
+      onChange={handleChange}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      placeholder={placeholder}
+      className={className}
+      autoComplete={autoComplete}
+    />
+  );
+});
+
+// Memoized textarea component to prevent unnecessary re-renders  
+const StableTextarea = memo(({ 
+  id, 
+  value, 
+  onChange, 
+  onFocus, 
+  onBlur, 
+  placeholder, 
+  className, 
+  rows,
+  autoComplete,
+  inputRef 
+}) => {
+  const handleChange = useCallback((e) => {
+    onChange(e.target.value);
+  }, [onChange]);
+
+  return (
+    <Textarea
+      ref={inputRef}
+      id={id}
+      value={value}
+      onChange={handleChange}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      placeholder={placeholder}
+      className={className}
+      rows={rows}
+      autoComplete={autoComplete}
+    />
+  );
+});
+
+StableInput.displayName = 'StableInput';
+StableTextarea.displayName = 'StableTextarea';
+
 const MobileContractWizard = ({ 
   contractTypes, 
   jurisdictions, 
