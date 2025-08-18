@@ -16480,5 +16480,80 @@ else:
 # END CONTEXT-AWARE AI AGENTS
 # ====================================================================================================
 
+
+# =========================
+# Strategy Engine (Phase 1)
+# =========================
+try:
+    from negotiation_strategy_engine import (
+        get_strategy_engine,
+        PositionAnalysisInput, PositionAnalysisResult,
+        CounterOfferInput, CounterOfferStrategyResult,
+        BATNAInput, BATNAResult, StrategySessionSummary
+    )
+    STRATEGY_ENGINE_AVAILABLE = True
+    logger.info("✅ Negotiation Strategy Engine loaded")
+except Exception as e:
+    STRATEGY_ENGINE_AVAILABLE = False
+    logger.error(f"❌ Negotiation Strategy Engine import failed: {e}")
+
+if STRATEGY_ENGINE_AVAILABLE:
+
+    @api_router.post("/ai-agents/contract-negotiation/strategy-analysis", response_model=PositionAnalysisResult)
+    async def strategy_analysis_endpoint(payload: PositionAnalysisInput):
+        try:
+            engine = await get_strategy_engine(db)
+            result = await engine.analyze_position(payload)
+            return result
+        except Exception as e:
+            logger.error(f"❌ Strategy analysis error: {e}")
+            raise HTTPException(status_code=500, detail=f"Strategy analysis failed: {str(e)}")
+
+    @api_router.post("/ai-agents/contract-negotiation/generate-counter-offer", response_model=CounterOfferStrategyResult)
+    async def generate_counter_offer_endpoint(payload: CounterOfferInput):
+        try:
+            engine = await get_strategy_engine(db)
+            result = await engine.generate_counter_offers(payload)
+            return result
+        except Exception as e:
+            logger.error(f"❌ Counter-offer generation error: {e}")
+            raise HTTPException(status_code=500, detail=f"Counter-offer generation failed: {str(e)}")
+
+    @api_router.post("/ai-agents/contract-negotiation/batna-analysis", response_model=BATNAResult)
+    async def batna_analysis_endpoint(payload: BATNAInput):
+        try:
+            engine = await get_strategy_engine(db)
+            result = await engine.analyze_batna(payload)
+            return result
+        except Exception as e:
+            logger.error(f"❌ BATNA analysis error: {e}")
+            raise HTTPException(status_code=500, detail=f"BATNA analysis failed: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/strategy-session/{session_id}", response_model=StrategySessionSummary)
+    async def get_strategy_session_endpoint(session_id: str):
+        try:
+            engine = await get_strategy_engine(db)
+            result = await engine.get_strategy_session(session_id)
+            return result
+        except Exception as e:
+            logger.error(f"❌ Strategy session retrieval error: {e}")
+            raise HTTPException(status_code=500, detail=f"Strategy session retrieval failed: {str(e)}")
+else:
+    @api_router.post("/ai-agents/contract-negotiation/strategy-analysis")
+    async def strategy_analysis_unavailable():
+        raise HTTPException(status_code=503, detail="Strategy Engine unavailable")
+
+    @api_router.post("/ai-agents/contract-negotiation/generate-counter-offer")
+    async def generate_counter_offer_unavailable():
+        raise HTTPException(status_code=503, detail="Strategy Engine unavailable")
+
+    @api_router.post("/ai-agents/contract-negotiation/batna-analysis")
+    async def batna_analysis_unavailable():
+        raise HTTPException(status_code=503, detail="Strategy Engine unavailable")
+
+    @api_router.get("/ai-agents/contract-negotiation/strategy-session/{session_id}")
+    async def strategy_session_unavailable(session_id: str):
+        raise HTTPException(status_code=503, detail="Strategy Engine unavailable")
+
 # Include all API routes in the main app (after ALL endpoints are defined)
 app.include_router(api_router)
