@@ -417,45 +417,126 @@ class NegotiationStrategyEngine:
         return result
 
     async def analyze_batna(self, data: BATNAInput) -> BATNAResult:
-        # Generate 3 generic alternatives
+        # Enhanced BATNA: alternatives + quantitative scoring + decision tree
         contract_value = data.base_offer.price if (data.base_offer and data.base_offer.price) else 0.0
+        relationship_weight = 0.1  # small adjustment factor for relationship considerations
 
-        alts = []
-        def alt(name: str, desc: str, ev: float, risk: float, months: int) -> BATNAAlternative:
-            score = max(0.0, min(1.0, round(ev * (1.0 - risk) / (contract_value + 1e-6 if contract_value else max(1.0, ev)), 3)))
+        def alt(name: str, desc: str, ev: float, risk: float, months: int, rel_impact: float, scen: Dict[str, Dict[str, float]]) -> BATNAAlternative:
+            ev = max(0.0, ev)
+            risk = max(0.0, min(1.0, risk))
+            roi = None
+            if contract_value:
+                roi = round((ev - contract_value) / contract_value, 3)
+            rav = round(ev * (1.0 - risk), 2)
+            score = max(0.0, min(1.0, round((rav / (contract_value if contract_value else max(1.0, ev))) + relationship_weight*rel_impact, 3)))
             return BATNAAlternative(
                 alt_id=str(uuid.uuid4()),
                 name=name,
                 description=desc,
                 expected_value=round(ev, 2),
-                risk=max(0.0, min(1.0, risk)),
+                risk=risk,
                 time_cost_months=months,
-                score=score
+                score=score,
+                roi=roi,
+                risk_adjusted_value=rav,
+                relationship_impact=max(-1.0, min(1.0, rel_impact)),
+                scenarios=scen
             )
 
-        alts.append(alt("Alternative Supplier", "Explore competitor proposals to create leverage", contract_value * 0.9 if contract_value else 50000.0, 0.35, 2))
-        alts.append(alt("Delay & Re-negotiate", "Extend timeline to improve terms later", contract_value * 0.8 if contract_value else 30000.0, 0.25, 3))
-        alts.append(alt("In-House Solution", "Build internally to avoid unfavorable terms", contract_value * 0.7 if contract_value else 20000.0, 0.5, 6))
+        # Build scenarios for each BATNA alternative (best/likely/worst)
+        def make_scenarios(base: float):
+            return {
+                "best": {"value": round(base*1.2, 2), "prob": 0.2},
+                "likely": {"value": round(base*1.0, 2), "prob": 0.6},
+                "worst": {"value": round(base*0.7, 2), "prob": 0.2},
+            }
 
-        # Walkaway point: pick 80% of best risk-adjusted expected value
-        best = max(alts, key=lambda a: a.expected_value * (1 - a.risk))
-        walkaway = round(best.expected_value * (1 - best.risk) * 0.8, 2)
+        alts: List[BATNAAlternative] = []
+        base_ev = contract_value if contract_value else 40000.0
+        alts.append(alt(
+            "Alternative Supplier",
+            "Explore competitor proposals to create leverage",
+            base_ev * 1.0,
+            0.35,
+            2,
+            0.1,
+            make_scenarios(base_ev*1.0)
+        ))
+        alts.append(alt(
+            "Delay & Re-negotiate",
+            "Extend timeline to improve terms later",
+            base_ev * 0.85,
+            0.25,
+            3,
+            -0.1,
+            make_scenarios(base_ev*0.85)
+        ))
+        alts.append(alt(
+            "In-House Solution",
+            "Build internally to avoid unfavorable terms",
+            base_ev * 0.75,
+            0.5,
+            6,
+            0.0,
+            make_scenarios(base_ev*0.75)
+        ))
+
+        # Ranking by composite score
+        alts_sorted = sorted(alts, key=lambda a: a.score, reverse=True)
+
+        # Walkaway point: 80% of best risk-adjusted expected value among alternatives
+        best_rav = max(a.risk_adjusted_value for a in alts_sorted if a.risk_adjusted_value is not None)
+        walkaway = round(best_rav * 0.8, 2)
+
+        # Decision tree data structure for simple frontend visualization
+        decision_tree = {
+            "name": "Negotiation Decision",
+            "children": [
+                {
+                    "name": "Proceed with Current Deal",
+                    "children": [
+                        {"name": "Negotiate Upfront", "value": round(contract_value*1.05, 2) if contract_value else None},
+                        {"name": "Accept Baseline", "value": round(contract_value, 2) if contract_value else None},
+                        {"name": "Concede for Speed", "value": round((contract_value or base_ev)*0.9, 2)}
+                    ]
+                },
+                {
+                    "name": "Pursue BATNA",
+                    "children": [
+                        {"name": alts_sorted[0].name, "value": alts_sorted[0].risk_adjusted_value},
+                        {"name": alts_sorted[1].name, "value": alts_sorted[1].risk_adjusted_value},
+                        {"name": alts_sorted[2].name, "value": alts_sorted[2].risk_adjusted_value},
+                    ]
+                }
+            ]
+        }
+
+        # Metrics summary
+        metrics = {
+            "best_alternative": alts_sorted[0].name,
+            "best_score": alts_sorted[0].score,
+            "avg_risk": round(sum(a.risk for a in alts_sorted)/len(alts_sorted), 3),
+            "avg_roi": round(sum((a.roi or 0) for a in alts_sorted)/len(alts_sorted), 3),
+        }
+
         notes = [
-            f"Walk away if current deal EV (risk-adjusted) falls below {walkaway}",
-            "Preserve relationship where possible if relationship_importance is high",
-            "Consider opportunity cost relative to timeline constraints"
+            f"Walk away if current deal risk-adjusted value falls below {walkaway}",
+            f"Top BATNA: {alts_sorted[0].name} (score {alts_sorted[0].score})",
+            "Reassess alternatives if market shifts or timeline pressure increases"
         ]
 
         ai_note = await self._get_ai_insight(
-            f"Briefly evaluate BATNA alternatives {[(a.name, a.expected_value, a.risk) for a in alts]} and suggest a walkaway rationale in 2 sentences.")
+            f"Given alternatives {[a.name for a in alts_sorted]}, provide a concise BATNA selection rationale and walkaway point guidance.")
 
         result = BATNAResult(
             batna_id=str(uuid.uuid4()),
             session_id=data.session_id,
             created_at=datetime.utcnow().isoformat(),
-            alternatives=alts,
+            alternatives=alts_sorted,
             recommended_walkaway_point=walkaway,
             decision_notes=notes,
+            decision_tree=decision_tree,
+            metrics=metrics,
             ai_insight=ai_note
         )
 
