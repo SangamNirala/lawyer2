@@ -115,6 +115,10 @@ class BATNAAlternative(BaseModel):
     risk: float  # 0-1
     time_cost_months: int
     score: float
+    roi: Optional[float] = None
+    risk_adjusted_value: Optional[float] = None
+    relationship_impact: Optional[float] = None  # -1 to +1
+    scenarios: Dict[str, Dict[str, float]] = Field(default_factory=dict)  # best/likely/worst with {value, prob}
 
 class BATNAResult(BaseModel):
     batna_id: str
@@ -123,6 +127,8 @@ class BATNAResult(BaseModel):
     alternatives: List[BATNAAlternative]
     recommended_walkaway_point: float
     decision_notes: List[str]
+    decision_tree: Dict[str, Any] = Field(default_factory=dict)
+    metrics: Dict[str, Any] = Field(default_factory=dict)
     ai_insight: Optional[str] = None
 
 class StrategySessionSummary(BaseModel):
