@@ -778,6 +778,16 @@ const AIAgentHub = () => {
           onClose={() => setShowEnhancedAnalysis(false)}
         />
       )}
+      
+      {/* Strategy Analytics Dashboard */}
+      {activeAgent === 'contract-negotiation' && showStrategyDashboard && (
+        <div className="mt-6">
+          <StrategyDashboard 
+            isCollapsed={false}
+            onToggle={() => setShowStrategyDashboard(!showStrategyDashboard)}
+          />
+        </div>
+      )}
     </div>
   );
 };
