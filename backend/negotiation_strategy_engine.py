@@ -294,6 +294,7 @@ class NegotiationStrategyEngine:
 
     async def generate_counter_offers(self, data: CounterOfferInput) -> CounterOfferStrategyResult:
         # Advanced: build scenarios based on base price, urgency, and goals
+        # Now integrated with Phase 4 predictive modeling
         base_price = data.base_offer.price if (data.base_offer and data.base_offer.price) else None
         last_pos = await self.db.position_analyses.find_one({"session_id": data.session_id}, sort=[("created_at", -1)])
         urgency = (last_pos or {}).get("timeline_impact", {}).get("urgency", 5)
@@ -305,7 +306,48 @@ class NegotiationStrategyEngine:
         def target_for(mult: float) -> Optional[float]:
             return round(base_price * mult, 2) if base_price else None
 
-        # Acceptance probability baseline using logistic-ish heuristic from leverage, strength, urgency
+        # Phase 4: Enhanced acceptance probability using strategy predictor
+        predictor_probs = {}
+        try:
+            from strategy_predictor import get_strategy_predictor
+            predictor = await get_strategy_predictor(self.db)
+            
+            # Prepare features for each scenario
+            scenario_features = {
+                "Stretch": {
+                    "leverage_score": leverage,
+                    "strength_score": strength / 10.0,
+                    "urgency": urgency / 10.0,
+                    "scenario_multiplier": 1.12,
+                    "conversation_sentiment": 0.5,
+                    "time_since_last": 0.0
+                },
+                "Balanced": {
+                    "leverage_score": leverage,
+                    "strength_score": strength / 10.0,
+                    "urgency": urgency / 10.0,
+                    "scenario_multiplier": 1.0,
+                    "conversation_sentiment": 0.5,
+                    "time_since_last": 0.0
+                },
+                "Conservative": {
+                    "leverage_score": leverage,
+                    "strength_score": strength / 10.0,
+                    "urgency": urgency / 10.0,
+                    "scenario_multiplier": 0.94,
+                    "conversation_sentiment": 0.5,
+                    "time_since_last": 0.0
+                }
+            }
+            
+            predictor_probs = await predictor.predict_acceptance(data.session_id, scenario_features)
+            logger.info(f"✅ Predictor enhanced probabilities: {predictor_probs}")
+            
+        except Exception as e:
+            logger.debug(f"Predictor not available, using heuristic: {e}")
+            predictor_probs = {}
+
+        # Acceptance probability baseline (fallback heuristic)
         def accept_base(mult: float) -> float:
             # Lower urgency and higher leverage/strength increases predicted acceptance
             raw = 0.55 + 0.15*(leverage-0.5)*2 + 0.1*((strength-5)/5) - 0.08*((urgency-5)/5) - 0.07*(mult-1.0)
