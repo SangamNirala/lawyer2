@@ -20,8 +20,14 @@ class ContractNegotiationTester:
         self.session_id = str(uuid.uuid4())
         
     async def __aenter__(self):
+        # Create SSL context that doesn't verify certificates for testing
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        
         timeout = aiohttp.ClientTimeout(total=TIMEOUT)
-        self.session = aiohttp.ClientSession(timeout=timeout)
+        connector = aiohttp.TCPConnector(ssl=ssl_context)
+        self.session = aiohttp.ClientSession(timeout=timeout, connector=connector)
         return self
         
     async def __aexit__(self, exc_type, exc_val, exc_tb):
