@@ -16539,6 +16539,355 @@ if STRATEGY_ENGINE_AVAILABLE:
         except Exception as e:
             logger.error(f"❌ Strategy session retrieval error: {e}")
             raise HTTPException(status_code=500, detail=f"Strategy session retrieval failed: {str(e)}")
+
+    # ============================================
+    # Phase 4: Advanced Intelligence Endpoints
+    # ============================================
+    
+    @api_router.post("/ai-agents/contract-negotiation/events/feedback")
+    async def feedback_endpoint(feedback: dict):
+        """
+        Collect feedback on negotiation scenarios for predictive model training.
+        
+        Expected payload:
+        {
+            "session_id": "uuid",
+            "scenario_id": "uuid", 
+            "accepted": true/false,
+            "counterparty_delay_sec": 300,  // optional
+            "notes": "Additional context"    // optional
+        }
+        """
+        try:
+            from strategy_predictor import get_strategy_predictor, FeedbackEvent
+            
+            # Validate required fields
+            if not all(key in feedback for key in ["session_id", "scenario_id", "accepted"]):
+                raise HTTPException(status_code=400, detail="Missing required fields: session_id, scenario_id, accepted")
+            
+            # Create feedback event
+            event = FeedbackEvent(
+                session_id=feedback["session_id"],
+                scenario_id=feedback["scenario_id"],
+                accepted=feedback["accepted"],
+                counterparty_delay_sec=feedback.get("counterparty_delay_sec"),
+                notes=feedback.get("notes")
+            )
+            
+            # Update model
+            predictor = await get_strategy_predictor(db)
+            result = await predictor.fit_incremental(event)
+            
+            return {
+                "status": "feedback_received",
+                "feedback_id": str(uuid.uuid4()),
+                "model_update": result
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Feedback processing error: {e}")
+            raise HTTPException(status_code=500, detail=f"Feedback processing failed: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/predictor/health")
+    async def predictor_health_endpoint():
+        """Get predictor health and model statistics"""
+        try:
+            from strategy_predictor import get_strategy_predictor
+            
+            predictor = await get_strategy_predictor(db)
+            health = await predictor.get_health()
+            
+            return health.model_dump()
+            
+        except Exception as e:
+            logger.error(f"❌ Predictor health check error: {e}")
+            raise HTTPException(status_code=500, detail=f"Predictor health check failed: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/strategy-updates/{session_id}")
+    async def strategy_updates_endpoint(session_id: str):
+        """Get real-time strategy updates for a session"""
+        try:
+            from strategy_predictor import get_strategy_predictor, StrategyUpdate
+            
+            predictor = await get_strategy_predictor(db)
+            
+            # Get next best scenario recommendation
+            best_scenario, confidence = await predictor.get_next_best_scenario(session_id)
+            
+            # Get updated acceptance probabilities
+            scenario_features = {
+                "Stretch": {"leverage_score": 0.5, "strength_score": 0.5, "urgency": 0.5, "scenario_multiplier": 1.12, "conversation_sentiment": 0.5, "time_since_last": 0.0},
+                "Balanced": {"leverage_score": 0.5, "strength_score": 0.5, "urgency": 0.5, "scenario_multiplier": 1.0, "conversation_sentiment": 0.5, "time_since_last": 0.0},
+                "Conservative": {"leverage_score": 0.5, "strength_score": 0.5, "urgency": 0.5, "scenario_multiplier": 0.94, "conversation_sentiment": 0.5, "time_since_last": 0.0}
+            }
+            
+            predicted_acceptance = await predictor.predict_acceptance(session_id, scenario_features)
+            
+            update = StrategyUpdate(
+                session_id=session_id,
+                updated_at=datetime.utcnow().isoformat(),
+                suggested_scenario=best_scenario,
+                predicted_acceptance=predicted_acceptance,
+                confidence=confidence,
+                next_best_action=f"Lead with {best_scenario} scenario (confidence: {confidence:.1%})"
+            )
+            
+            return update.model_dump()
+            
+        except Exception as e:
+            logger.error(f"❌ Strategy updates error: {e}")
+            raise HTTPException(status_code=500, detail=f"Strategy updates failed: {str(e)}")
+
+    # ============================================ 
+    # Phase 4: Analytics and Reporting Endpoints
+    # ============================================
+    
+    @api_router.get("/ai-agents/contract-negotiation/analytics/overview")
+    async def analytics_overview_endpoint():
+        """Get comprehensive analytics overview"""
+        try:
+            # Check cache first
+            cache_key = "analytics_overview"
+            if hasattr(analytics_overview_endpoint, '_cache'):
+                cached_data, cache_time = analytics_overview_endpoint._cache.get(cache_key, (None, None))
+                if cached_data and cache_time and datetime.utcnow() - cache_time < timedelta(seconds=30):
+                    return cached_data
+            
+            # Aggregation pipelines for performance
+            pipeline_acceptance = [
+                {"$group": {
+                    "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$dateFromString": {"dateString": "$created_at"}}}},
+                    "total": {"$sum": 1},
+                    "accepted": {"$sum": {"$cond": [{"$eq": ["$accepted", True]}, 1, 0]}}
+                }},
+                {"$project": {
+                    "date": "$_id",
+                    "acceptance_rate": {"$divide": ["$accepted", "$total"]},
+                    "total_events": "$total"
+                }},
+                {"$sort": {"date": 1}},
+                {"$limit": 30}
+            ]
+            
+            acceptance_over_time = await db.feedback_events.aggregate(pipeline_acceptance).to_list(length=30)
+            
+            # Scenario performance
+            pipeline_scenarios = [
+                {"$lookup": {
+                    "from": "counter_offer_strategies",
+                    "let": {"scenario_id": "$scenario_id"},
+                    "pipeline": [
+                        {"$unwind": "$scenarios"},
+                        {"$match": {"$expr": {"$eq": ["$scenarios.scenario_id", "$$scenario_id"]}}},
+                        {"$project": {"scenario_name": "$scenarios.name"}}
+                    ],
+                    "as": "scenario_info"
+                }},
+                {"$unwind": {"path": "$scenario_info", "preserveNullAndEmptyArrays": True}},
+                {"$group": {
+                    "_id": {"$ifNull": ["$scenario_info.scenario_name", "Unknown"]},
+                    "total_uses": {"$sum": 1},
+                    "acceptances": {"$sum": {"$cond": [{"$eq": ["$accepted", True]}, 1, 0]}},
+                    "avg_delay": {"$avg": {"$ifNull": ["$counterparty_delay_sec", 300]}}
+                }},
+                {"$project": {
+                    "scenario": "$_id",
+                    "total_uses": 1,
+                    "acceptance_rate": {"$divide": ["$acceptances", "$total_uses"]},
+                    "avg_response_time": "$avg_delay"
+                }}
+            ]
+            
+            scenario_performance = await db.feedback_events.aggregate(pipeline_scenarios).to_list(length=10)
+            
+            # Overall statistics
+            total_events = await db.feedback_events.count_documents({})
+            total_sessions = await db.bandit_sessions.count_documents({})
+            
+            # Calculate overall acceptance rate
+            accepted_events = await db.feedback_events.count_documents({"accepted": True})
+            overall_acceptance_rate = (accepted_events / total_events) if total_events > 0 else 0
+            
+            # Average response time
+            avg_response_pipeline = [
+                {"$group": {"_id": None, "avg_delay": {"$avg": {"$ifNull": ["$counterparty_delay_sec", 300]}}}}
+            ]
+            avg_response_result = await db.feedback_events.aggregate(avg_response_pipeline).to_list(length=1)
+            avg_response_time = avg_response_result[0]["avg_delay"] if avg_response_result else 300
+            
+            # Leverage vs acceptance correlation (simplified)
+            correlation_pipeline = [
+                {"$lookup": {
+                    "from": "position_analyses", 
+                    "localField": "session_id",
+                    "foreignField": "session_id",
+                    "as": "position"
+                }},
+                {"$unwind": {"path": "$position", "preserveNullAndEmptyArrays": True}},
+                {"$group": {
+                    "_id": {"$round": [{"$multiply": [{"$ifNull": ["$position.leverage_score", 0.5]}, 10]}, 0]},
+                    "acceptance_rate": {"$avg": {"$cond": [{"$eq": ["$accepted", True]}, 1, 0]}},
+                    "count": {"$sum": 1}
+                }},
+                {"$match": {"count": {"$gte": 2}}},  # Only buckets with sufficient data
+                {"$sort": {"_id": 1}}
+            ]
+            
+            leverage_correlation = await db.feedback_events.aggregate(correlation_pipeline).to_list(length=10)
+            
+            # Top recommendations (from recent strategies)
+            recent_strategies = await db.counter_offer_strategies.find({}, {"recommendations": 1}).sort("created_at", -1).limit(20).to_list(length=20)
+            all_recommendations = []
+            for strategy in recent_strategies:
+                all_recommendations.extend(strategy.get("recommendations", []))
+            
+            # Count recommendation frequency
+            from collections import Counter
+            rec_counts = Counter(all_recommendations)
+            top_recommendations = [{"recommendation": rec, "frequency": count} for rec, count in rec_counts.most_common(5)]
+            
+            result = {
+                "acceptance_rate_over_time": acceptance_over_time,
+                "scenario_performance": scenario_performance,
+                "overall_stats": {
+                    "total_events": total_events,
+                    "total_sessions": total_sessions,
+                    "overall_acceptance_rate": round(overall_acceptance_rate, 3),
+                    "avg_response_time": round(avg_response_time, 1)
+                },
+                "leverage_vs_acceptance": leverage_correlation,
+                "top_recommendations": top_recommendations,
+                "generated_at": datetime.utcnow().isoformat()
+            }
+            
+            # Cache result
+            if not hasattr(analytics_overview_endpoint, '_cache'):
+                analytics_overview_endpoint._cache = {}
+            analytics_overview_endpoint._cache[cache_key] = (result, datetime.utcnow())
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"❌ Analytics overview error: {e}")
+            raise HTTPException(status_code=500, detail=f"Analytics overview failed: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/analytics/ab-tests") 
+    async def analytics_ab_tests_endpoint():
+        """Get A/B test results summary"""
+        try:
+            # Simple A/B test analysis based on scenario sequencing
+            pipeline = [
+                {"$lookup": {
+                    "from": "counter_offer_strategies",
+                    "localField": "session_id", 
+                    "foreignField": "session_id",
+                    "as": "strategy"
+                }},
+                {"$unwind": {"path": "$strategy", "preserveNullAndEmptyArrays": True}},
+                {"$project": {
+                    "accepted": 1,
+                    "anchor_strategy": "$strategy.anchor_strategy",
+                    "first_scenario": {"$arrayElemAt": ["$strategy.scenarios.name", 0]}
+                }},
+                {"$group": {
+                    "_id": "$first_scenario",
+                    "total_tests": {"$sum": 1},
+                    "successes": {"$sum": {"$cond": [{"$eq": ["$accepted", True]}, 1, 0]}},
+                    "success_rate": {"$avg": {"$cond": [{"$eq": ["$accepted", True]}, 1, 0]}}
+                }},
+                {"$match": {"total_tests": {"$gte": 3}}},  # Minimum sample size
+                {"$sort": {"success_rate": -1}}
+            ]
+            
+            ab_results = await db.feedback_events.aggregate(pipeline).to_list(length=10)
+            
+            # Statistical significance (simplified)
+            for result in ab_results:
+                n = result["total_tests"]
+                p = result["success_rate"]
+                # Simple confidence interval
+                if n > 0:
+                    margin_of_error = 1.96 * math.sqrt(p * (1 - p) / n)
+                    result["confidence_interval"] = [
+                        max(0, p - margin_of_error),
+                        min(1, p + margin_of_error)
+                    ]
+                    result["statistical_power"] = "low" if n < 10 else "medium" if n < 30 else "high"
+                else:
+                    result["confidence_interval"] = [0, 1]
+                    result["statistical_power"] = "none"
+            
+            return {
+                "running_tests": ab_results,
+                "test_summary": {
+                    "total_test_groups": len(ab_results),
+                    "best_performing": ab_results[0]["_id"] if ab_results else None,
+                    "sample_size_recommendation": "Continue testing until n>=30 per group for statistical significance"
+                },
+                "generated_at": datetime.utcnow().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ A/B tests analytics error: {e}")
+            raise HTTPException(status_code=500, detail=f"A/B tests analytics failed: {str(e)}")
+    
+    @api_router.get("/ai-agents/contract-negotiation/analytics/export")
+    async def analytics_export_endpoint(format: str = Query("csv", regex="^(csv|json)$")):
+        """Export analytics data for offline analysis"""
+        try:
+            from fastapi.responses import PlainTextResponse
+            import json
+            
+            # Export feedback events with anonymized session data
+            events = await db.feedback_events.find({}, {
+                "_id": 0,
+                "session_id": 0,  # Anonymize
+                "scenario_id": 0   # Anonymize
+            }).sort("created_at", -1).limit(1000).to_list(length=1000)
+            
+            # Add scenario names for context
+            for event in events:
+                event["session_hash"] = hash(event.get("session_id", "")) % 10000  # Simple anonymization
+            
+            if format == "csv":
+                # Convert to CSV format
+                if events:
+                    import csv
+                    import io
+                    
+                    output = io.StringIO()
+                    fieldnames = events[0].keys()
+                    writer = csv.DictWriter(output, fieldnames=fieldnames)
+                    writer.writeheader()
+                    writer.writerows(events)
+                    
+                    csv_content = output.getvalue()
+                    output.close()
+                    
+                    return PlainTextResponse(
+                        content=csv_content,
+                        media_type="text/csv",
+                        headers={"Content-Disposition": f"attachment; filename=negotiation_analytics_{datetime.utcnow().strftime('%Y%m%d')}.csv"}
+                    )
+                else:
+                    return PlainTextResponse(
+                        content="session_hash,accepted,created_at,notes\n",
+                        media_type="text/csv",
+                        headers={"Content-Disposition": f"attachment; filename=negotiation_analytics_{datetime.utcnow().strftime('%Y%m%d')}.csv"}
+                    )
+                    
+            else:  # JSON format
+                return {
+                    "export_format": "json",
+                    "record_count": len(events),
+                    "exported_at": datetime.utcnow().isoformat(),
+                    "data": events
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Analytics export error: {e}")
+            raise HTTPException(status_code=500, detail=f"Analytics export failed: {str(e)}")
+
 else:
     @api_router.post("/ai-agents/contract-negotiation/strategy-analysis")
     async def strategy_analysis_unavailable():
