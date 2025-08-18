@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 class AIAgentEndpointTester:
-    def __init__(self, base_url: str = "https://strategyengine.preview.emergentagent.com"):
+    def __init__(self, base_url: str = "https://strat-engine-ai.preview.emergentagent.com"):
         self.base_url = base_url
         self.test_results = []
         self.session_ids = {}
