@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
 import random
+import math
 from datetime import datetime, timedelta
 import google.generativeai as genai
 from groq import Groq
