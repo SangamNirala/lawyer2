@@ -354,7 +354,14 @@ class NegotiationStrategyEngine:
             return max(0.05, min(0.95, raw))
 
         def scenario(name: str, order: int, mult: float, conces: List[str], asks: List[str], tactic: str, narrative: str, deps: List[str], anchor_rationale: Optional[str]) -> CounterOfferScenario:
-            p = accept_base(mult)
+            # Phase 4: Use predictor probability if available, else fallback to heuristic
+            if name in predictor_probs:
+                p = predictor_probs[name]
+                logger.debug(f"Using predictor probability for {name}: {p}")
+            else:
+                p = accept_base(mult)
+                logger.debug(f"Using heuristic probability for {name}: {p}")
+                
             price = target_for(mult)
             riv = None
             if price is not None:
