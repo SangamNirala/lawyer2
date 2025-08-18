@@ -82,6 +82,13 @@ class CounterOfferScenario(BaseModel):
     asks: List[str]
     predicted_acceptance: float
     sequence_order: int
+    target_price: Optional[float] = None
+    price_impact: Optional[float] = None
+    risk_adjusted_value: Optional[float] = None
+    tactic: Optional[str] = None
+    narrative: Optional[str] = None
+    dependencies: List[str] = Field(default_factory=list)
+    anchor_rationale: Optional[str] = None
 
 class CounterOfferStrategyResult(BaseModel):
     strategy_id: str
@@ -89,6 +96,9 @@ class CounterOfferStrategyResult(BaseModel):
     created_at: str
     scenarios: List[CounterOfferScenario]
     recommendations: List[str]
+    anchor_strategy: Optional[str] = None
+    sequencing_plan: List[Dict[str, Any]] = Field(default_factory=list)
+    metrics: Dict[str, Any] = Field(default_factory=dict)
     ai_insight: Optional[str] = None
 
 class BATNAInput(BaseModel):
