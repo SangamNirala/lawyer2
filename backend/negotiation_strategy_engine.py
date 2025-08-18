@@ -416,11 +416,36 @@ class NegotiationStrategyEngine:
             anchor_rationale="Preserves relationship and accelerates closure under time pressure"
         ))
 
-        # Strategic sequencing plan
+        # Phase 4: Dynamic sequencing using bandit recommendations
+        try:
+            predictor = await get_strategy_predictor(self.db)
+            best_scenario, confidence = await predictor.get_next_best_scenario(data.session_id)
+            
+            # Re-order scenarios based on bandit recommendation
+            scenario_order = [best_scenario]
+            for s in scenarios:
+                if s.name != best_scenario:
+                    scenario_order.append(s.name)
+            
+            # Update sequence_order in scenarios
+            for i, scenario_name in enumerate(scenario_order, 1):
+                for s in scenarios:
+                    if s.name == scenario_name:
+                        s.sequence_order = i
+            
+            # Sort scenarios by new order
+            scenarios.sort(key=lambda s: s.sequence_order)
+            
+            logger.info(f"✅ Dynamic sequencing: {scenario_order}, confidence: {confidence}")
+            
+        except Exception as e:
+            logger.debug(f"Bandit sequencing not available, using default: {e}")
+
+        # Strategic sequencing plan - now dynamic
         sequencing_plan = [
-            {"order": 1, "scenario": "Stretch", "if_rejected": "Move to Balanced; offer non-monetary concessions first"},
-            {"order": 2, "scenario": "Balanced", "if_rejected": "Offer Conservative with conditional commitments"},
-            {"order": 3, "scenario": "Conservative", "if_rejected": "Escalate to BATNA review and walkaway check"},
+            {"order": scenarios[0].sequence_order, "scenario": scenarios[0].name, "if_rejected": f"Move to {scenarios[1].name}; offer non-monetary concessions first"},
+            {"order": scenarios[1].sequence_order, "scenario": scenarios[1].name, "if_rejected": f"Offer {scenarios[2].name} with conditional commitments"},
+            {"order": scenarios[2].sequence_order, "scenario": scenarios[2].name, "if_rejected": "Escalate to BATNA review and walkaway check"},
         ]
 
         # Recommendations tailored by urgency/leverage
