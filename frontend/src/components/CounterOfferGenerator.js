@@ -18,7 +18,25 @@ export default function CounterOfferGenerator({ sessionId, goals = [], keyTerms 
   const [error, setError] = useState(null);
   const [strategy, setStrategy] = useState(null);
 
-  const payload = useMemo(() => ({ session_id: sessionId, goals, key_terms: keyTerms, base_offer: baseOffer }), [sessionId, goals, keyTerms, baseOffer]);
+  const [form, setForm] = useState({
+    price: baseOffer?.price ?? '',
+    currency: baseOffer?.currency ?? 'USD',
+    term_months: baseOffer?.term_months ?? 12,
+    payment_terms: baseOffer?.payment_terms ?? 'Net 30',
+    goals: goals.join(', '),
+    key_terms: keyTerms.join(', ')
+  });
+
+  const parsedGoals = useMemo(() => form.goals.split(',').map(s => s.trim()).filter(Boolean), [form.goals]);
+  const parsedKeyTerms = useMemo(() => form.key_terms.split(',').map(s => s.trim()).filter(Boolean), [form.key_terms]);
+  const baseOfferPayload = useMemo(() => ({
+    price: form.price === '' ? undefined : Number(form.price),
+    currency: form.currency,
+    term_months: Number(form.term_months) || undefined,
+    payment_terms: form.payment_terms || undefined
+  }), [form]);
+
+  const payload = useMemo(() => ({ session_id: sessionId, goals: parsedGoals, key_terms: parsedKeyTerms, base_offer: baseOfferPayload }), [sessionId, parsedGoals, parsedKeyTerms, baseOfferPayload]);
 
   const fetchStrategy = async () => {
     setLoading(true); setError(null);
@@ -46,8 +64,41 @@ export default function CounterOfferGenerator({ sessionId, goals = [], keyTerms 
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Counter-Offer Generator</h3>
-        <button onClick={fetchStrategy} disabled={loading} className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">{loading ? 'Generating...' : 'Regenerate'}</button>
+        <button onClick={fetchStrategy} disabled={loading} className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">{loading ? 'Generating...' : 'Generate'}</button>
       </div>
+
+      {/* Config form */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-2 text-xs">
+        <div className="flex flex-col">
+          <label className="text-gray-600 mb-1">Price</label>
+          <input type="number" value={form.price} onChange={e => setForm(f => ({...f, price: e.target.value}))} className="border rounded px-2 py-1" placeholder="80000" />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-gray-600 mb-1">Currency</label>
+          <select value={form.currency} onChange={e => setForm(f => ({...f, currency: e.target.value}))} className="border rounded px-2 py-1">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+          </select>
+        </div>
+        <div className="flex flex-col">
+          <label className="text-gray-600 mb-1">Term (months)</label>
+          <input type="number" value={form.term_months} onChange={e => setForm(f => ({...f, term_months: e.target.value}))} className="border rounded px-2 py-1" placeholder="12" />
+        </div>
+        <div className="flex flex-col md:col-span-2">
+          <label className="text-gray-600 mb-1">Payment Terms</label>
+          <input value={form.payment_terms} onChange={e => setForm(f => ({...f, payment_terms: e.target.value}))} className="border rounded px-2 py-1" placeholder="Net 30" />
+        </div>
+        <div className="flex flex-col md:col-span-2">
+          <label className="text-gray-600 mb-1">Goals (comma separated)</label>
+          <input value={form.goals} onChange={e => setForm(f => ({...f, goals: e.target.value}))} className="border rounded px-2 py-1" placeholder="clarity, speed" />
+        </div>
+        <div className="flex flex-col md:col-span-3">
+          <label className="text-gray-600 mb-1">Key Terms (comma separated)</label>
+          <input value={form.key_terms} onChange={e => setForm(f => ({...f, key_terms: e.target.value}))} className="border rounded px-2 py-1" placeholder="payment terms, ip" />
+        </div>
+      </div>
+
       {error && <div className="text-sm text-red-600">{error}</div>}
       {!strategy ? (
         <div className="text-sm text-gray-500">No strategy yet.</div>
@@ -72,13 +123,13 @@ export default function CounterOfferGenerator({ sessionId, goals = [], keyTerms 
                 <div className="text-sm font-semibold mb-1">{sc.name}</div>
                 <div className="text-xs text-gray-500 mb-2">{sc.description}</div>
                 {typeof sc.target_price === 'number' && (
-                  <div className="text-sm mb-1">Target Price: <span className="font-mono">{currency(sc.target_price, baseOffer?.currency)}</span></div>
+                  <div className="text-sm mb-1">Target Price: <span className="font-mono">{currency(sc.target_price, baseOfferPayload?.currency)}</span></div>
                 )}
                 {typeof sc.price_impact === 'number' && (
                   <div className="text-xs text-gray-600 mb-1">Price Impact: {(sc.price_impact>=0?'+':'')}{Math.round(sc.price_impact*100)}%</div>
                 )}
                 {typeof sc.risk_adjusted_value === 'number' && (
-                  <div className="text-xs text-gray-600 mb-2">Risk-Adjusted Value: {currency(sc.risk_adjusted_value, baseOffer?.currency)}</div>
+                  <div className="text-xs text-gray-600 mb-2">Risk-Adjusted Value: {currency(sc.risk_adjusted_value, baseOfferPayload?.currency)}</div>
                 )}
                 <div className="text-xs text-gray-600 mb-2">Predicted Acceptance</div>
                 <AcceptanceBar value={sc.predicted_acceptance} />
