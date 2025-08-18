@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import MobileAIAgentHub from './MobileAIAgentHub';
 import EnhancedContractAnalysis from './EnhancedContractAnalysis';
+import CounterOfferGenerator from './CounterOfferGenerator';
 
 // Simple markdown renderer for basic formatting
 const renderMarkdown = (text) => {
