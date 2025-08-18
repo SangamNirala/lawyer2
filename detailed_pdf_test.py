@@ -4,7 +4,7 @@ import re
 
 def detailed_pdf_analysis():
     """Detailed analysis of the edited PDF content"""
-    base_url = "https://legal-api-testing.preview.emergentagent.com"
+    base_url = "https://strategyengine.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     # Generate a simple contract
