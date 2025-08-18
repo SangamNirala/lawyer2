@@ -627,6 +627,17 @@ const AIAgentHub = () => {
                 
                 <div className="flex items-center space-x-2">
                   {activeAgent === 'contract-negotiation' && (
+                    <div className="hidden lg:block ml-2">
+                      <CounterOfferGenerator 
+                        sessionId={getCurrentSession(activeAgent).sessionId}
+                        goals={[]}
+                        keyTerms={[]}
+                        baseOffer={null}
+                      />
+                    </div>
+                  )}
+
+                  {activeAgent === 'contract-negotiation' && (
                     <>
                       <Button 
                         variant="outline" 
