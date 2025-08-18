@@ -28,6 +28,7 @@ import {
 import MobileAIAgentHub from './MobileAIAgentHub';
 import EnhancedContractAnalysis from './EnhancedContractAnalysis';
 import CounterOfferGenerator from './CounterOfferGenerator';
+import BATNAMatrix from './BATNAMatrix';
 
 // Simple markdown renderer for basic formatting
 const renderMarkdown = (text) => {
