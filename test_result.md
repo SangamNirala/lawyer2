@@ -261,10 +261,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Contract Negotiation Agent - Document Upload Form Data Fix"
+    - "Enhanced Contract Negotiation Agent - Counter-Offer Generation New Fields Re-test"
   stuck_tasks: []
   test_all: false
-  test_priority: "enhanced_legal_analysis_first"
+  test_priority: "counter_offer_focused_retest_complete"
 
   - task: "Enhanced Contract Negotiation Agent - Complete System Testing"
     implemented: true
