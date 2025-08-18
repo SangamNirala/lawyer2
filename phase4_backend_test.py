@@ -185,7 +185,12 @@ class Phase4BackendTester:
                 f"{BACKEND_URL}/ai-agents/contract-negotiation/predictor/health"
             ) as response:
                 response_time = time.time() - test_start
-                data = await response.json()
+                try:
+                    data = await response.json()
+                except Exception as json_error:
+                    # Try to get text response for debugging
+                    text_response = await response.text()
+                    raise Exception(f"JSON parsing failed: {json_error}. Response: {text_response[:200]}")
                 
                 if response.status == 200:
                     # Verify response structure
