@@ -287,61 +287,112 @@ class NegotiationStrategyEngine:
         return result
 
     async def generate_counter_offers(self, data: CounterOfferInput) -> CounterOfferStrategyResult:
-        # Build 3 scenarios: Conservative, Balanced, Stretch
+        # Advanced: build scenarios based on base price, urgency, and goals
         base_price = data.base_offer.price if (data.base_offer and data.base_offer.price) else None
+        last_pos = await self.db.position_analyses.find_one({"session_id": data.session_id}, sort=[("created_at", -1)])
+        urgency = (last_pos or {}).get("timeline_impact", {}).get("urgency", 5)
+        leverage = (last_pos or {}).get("leverage_score", 0.5)
+        strength = (last_pos or {}).get("strength_score", 5)
 
-        def scenario(name: str, order: int, price_multiplier: float, conces: List[str], asks: List[str], accept_base: float) -> CounterOfferScenario:
-            predicted = max(0.05, min(0.95, round(accept_base, 2)))
+        # Determine anchor and bands
+        # If no base_price, we can only provide qualitative asks without numeric target_price
+        def target_for(mult: float) -> Optional[float]:
+            return round(base_price * mult, 2) if base_price else None
+
+        # Acceptance probability baseline using logistic-ish heuristic from leverage, strength, urgency
+        def accept_base(mult: float) -> float:
+            # Lower urgency and higher leverage/strength increases predicted acceptance
+            raw = 0.55 + 0.15*(leverage-0.5)*2 + 0.1*((strength-5)/5) - 0.08*((urgency-5)/5) - 0.07*(mult-1.0)
+            return max(0.05, min(0.95, raw))
+
+        def scenario(name: str, order: int, mult: float, conces: List[str], asks: List[str], tactic: str, narrative: str, deps: List[str], anchor_rationale: Optional[str]) -> CounterOfferScenario:
+            p = accept_base(mult)
+            price = target_for(mult)
+            riv = None
+            if price is not None:
+                # risk-adjusted value approx: price * leverage weighting
+                riv = round(price * (0.5 + leverage/2), 2)
             return CounterOfferScenario(
                 scenario_id=str(uuid.uuid4()),
                 name=name,
                 description=f"{name} trade-off package",
                 concessions=conces,
                 asks=asks,
-                predicted_acceptance=predicted,
-                sequence_order=order
+                predicted_acceptance=p,
+                sequence_order=order,
+                target_price=price,
+                price_impact=(None if (price is None or base_price is None) else round((price-base_price)/base_price, 3)),
+                risk_adjusted_value=riv,
+                tactic=tactic,
+                narrative=narrative,
+                dependencies=deps,
+                anchor_rationale=anchor_rationale
             )
 
-        # Acceptance base derived from risk tolerance and relationship importance if available via last position
-        last_pos = await self.db.position_analyses.find_one({"session_id": data.session_id}, sort=[("created_at", -1)])
-        acceptance_anchor = 0.6
-        if last_pos:
-            acceptance_anchor = 0.5 + 0.3 * (1.0 - (0.0 if last_pos.get("timeline_impact", {}).get("impact") == "low" else 0.3))
-
         scenarios: List[CounterOfferScenario] = []
-        # Conservative
+        # Stretch (High anchor)
         scenarios.append(scenario(
-            "Conservative", 1,
-            0.95,
+            "Stretch", 1, 1.12,
+            ["Premium service tier bundling"],
+            ["Shorter payment terms (Net 15)", "IP ownership clarification", "Annual prepay"],
+            tactic="High-anchor then trade-down",
+            narrative="Open strong to set value anchor; be ready to exchange monetary asks for structural wins",
+            deps=["Position analysis complete"],
+            anchor_rationale="Signals confidence; creates room for principled concessions"
+        ))
+        # Balanced (Principled midpoint)
+        scenarios.append(scenario(
+            "Balanced", 2, 1.00,
+            ["Scope optimization", "Standard SLAs"],
+            ["Milestone payments", "Termination for convenience with notice"],
+            tactic="Principled reciprocity",
+            narrative="Fair compromise: trade limited price flexibility for stronger protections",
+            deps=["Counterparty acknowledges scope"],
+            anchor_rationale="Aligns with market; supports collaborative tone"
+        ))
+        # Conservative (Fallback)
+        scenarios.append(scenario(
+            "Conservative", 3, 0.94,
             ["Minor price concession", "Extended payment terms (Net 45)"],
             ["Longer commitment (12-18 months)", "Mutual liability cap at 1x fees"],
-            acceptance_anchor + 0.1
-        ))
-        # Balanced
-        scenarios.append(scenario(
-            "Balanced", 2,
-            1.0,
-            ["Small scope adjustment", "Standard SLAs"],
-            ["Milestone payments", "Termination for convenience with notice"],
-            acceptance_anchor
-        ))
-        # Stretch
-        scenarios.append(scenario(
-            "Stretch", 3,
-            1.1,
-            ["Bundled discount upon prepayment"],
-            ["Shorter payment terms (Net 15)", "IP ownership clarification"],
-            acceptance_anchor - 0.1
+            tactic="Graceful fallback",
+            narrative="Provide face-saving path to agreement while protecting core value",
+            deps=["Deadlock on Balanced"],
+            anchor_rationale="Preserves relationship and accelerates closure under time pressure"
         ))
 
-        recs = [
-            "Open with Balanced scenario, hold Stretch as anchor, use Conservative as fallback",
-            "Sequence asks to secure non-monetary wins early",
-            "Link concessions to reciprocal commitments"
+        # Strategic sequencing plan
+        sequencing_plan = [
+            {"order": 1, "scenario": "Stretch", "if_rejected": "Move to Balanced; offer non-monetary concessions first"},
+            {"order": 2, "scenario": "Balanced", "if_rejected": "Offer Conservative with conditional commitments"},
+            {"order": 3, "scenario": "Conservative", "if_rejected": "Escalate to BATNA review and walkaway check"},
         ]
 
+        # Recommendations tailored by urgency/leverage
+        recs = []
+        if urgency >= 8:
+            recs.append("Time-sensitive: compress negotiation rounds; pre-prepare final form of Balanced scenario")
+        if leverage >= 0.7:
+            recs.append("Leverage advantage: maintain Stretch anchor longer; trade only non-core terms early")
+        if strength <= 4:
+            recs.append("Lower strength: emphasize relationship and risk mitigation; anchor closer to Balanced")
+        if not recs:
+            recs = [
+                "Open with Stretch to set anchor, aim to close on Balanced, keep Conservative as time-bound fallback",
+                "Link price concessions to increased term length or accelerated payments",
+                "Sequence non-monetary wins first to build momentum"
+            ]
+
         ai_note = await self._get_ai_insight(
-            f"Given goals={data.goals} and terms={data.key_terms}, provide 2-3 tactical tips to improve counter-offers. Keep bullet-point concise.")
+            f"Given goals={data.goals} and terms={data.key_terms}, craft 2-4 tactical counter-offer pointers that emphasize sequencing, reciprocity, and anchors. Keep concise.")
+
+        # Metrics snapshot
+        metrics = {
+            "avg_predicted_acceptance": round(sum(s.predicted_acceptance for s in scenarios)/len(scenarios), 3),
+            "stretch_anchor": scenarios[0].target_price,
+            "balanced_target": scenarios[1].target_price,
+            "conservative_target": scenarios[2].target_price,
+        }
 
         result = CounterOfferStrategyResult(
             strategy_id=str(uuid.uuid4()),
@@ -349,6 +400,9 @@ class NegotiationStrategyEngine:
             created_at=datetime.utcnow().isoformat(),
             scenarios=scenarios,
             recommendations=recs,
+            anchor_strategy="Start with Stretch anchor; trade to Balanced; reserve Conservative for deadline pressure",
+            sequencing_plan=sequencing_plan,
+            metrics=metrics,
             ai_insight=ai_note
         )
 
