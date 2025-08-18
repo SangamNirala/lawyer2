@@ -651,6 +651,18 @@ const AIAgentHub = () => {
                   )}
 
                   {activeAgent === 'contract-negotiation' && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowStrategyDashboard(!showStrategyDashboard)}
+                      className="flex items-center space-x-1 ml-2"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      <span>Analytics</span>
+                    </Button>
+                  )}
+
+                  {activeAgent === 'contract-negotiation' && (
                     <>
                       <Button 
                         variant="outline" 
