@@ -639,6 +639,15 @@ const AIAgentHub = () => {
                   )}
 
                   {activeAgent === 'contract-negotiation' && (
+                    <div className="hidden lg:block ml-2">
+                      <BATNAMatrix 
+                        sessionId={getCurrentSession(activeAgent).sessionId}
+                        baseOffer={null}
+                      />
+                    </div>
+                  )}
+
+                  {activeAgent === 'contract-negotiation' && (
                     <>
                       <Button 
                         variant="outline" 
