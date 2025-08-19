@@ -30,6 +30,7 @@ import EnhancedContractAnalysis from './EnhancedContractAnalysis';
 import CounterOfferGenerator from './CounterOfferGenerator';
 import BATNAMatrix from './BATNAMatrix';
 import StrategyDashboard from './StrategyDashboard';
+import RiskAssessmentDashboard from './RiskAssessmentDashboard';
 
 // Simple markdown renderer for basic formatting
 const renderMarkdown = (text) => {
