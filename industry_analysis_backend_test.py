@@ -267,7 +267,7 @@ class IndustryAnalysisTestSuite:
                     data = await response.json()
                     
                     # Verify response structure
-                    required_fields = ["industries", "total_industries", "supported_categories"]
+                    required_fields = ["supported_industries", "total_industries", "contract_categories"]
                     missing_fields = [field for field in required_fields if field not in data]
                     
                     if missing_fields:
