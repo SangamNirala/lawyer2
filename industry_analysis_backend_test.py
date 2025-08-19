@@ -281,7 +281,7 @@ class IndustryAnalysisTestSuite:
                     
                     # Verify all 4 industries are supported
                     expected_industries = ["healthcare", "financial", "technology", "manufacturing"]
-                    actual_industries = [industry["industry"] for industry in data["industries"]]
+                    actual_industries = list(data["supported_industries"].keys())
                     
                     missing_industries = [ind for ind in expected_industries if ind not in actual_industries]
                     if missing_industries:
