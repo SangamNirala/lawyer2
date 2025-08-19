@@ -405,7 +405,7 @@ const RiskAssessmentDashboard = ({
                   <Card>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <Warning className="w-8 h-8 text-orange-500" />
+                        <AlertTriangle className="w-8 h-8 text-orange-500" />
                         <Badge variant="destructive">
                           {assessment.high_priority_risks?.length || 0}
                         </Badge>
