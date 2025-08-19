@@ -10,7 +10,7 @@ import aiohttp
 import json
 import os
 
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://strat-engine-ai.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://risk-ai-negotiator.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 async def debug_response_structure():

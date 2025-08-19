@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://strat-engine-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://risk-ai-negotiator.preview.emergentagent.com/api"
 
 def test_endpoint_with_retry(method, endpoint, data=None, timeout=30, retries=2):
     """Test endpoint with retry logic"""

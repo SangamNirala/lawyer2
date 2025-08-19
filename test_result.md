@@ -479,7 +479,7 @@ Execute comprehensive Phase 2A backend testing focusing on async background enri
 - Verify any performance improvements or data enrichment
 
 **TECHNICAL REQUIREMENTS:**
-- Backend URL: https://strat-engine-ai.preview.emergentagent.com/api
+- Backend URL: https://risk-ai-negotiator.preview.emergentagent.com/api
 - MongoDB and AI services are configured and operational
 - Legal Research Engine endpoints are available in server.py
 - CourtListener integration exists through rebuild functionality

@@ -17,7 +17,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://strat-engine-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://risk-ai-negotiator.preview.emergentagent.com/api"
 
 class Phase4ComprehensiveTester:
     def __init__(self):

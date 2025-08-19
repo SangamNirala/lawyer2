@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend URL from frontend/.env
-BACKEND_URL = "https://strat-engine-ai.preview.emergentagent.com/api"
+BACKEND_URL = "https://risk-ai-negotiator.preview.emergentagent.com/api"
 
 def test_multi_jurisdiction_search():
     """Test the multi-jurisdiction search endpoint with exact payload from review request"""
