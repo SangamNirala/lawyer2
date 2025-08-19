@@ -679,7 +679,7 @@ class IndustryAnalysisTestSuite:
                         return
                     
                     # Verify arrays have content
-                    array_fields = ["negotiation_strategies", "priority_clauses", "risk_mitigation", "tactical_recommendations"]
+                    array_fields = ["negotiation_strategies", "mandatory_clauses", "key_risks", "best_practices"]
                     empty_arrays = []
                     
                     for field in array_fields:
