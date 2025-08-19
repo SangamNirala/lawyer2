@@ -17402,6 +17402,10 @@ if REGULATORY_ENGINE_AVAILABLE:
             if not assessment:
                 raise HTTPException(status_code=404, detail="No compliance assessment found")
             
+            # Remove MongoDB ObjectId before processing
+            if "_id" in assessment:
+                del assessment["_id"]
+            
             # Analyze gaps in detail
             detailed_gaps = []
             for gap in assessment.get("compliance_gaps", []):
