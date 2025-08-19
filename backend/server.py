@@ -16498,6 +16498,22 @@ except Exception as e:
     STRATEGY_ENGINE_AVAILABLE = False
     logger.error(f"❌ Negotiation Strategy Engine import failed: {e}")
 
+# Try to import Advanced Risk Assessment Engine
+try:
+    from advanced_risk_assessment import (
+        get_risk_assessment_engine, 
+        RiskAssessmentInput, 
+        ComprehensiveRiskAssessment,
+        RiskLevel,
+        RiskCategory,
+        DimensionalRiskScore
+    )
+    RISK_ENGINE_AVAILABLE = True
+    logger.info("✅ Advanced Risk Assessment Engine available")
+except ImportError as e:
+    RISK_ENGINE_AVAILABLE = False
+    logger.error(f"❌ Advanced Risk Assessment Engine import failed: {e}")
+
 if STRATEGY_ENGINE_AVAILABLE:
 
     @api_router.post("/ai-agents/contract-negotiation/strategy-analysis", response_model=PositionAnalysisResult)
