@@ -98,6 +98,10 @@ class RiskAssessmentTester:
             ) as response:
                 response_time = time.time() - start_time
                 
+                print(f"Response status: {response.status}")
+                response_text = await response.text()
+                print(f"Response text: {response_text[:500]}...")
+                
                 if response.status == 200:
                     data = await response.json()
                     
