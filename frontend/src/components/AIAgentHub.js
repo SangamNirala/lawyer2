@@ -72,6 +72,7 @@ const AIAgentHub = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showEnhancedAnalysis, setShowEnhancedAnalysis] = useState(false);
   const [showStrategyDashboard, setShowStrategyDashboard] = useState(false);
+  const [showRiskAssessment, setShowRiskAssessment] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
