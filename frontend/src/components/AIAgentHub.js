@@ -565,28 +565,36 @@ const AIAgentHub = () => {
                   return (
                     <div
                       key={agentType}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                         isActive 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg transform scale-105' 
+                          : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 hover:shadow-md'
                       }`}
                       onClick={() => setActiveAgent(agentType)}
                     >
-                      <div className="flex items-start">
-                        <div className={`p-2 rounded-lg ${agent.color} mr-3`}>
-                          <Icon className="w-4 h-4 text-white" />
+                      <div className="flex items-start space-x-4">
+                        <div className={`p-3 rounded-xl ${agent.color} shadow-sm`}>
+                          <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-sm">{agent.name}</div>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="font-bold text-lg text-gray-800 mb-1">{agent.name}</div>
+                          <div className="text-sm text-gray-600 mb-3 leading-relaxed">
                             {agent.description}
                           </div>
-                          <div className="mt-2">
-                            {agent.capabilities.map((capability, index) => (
-                              <Badge key={index} variant="secondary" className="mr-1 mb-1 text-xs">
-                                {capability}
-                              </Badge>
-                            ))}
+                          <div className="mb-3">
+                            <div className="text-xs font-semibold text-gray-700 mb-2">Core Capabilities:</div>
+                            <div className="flex flex-wrap gap-2">
+                              {agent.capabilities.slice(0, 4).map((capability, index) => (
+                                <Badge key={index} variant="outline" className="text-xs px-2 py-1 bg-white border-gray-300">
+                                  {capability}
+                                </Badge>
+                              ))}
+                              {agent.capabilities.length > 4 && (
+                                <Badge variant="outline" className="text-xs px-2 py-1 bg-gray-100 border-gray-300">
+                                  +{agent.capabilities.length - 4} more
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           
                           {/* Enhanced features for contract negotiation agent */}
