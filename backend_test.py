@@ -317,7 +317,7 @@ def test_session_history(session_id):
     
     try:
         start_time = time.time()
-        response = requests.get(f"{BACKEND_URL}/ai-agents/session/{session_id}/history", timeout=10)
+        response = requests.get(f"{BACKEND_URL}/ai-agents/session/{session_id}/history?agent_type=contract_negotiation", timeout=10)
         response_time = time.time() - start_time
         
         print(f"Status Code: {response.status_code}")
