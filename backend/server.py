@@ -17167,6 +17167,497 @@ else:
             detail="Advanced Risk Assessment Engine is currently unavailable."
         )
 
+# ============================================
+# Regulatory Compliance Endpoints - Step 2
+# ============================================
+
+# Import regulatory compliance engine
+try:
+    from regulatory_compliance_engine import (
+        get_regulatory_compliance_engine,
+        RegulatoryComplianceInput,
+        RegulatoryComplianceResult,
+        RegulatoryFramework,
+        IndustryType,
+        ComplianceRiskLevel
+    )
+    REGULATORY_ENGINE_AVAILABLE = True
+    logger.info("✅ Regulatory Compliance Engine available")
+except ImportError as e:
+    logger.warning(f"⚠️ Regulatory Compliance Engine not available: {e}")
+    REGULATORY_ENGINE_AVAILABLE = False
+
+if REGULATORY_ENGINE_AVAILABLE:
+    
+    @api_router.post("/ai-agents/contract-negotiation/regulatory-compliance", response_model=RegulatoryComplianceResult)
+    async def assess_regulatory_compliance(payload: RegulatoryComplianceInput):
+        """
+        Regulatory Compliance Assessment - Specialized Framework Analysis
+        
+        Analyzes contract compliance across major regulatory frameworks:
+        - GDPR (General Data Protection Regulation) - EU data protection
+        - SOX (Sarbanes-Oxley Act) - US financial controls
+        - HIPAA (Health Insurance Portability and Accountability Act) - US healthcare
+        - CCPA (California Consumer Privacy Act) - US state privacy
+        - PCI DSS (Payment Card Industry Data Security Standard) - payment processing
+        
+        Industry-Specific Analysis:
+        - Healthcare: HIPAA compliance, PHI handling, BAA requirements
+        - Finance: SOX compliance, financial reporting, internal controls
+        - Technology/SaaS: GDPR/CCPA compliance, data processing agreements
+        
+        Features:
+        - Framework-specific compliance scoring
+        - Industry-specific compliance profiles
+        - Gap analysis and remediation recommendations
+        - Required clause identification
+        - Compliance checklist generation
+        """
+        try:
+            logger.info(f"🛡️ Starting regulatory compliance assessment for session: {payload.session_id}")
+            logger.info(f"📋 Target frameworks: {[f.value for f in payload.target_frameworks]}")
+            logger.info(f"🏢 Industry type: {payload.industry_type.value if payload.industry_type else 'Not specified'}")
+            
+            engine = await get_regulatory_compliance_engine(db)
+            compliance_result = await engine.assess_regulatory_compliance(payload)
+            
+            logger.info(f"✅ Regulatory compliance assessment completed: {compliance_result.overall_compliance_score}/10 ({compliance_result.compliance_level.value})")
+            return compliance_result
+            
+        except ValueError as e:
+            logger.warning(f"⚠️ Regulatory compliance validation error: {e}")
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.error(f"❌ Regulatory compliance assessment error: {e}")
+            raise HTTPException(status_code=500, detail=f"Regulatory compliance assessment failed: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/regulatory-compliance/{compliance_id}", response_model=RegulatoryComplianceResult)
+    async def get_regulatory_compliance_assessment(compliance_id: str):
+        """
+        Retrieve Regulatory Compliance Assessment
+        
+        Get detailed regulatory compliance assessment results including:
+        - Overall compliance score and level
+        - Framework-specific assessments (GDPR, SOX, HIPAA, etc.)
+        - Compliance gaps and violations
+        - Required clauses and amendments
+        - Industry-specific recommendations
+        """
+        try:
+            assessment = await db.compliance_assessments.find_one({"compliance_id": compliance_id})
+            if not assessment:
+                raise HTTPException(status_code=404, detail="Compliance assessment not found")
+            
+            return RegulatoryComplianceResult(**assessment)
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve compliance assessment: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve assessment: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/regulatory-compliance/session/{session_id}")
+    async def get_session_compliance_assessments(session_id: str, limit: int = 10):
+        """
+        Get Session Compliance Assessment History
+        
+        Retrieve all regulatory compliance assessments for a session including:
+        - Chronological compliance assessment history
+        - Compliance trend analysis across frameworks
+        - Framework-specific compliance evolution
+        - Gap resolution tracking
+        """
+        try:
+            assessments_cursor = db.compliance_assessments.find(
+                {"session_id": session_id}
+            ).sort("created_at", -1).limit(limit)
+            
+            assessments = []
+            async for assessment in assessments_cursor:
+                assessments.append(RegulatoryComplianceResult(**assessment))
+            
+            # Calculate compliance trend
+            trend_analysis = await _calculate_compliance_trend(session_id) if assessments else None
+            
+            return {
+                "session_id": session_id,
+                "assessments": assessments,
+                "total_count": len(assessments),
+                "latest_assessment": assessments[0] if assessments else None,
+                "compliance_trend": trend_analysis,
+                "frameworks_analyzed": list(set(
+                    framework for assessment in assessments 
+                    for framework in assessment.framework_assessments.keys()
+                ))
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve session compliance assessments: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve assessments: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/regulatory-frameworks")
+    async def get_supported_regulatory_frameworks():
+        """
+        Get Supported Regulatory Frameworks
+        
+        Returns comprehensive list of supported regulatory frameworks and their details:
+        - Framework names and descriptions
+        - Applicable industries and jurisdictions
+        - Key requirements and compliance areas
+        - Implementation complexity and timeline
+        """
+        try:
+            frameworks = {
+                "gdpr": {
+                    "name": "General Data Protection Regulation (GDPR)",
+                    "jurisdiction": "European Union",
+                    "industry": "All industries processing EU personal data",
+                    "key_areas": ["Data processing", "Consent", "Data subject rights", "Privacy by design"],
+                    "penalty_range": "Up to 4% of annual revenue or €20M",
+                    "implementation_timeline": "3-6 months",
+                    "complexity": "High"
+                },
+                "sox": {
+                    "name": "Sarbanes-Oxley Act (SOX)",
+                    "jurisdiction": "United States",
+                    "industry": "Public companies and their auditors",
+                    "key_areas": ["Financial reporting", "Internal controls", "Audit independence", "Corporate governance"],
+                    "penalty_range": "Criminal penalties up to $5M and 20 years imprisonment",
+                    "implementation_timeline": "6-12 months", 
+                    "complexity": "High"
+                },
+                "hipaa": {
+                    "name": "Health Insurance Portability and Accountability Act (HIPAA)",
+                    "jurisdiction": "United States",
+                    "industry": "Healthcare and related entities",
+                    "key_areas": ["PHI protection", "Administrative safeguards", "Physical safeguards", "Technical safeguards"],
+                    "penalty_range": "$100 - $50,000 per violation, up to $1.5M annually",
+                    "implementation_timeline": "2-4 months",
+                    "complexity": "Medium-High"
+                },
+                "ccpa": {
+                    "name": "California Consumer Privacy Act (CCPA)",
+                    "jurisdiction": "California, United States",
+                    "industry": "Businesses meeting CCPA thresholds",
+                    "key_areas": ["Consumer rights", "Data transparency", "Opt-out rights", "Non-discrimination"],
+                    "penalty_range": "$2,500 - $7,500 per violation",
+                    "implementation_timeline": "2-3 months",
+                    "complexity": "Medium"
+                },
+                "pci_dss": {
+                    "name": "Payment Card Industry Data Security Standard (PCI DSS)",
+                    "jurisdiction": "Global (card industry requirement)",
+                    "industry": "Organizations processing payment cards",
+                    "key_areas": ["Cardholder data protection", "Secure networks", "Access control", "Monitoring"],
+                    "penalty_range": "$5,000 - $100,000+ per month of non-compliance",
+                    "implementation_timeline": "3-6 months",
+                    "complexity": "Medium-High"
+                }
+            }
+            
+            return {
+                "supported_frameworks": frameworks,
+                "industry_mappings": {
+                    "healthcare": ["hipaa", "gdpr"],
+                    "finance": ["sox", "gdpr", "pci_dss"],
+                    "technology": ["gdpr", "ccpa"],
+                    "general": ["gdpr", "ccpa"]
+                },
+                "total_frameworks": len(frameworks),
+                "last_updated": datetime.utcnow().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve regulatory frameworks: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve frameworks: {str(e)}")
+
+    @api_router.post("/ai-agents/contract-negotiation/compliance-gap-analysis")
+    async def perform_compliance_gap_analysis(request: dict):
+        """
+        Detailed Compliance Gap Analysis
+        
+        Performs comprehensive gap analysis for specific frameworks:
+        - Requirement-by-requirement compliance check
+        - Risk scoring for each compliance gap
+        - Prioritized remediation roadmap
+        - Cost-benefit analysis for compliance improvements
+        - Timeline estimates for gap closure
+        """
+        try:
+            session_id = request.get("session_id")
+            compliance_id = request.get("compliance_id")
+            target_frameworks = request.get("target_frameworks", [])
+            
+            if not session_id:
+                raise HTTPException(status_code=400, detail="session_id is required")
+            
+            # Get latest compliance assessment or specific one
+            if compliance_id:
+                assessment = await db.compliance_assessments.find_one({"compliance_id": compliance_id})
+            else:
+                assessment = await db.compliance_assessments.find_one(
+                    {"session_id": session_id}, sort=[("created_at", -1)]
+                )
+            
+            if not assessment:
+                raise HTTPException(status_code=404, detail="No compliance assessment found")
+            
+            # Analyze gaps in detail
+            detailed_gaps = []
+            for gap in assessment.get("compliance_gaps", []):
+                gap_analysis = {
+                    "gap_id": gap.get("gap_id"),
+                    "framework": gap.get("requirement", {}).get("framework"),
+                    "requirement_code": gap.get("requirement", {}).get("requirement_code"),
+                    "gap_description": gap.get("gap_description"),
+                    "risk_score": gap.get("risk_score", 0),
+                    "business_impact": gap.get("business_impact"),
+                    "remediation_timeline": gap.get("remediation_timeline"),
+                    "estimated_effort": _estimate_remediation_effort(gap),
+                    "cost_estimate": _estimate_compliance_cost(gap),
+                    "implementation_steps": gap.get("recommended_clauses", []),
+                    "success_criteria": _generate_success_criteria(gap)
+                }
+                detailed_gaps.append(gap_analysis)
+            
+            # Create prioritized roadmap
+            roadmap = _create_compliance_roadmap(detailed_gaps)
+            
+            gap_analysis_result = {
+                "analysis_id": str(uuid.uuid4()),
+                "session_id": session_id,
+                "compliance_assessment_id": assessment.get("compliance_id"),
+                "created_at": datetime.utcnow().isoformat(),
+                "total_gaps": len(detailed_gaps),
+                "critical_gaps": len([g for g in detailed_gaps if g["risk_score"] >= 8]),
+                "high_priority_gaps": len([g for g in detailed_gaps if g["risk_score"] >= 6]),
+                "detailed_gaps": detailed_gaps,
+                "remediation_roadmap": roadmap,
+                "estimated_timeline": roadmap.get("total_timeline", "3-6 months"),
+                "estimated_cost_range": roadmap.get("cost_range", "$10,000 - $50,000"),
+                "quick_wins": [g for g in detailed_gaps if g["estimated_effort"] == "low" and g["business_impact"] in ["medium", "high"]],
+                "recommendations": [
+                    "Prioritize critical gaps (risk score >= 8) for immediate attention",
+                    "Address high-priority gaps within 30-60 days",
+                    "Implement quick wins to build compliance momentum",
+                    "Schedule regular compliance reviews every 90 days"
+                ]
+            }
+            
+            # Store gap analysis
+            await db.compliance_gap_analyses.insert_one(gap_analysis_result)
+            
+            return gap_analysis_result
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to perform gap analysis: {e}")
+            raise HTTPException(status_code=500, detail=f"Gap analysis failed: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/industry-compliance/{industry_type}")
+    async def get_industry_compliance_requirements(industry_type: str):
+        """
+        Get Industry-Specific Compliance Requirements
+        
+        Returns comprehensive compliance requirements for specific industries:
+        - Mandatory regulatory frameworks
+        - Industry-standard clauses and provisions
+        - Common compliance violations and prevention
+        - Best practices and implementation guidance
+        """
+        try:
+            # Validate industry type
+            valid_industries = [industry.value for industry in IndustryType]
+            if industry_type not in valid_industries:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid industry type. Supported: {valid_industries}"
+                )
+            
+            engine = await get_regulatory_compliance_engine(db)
+            
+            # Get industry profile
+            industry_enum = IndustryType(industry_type)
+            profile = engine.industry_profiles.get(industry_enum)
+            
+            if not profile:
+                raise HTTPException(status_code=404, detail=f"Industry profile not found for {industry_type}")
+            
+            # Get framework details for applicable frameworks
+            framework_details = {}
+            for framework in profile.applicable_frameworks:
+                requirements = engine.frameworks.get(framework, [])
+                framework_details[framework.value] = {
+                    "total_requirements": len(requirements),
+                    "key_requirements": [req.title for req in requirements[:5]],  # Top 5
+                    "critical_requirements": [req.title for req in requirements if req.penalty_severity == "critical"]
+                }
+            
+            industry_compliance = {
+                "industry": industry_type,
+                "profile": profile.model_dump(),
+                "applicable_frameworks": {
+                    "mandatory": [f.value for f in profile.applicable_frameworks],
+                    "framework_details": framework_details
+                },
+                "compliance_checklist": profile.industry_specific_clauses,
+                "common_violations": profile.common_violations,
+                "implementation_guidance": {
+                    "step_1": "Identify all applicable regulatory frameworks",
+                    "step_2": "Conduct current state compliance assessment", 
+                    "step_3": "Develop compliance gap remediation plan",
+                    "step_4": "Implement required controls and procedures",
+                    "step_5": "Monitor and maintain ongoing compliance"
+                },
+                "estimated_compliance_timeline": {
+                    "healthcare": "3-6 months (HIPAA focus)",
+                    "finance": "6-12 months (SOX complexity)", 
+                    "technology": "2-4 months (GDPR/CCPA focus)"
+                }.get(industry_type, "3-6 months"),
+                "recommended_next_steps": [
+                    "Perform comprehensive compliance assessment",
+                    f"Focus on {profile.applicable_frameworks[0].value.upper()} as primary framework",
+                    "Engage legal counsel for framework-specific guidance",
+                    "Develop compliance monitoring and reporting procedures"
+                ]
+            }
+            
+            return industry_compliance
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to get industry compliance requirements: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to get requirements: {str(e)}")
+
+else:
+    # Fallback endpoints when Regulatory Compliance Engine is not available
+    @api_router.post("/ai-agents/contract-negotiation/regulatory-compliance")
+    async def regulatory_compliance_unavailable():
+        raise HTTPException(
+            status_code=503,
+            detail="Regulatory Compliance Engine is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.get("/ai-agents/contract-negotiation/regulatory-compliance/{compliance_id}")
+    async def get_regulatory_compliance_unavailable(compliance_id: str):
+        raise HTTPException(
+            status_code=503,
+            detail="Regulatory Compliance Engine is currently unavailable."
+        )
+
+# Helper functions for regulatory compliance
+def _estimate_remediation_effort(gap: dict) -> str:
+    """Estimate effort required to remediate compliance gap"""
+    risk_score = gap.get("risk_score", 0)
+    
+    if risk_score >= 8:
+        return "high"
+    elif risk_score >= 5:
+        return "medium"
+    else:
+        return "low"
+
+def _estimate_compliance_cost(gap: dict) -> str:
+    """Estimate cost range for compliance remediation"""
+    business_impact = gap.get("business_impact", "medium")
+    
+    cost_mapping = {
+        "low": "$1,000 - $5,000",
+        "medium": "$5,000 - $15,000", 
+        "high": "$15,000 - $50,000",
+        "critical": "$50,000+"
+    }
+    
+    return cost_mapping.get(business_impact, "$5,000 - $15,000")
+
+def _generate_success_criteria(gap: dict) -> List[str]:
+    """Generate success criteria for gap remediation"""
+    criteria = [
+        "Compliance assessment shows gap is resolved",
+        "Required clauses are implemented in contract",
+        "Internal procedures are documented and trained"
+    ]
+    
+    framework = gap.get("requirement", {}).get("framework")
+    if framework == "gdpr":
+        criteria.append("Data Processing Agreement is executed")
+        criteria.append("Privacy impact assessment is completed")
+    elif framework == "hipaa":
+        criteria.append("Business Associate Agreement is signed")
+        criteria.append("PHI safeguards are implemented")
+    elif framework == "sox":
+        criteria.append("Internal control testing is passed")
+        criteria.append("Management certification is obtained")
+    
+    return criteria
+
+def _create_compliance_roadmap(gaps: List[dict]) -> dict:
+    """Create prioritized compliance roadmap"""
+    # Sort gaps by risk score and business impact
+    sorted_gaps = sorted(gaps, key=lambda x: (x["risk_score"], x["business_impact"] == "critical"), reverse=True)
+    
+    immediate_actions = [g for g in sorted_gaps if g["risk_score"] >= 8][:3]
+    short_term_actions = [g for g in sorted_gaps if 6 <= g["risk_score"] < 8][:5]
+    long_term_actions = [g for g in sorted_gaps if g["risk_score"] < 6]
+    
+    total_cost = sum(_extract_cost_number(g["cost_estimate"]) for g in gaps)
+    
+    return {
+        "immediate_actions": immediate_actions,  # 0-30 days
+        "short_term_actions": short_term_actions,  # 30-90 days  
+        "long_term_actions": long_term_actions,  # 90+ days
+        "total_timeline": "3-6 months" if len(gaps) > 5 else "1-3 months",
+        "cost_range": f"${total_cost:,} - ${int(total_cost * 1.5):,}",
+        "priority_sequence": [
+            "Address all critical gaps (risk >= 8) immediately",
+            "Implement quick wins with high business impact",
+            "Tackle framework-specific requirements systematically",
+            "Establish ongoing compliance monitoring"
+        ]
+    }
+
+def _extract_cost_number(cost_string: str) -> int:
+    """Extract numeric cost from cost string for calculations"""
+    import re
+    numbers = re.findall(r'[\d,]+', cost_string.replace(',', ''))
+    if numbers:
+        return int(numbers[0])
+    return 10000  # Default fallback
+
+async def _calculate_compliance_trend(session_id: str) -> Dict[str, Any]:
+    """Calculate compliance trend analysis for a session"""
+    try:
+        assessments = await db.compliance_assessments.find(
+            {"session_id": session_id},
+            {"overall_compliance_score": 1, "created_at": 1, "compliance_level": 1}
+        ).sort("created_at", 1).to_list(None)
+        
+        if len(assessments) < 2:
+            return {"trend": "insufficient_data", "assessments_count": len(assessments)}
+        
+        scores = [a["overall_compliance_score"] for a in assessments]
+        latest_score = scores[-1]
+        previous_score = scores[-2]
+        
+        change = latest_score - previous_score
+        trend = "improving" if change > 0.5 else "declining" if change < -0.5 else "stable"
+        
+        return {
+            "trend": trend,
+            "change": round(change, 2),
+            "latest_score": latest_score,
+            "previous_score": previous_score,
+            "assessments_count": len(assessments),
+            "score_range": {"min": min(scores), "max": max(scores), "avg": round(sum(scores) / len(scores), 2)},
+            "compliance_levels": [a.get("compliance_level") for a in assessments]
+        }
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Compliance trend calculation failed: {e}")
+        return {"trend": "calculation_error", "error": str(e)}
+
 # Helper function for risk trend calculation
 async def _calculate_risk_trend(session_id: str) -> Dict[str, Any]:
     """Calculate risk trend analysis for a session"""
