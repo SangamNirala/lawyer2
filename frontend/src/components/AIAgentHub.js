@@ -599,22 +599,25 @@ const AIAgentHub = () => {
                           
                           {/* Enhanced features for contract negotiation agent */}
                           {agentType === 'contract-negotiation' && agent.enhanced_features && (
-                            <div className="mt-3 pt-2 border-t border-gray-200">
-                              <div className="text-xs font-semibold text-blue-600 mb-1">Enhanced Features:</div>
-                              <div className="space-y-1">
+                            <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                              <div className="flex items-center mb-2">
+                                <AlertTriangle className="w-4 h-4 mr-2 text-blue-600" />
+                                <span className="text-sm font-bold text-blue-800">Enhanced AI Features</span>
+                              </div>
+                              <div className="grid grid-cols-1 gap-2">
                                 {agent.enhanced_features.slice(0, 4).map((feature, index) => (
-                                  <div key={index} className="flex items-center text-xs text-gray-600">
-                                    <FileText className="w-3 h-3 mr-1 text-blue-500" />
+                                  <div key={index} className="flex items-center text-sm text-gray-700">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
                                     {feature}
                                   </div>
                                 ))}
-                                <div className="flex items-center text-xs text-red-600 font-medium">
-                                  <AlertTriangle className="w-3 h-3 mr-1 text-red-500" />
-                                  Multi-dimensional risk scoring
-                                </div>
-                                <div className="flex items-center text-xs text-red-600 font-medium">
-                                  <AlertTriangle className="w-3 h-3 mr-1 text-red-500" />
-                                  Advanced risk assessment engine
+                              </div>
+                              <div className="mt-3 pt-2 border-t border-blue-200">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-blue-600 font-medium">Advanced Risk Engine</span>
+                                  <Badge variant="destructive" className="text-xs px-2 py-0">
+                                    AI-Powered
+                                  </Badge>
                                 </div>
                               </div>
                             </div>
