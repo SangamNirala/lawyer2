@@ -32,9 +32,17 @@ class RegulatoryComplianceTestSuite:
         
     async def setup(self):
         """Setup test session"""
+        import ssl
+        # Create SSL context that doesn't verify certificates for testing
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        
+        connector = aiohttp.TCPConnector(ssl=ssl_context)
         self.session = aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=30),
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
+            connector=connector
         )
         print("🔧 Test session initialized")
         
