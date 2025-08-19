@@ -70,8 +70,10 @@ class RiskAssessmentTester:
                     key_fields.append(f"dimensional_scores: {len(response_data['dimensional_scores'])} categories")
                 if 'clause_analyses' in response_data:
                     key_fields.append(f"clause_analyses: {len(response_data['clause_analyses'])} clauses")
-                if 'mitigation_plan' in response_data:
-                    key_fields.append(f"mitigation_plan: {len(response_data['mitigation_plan'])} recommendations")
+                if 'risk_mitigation_plan' in response_data:
+                    key_fields.append(f"risk_mitigation_plan: {len(response_data['risk_mitigation_plan'])} recommendations")
+                if 'red_flags' in response_data:
+                    key_fields.append(f"red_flags: {len(response_data['red_flags'])} flags")
                 if 'high_priority_risks' in response_data:
                     key_fields.append(f"high_priority_risks: {len(response_data['high_priority_risks'])} risks")
                     
