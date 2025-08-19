@@ -29,8 +29,7 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Lightbulb,
-  AlertTriangle
+  Lightbulb
 } from 'lucide-react';
 
 // Risk level color mapping
