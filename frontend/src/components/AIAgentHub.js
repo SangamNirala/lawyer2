@@ -103,7 +103,9 @@ const AIAgentHub = () => {
         'AI-powered document analysis',
         'Clause-by-clause risk assessment',
         'Side-by-side contract comparison',
-        'Automated compliance checking'
+        'Automated compliance checking',
+        'Multi-dimensional risk scoring',
+        'Advanced risk assessment engine'
       ]
     },
     'litigation-strategy': {
@@ -668,6 +670,16 @@ const AIAgentHub = () => {
 
                   {activeAgent === 'contract-negotiation' && (
                     <>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowRiskAssessment(true)}
+                        className="flex items-center space-x-1 mr-2"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                        <span>Risk Assessment</span>
+                      </Button>
+                      
                       <Button 
                         variant="outline" 
                         size="sm"
