@@ -387,7 +387,7 @@ class IndustryAnalysisTestSuite:
                             f"Industry Benchmarks - {industry.title()}",
                             True,
                             response_time,
-                            f"Industry: {data['industry']}, Benchmarks: {data['total_benchmarks']}"
+                            f"Industry: {data['industry']}, Benchmarks: {len(data['benchmarks'])}"
                         )
                         
                     else:
