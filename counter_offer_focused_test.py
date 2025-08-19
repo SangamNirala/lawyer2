@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 # Test Configuration
-BACKEND_URL = "https://sector-insight.preview.emergentagent.com/api"
+BACKEND_URL = "https://clever-jepsen.preview.emergentagent.com/api"
 TIMEOUT = 15  # 15 seconds timeout for this specific test
 
 class CounterOfferFocusedTester:

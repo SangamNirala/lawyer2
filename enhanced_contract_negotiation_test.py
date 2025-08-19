@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class EnhancedContractNegotiationTester:
     def __init__(self):
         # Use the production URL from frontend/.env
-        self.base_url = "https://sector-insight.preview.emergentagent.com/api"
+        self.base_url = "https://clever-jepsen.preview.emergentagent.com/api"
         self.session = None
         self.test_results = []
         self.test_session_id = str(uuid.uuid4())

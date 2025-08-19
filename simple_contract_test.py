@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BASE_URL = "https://sector-insight.preview.emergentagent.com"
+BASE_URL = "https://clever-jepsen.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""

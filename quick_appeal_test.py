@@ -7,7 +7,7 @@ import requests
 import json
 import time
 
-BACKEND_URL = "https://sector-insight.preview.emergentagent.com/api"
+BACKEND_URL = "https://clever-jepsen.preview.emergentagent.com/api"
 
 def test_basic_appeal_analysis():
     """Test basic appeal analysis functionality"""

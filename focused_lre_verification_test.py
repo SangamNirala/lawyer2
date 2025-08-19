@@ -26,7 +26,7 @@ import time
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://sector-insight.preview.emergentagent.com/api"
+BACKEND_URL = "https://clever-jepsen.preview.emergentagent.com/api"
 
 def test_endpoint_with_monitoring(method: str, endpoint: str, data: dict = None, timeout: float = 15.0):
     """Test endpoint with detailed monitoring"""
