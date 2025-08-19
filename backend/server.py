@@ -17701,5 +17701,362 @@ async def _calculate_risk_trend(session_id: str) -> Dict[str, Any]:
         logger.warning(f"⚠️ Risk trend calculation failed: {e}")
         return {"trend": "calculation_error", "error": str(e)}
 
+# ============================================
+# Step 3: Industry-Specific Analysis Endpoints
+# ============================================
+
+# Import industry-specific analysis engine
+try:
+    from industry_specific_analysis_engine import (
+        IndustrySpecificAnalysisEngine,
+        get_industry_analysis_engine,
+        IndustryAnalysisInput,
+        IndustryAnalysisResult,
+        IndustryType,
+        ContractCategory,
+        IndustryProfile
+    )
+    INDUSTRY_ENGINE_AVAILABLE = True
+    logger.info("✅ Industry-Specific Analysis Engine: Available")
+except ImportError as e:
+    INDUSTRY_ENGINE_AVAILABLE = False
+    logger.warning(f"⚠️ Industry Analysis Engine not available: {e}")
+
+if INDUSTRY_ENGINE_AVAILABLE:
+
+    @api_router.post("/ai-agents/contract-negotiation/industry-analysis", response_model=IndustryAnalysisResult)
+    async def industry_analysis_endpoint(payload: IndustryAnalysisInput):
+        """
+        Industry-Specific Contract Analysis
+        
+        Provides comprehensive industry-specific analysis including:
+        - Industry-specific clauses and templates
+        - Risk factors and mitigation strategies  
+        - Negotiation strategies and tactics
+        - Compliance requirements
+        - Market benchmarks and standards
+        - Common pitfalls and best practices
+        
+        Supports: Healthcare, Financial, Technology/SaaS, Manufacturing
+        """
+        try:
+            engine = await get_industry_analysis_engine(db)
+            result = await engine.analyze_industry_contract(payload)
+            
+            logger.info(f"✅ Industry analysis completed for {payload.industry.value} - {payload.contract_category.value}")
+            return result
+            
+        except ValueError as e:
+            logger.warning(f"⚠️ Industry analysis validation error: {e}")
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.error(f"❌ Industry analysis error: {e}")
+            raise HTTPException(status_code=500, detail=f"Industry analysis failed: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/industry-analysis/{analysis_id}", response_model=IndustryAnalysisResult)
+    async def get_industry_analysis(analysis_id: str):
+        """
+        Retrieve Industry Analysis Result
+        
+        Get detailed industry-specific analysis results by analysis ID.
+        """
+        try:
+            result = await db.industry_analyses.find_one({"analysis_id": analysis_id})
+            if not result:
+                raise HTTPException(status_code=404, detail="Industry analysis not found")
+            
+            return IndustryAnalysisResult(**result)
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve industry analysis: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve analysis: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/industry-analysis/session/{session_id}")
+    async def get_session_industry_analyses(session_id: str, limit: int = 10):
+        """
+        Get Session Industry Analysis History
+        
+        Retrieve all industry analyses for a session with pagination.
+        """
+        try:
+            cursor = db.industry_analyses.find(
+                {"session_id": session_id}
+            ).sort("created_at", -1).limit(limit)
+            
+            analyses = await cursor.to_list(None)
+            
+            return {
+                "session_id": session_id,
+                "analyses": analyses,
+                "count": len(analyses),
+                "total_analyses": await db.industry_analyses.count_documents({"session_id": session_id})
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve session analyses: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve session analyses: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/industry-profiles")
+    async def get_supported_industries():
+        """
+        Get Supported Industries and Contract Categories
+        
+        Returns all supported industries with their available contract categories,
+        compliance frameworks, and key features.
+        """
+        try:
+            engine = await get_industry_analysis_engine(db)
+            
+            industry_info = {}
+            for industry_type in IndustryType:
+                profile = engine.industry_profiles.get(industry_type)
+                if profile:
+                    industry_info[industry_type.value] = {
+                        "industry": industry_type.value,
+                        "supported_contract_types": [cat.value for cat in profile.supported_contract_types],
+                        "compliance_frameworks": profile.compliance_frameworks,
+                        "mandatory_clauses_count": len(profile.mandatory_clauses),
+                        "recommended_clauses_count": len(profile.recommended_clauses),
+                        "common_risks_count": len(profile.common_risks),
+                        "negotiation_strategies_count": len(profile.negotiation_strategies),
+                        "best_practices": profile.best_practices[:3],  # Top 3 best practices
+                        "common_pitfalls": profile.common_pitfalls[:3]  # Top 3 pitfalls
+                    }
+            
+            contract_categories = {}
+            for category in ContractCategory:
+                contract_categories[category.value] = category.value.replace('_', ' ').title()
+            
+            return {
+                "supported_industries": industry_info,
+                "contract_categories": contract_categories,
+                "total_industries": len(industry_info),
+                "total_contract_types": len(contract_categories)
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to get industry profiles: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to get industry profiles: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/industry-benchmarks/{industry}")
+    async def get_industry_benchmarks(industry: str, contract_category: Optional[str] = None):
+        """
+        Get Industry Market Benchmarks
+        
+        Retrieve market benchmarks and standards for specific industry and optionally
+        filtered by contract category.
+        """
+        try:
+            # Validate industry
+            try:
+                industry_type = IndustryType(industry)
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Unsupported industry: {industry}")
+            
+            engine = await get_industry_analysis_engine(db)
+            
+            # Get industry profile
+            profile = engine.industry_profiles.get(industry_type)
+            if not profile:
+                raise HTTPException(status_code=404, detail=f"Profile not found for industry: {industry}")
+            
+            # Filter benchmarks if contract_category specified
+            benchmarks = profile.market_benchmarks
+            if contract_category:
+                # This could be enhanced to filter by contract category
+                # For now, return all benchmarks for the industry
+                pass
+            
+            return {
+                "industry": industry,
+                "contract_category": contract_category,
+                "benchmarks": [benchmark.model_dump() for benchmark in benchmarks],
+                "compliance_frameworks": profile.compliance_frameworks,
+                "best_practices": profile.best_practices,
+                "common_pitfalls": profile.common_pitfalls
+            }
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to get industry benchmarks: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to get benchmarks: {str(e)}")
+
+    @api_router.post("/ai-agents/contract-negotiation/industry-recommendations")
+    async def get_industry_recommendations(payload: dict):
+        """
+        Get Industry-Specific Recommendations
+        
+        Get targeted recommendations based on industry, contract type, and situation.
+        
+        Expected payload:
+        {
+            "industry": "healthcare|financial|technology|manufacturing",
+            "contract_category": "contract_category_value",
+            "negotiation_position": "strong|balanced|weak",
+            "relationship_type": "new|existing|strategic", 
+            "priority_objectives": ["objective1", "objective2"]
+        }
+        """
+        try:
+            # Validate required fields
+            if "industry" not in payload:
+                raise HTTPException(status_code=400, detail="Industry is required")
+            
+            industry_type = IndustryType(payload["industry"])
+            
+            engine = await get_industry_analysis_engine(db)
+            profile = engine.industry_profiles.get(industry_type)
+            
+            if not profile:
+                raise HTTPException(status_code=404, detail=f"Profile not found for industry: {payload['industry']}")
+            
+            # Get negotiation strategies based on position
+            negotiation_position = payload.get("negotiation_position", "balanced")
+            recommended_strategies = []
+            
+            for strategy in profile.negotiation_strategies:
+                if negotiation_position == "strong" and strategy.tactic.value in ["competitive", "value_based"]:
+                    recommended_strategies.append(strategy)
+                elif negotiation_position == "weak" and strategy.tactic.value in ["collaborative", "relationship_focused"]:
+                    recommended_strategies.append(strategy)
+                elif negotiation_position == "balanced":
+                    recommended_strategies.append(strategy)
+            
+            # Get relevant clauses
+            contract_category = payload.get("contract_category")
+            relevant_clauses = profile.mandatory_clauses + profile.recommended_clauses
+            
+            # Get industry-specific recommendations
+            recommendations = {
+                "industry": payload["industry"],
+                "negotiation_strategies": [strategy.model_dump() for strategy in recommended_strategies[:3]],
+                "mandatory_clauses": [clause.model_dump() for clause in profile.mandatory_clauses],
+                "key_risks": [risk.model_dump() for risk in profile.common_risks[:5]],
+                "compliance_requirements": profile.compliance_frameworks,
+                "best_practices": profile.best_practices,
+                "common_pitfalls": profile.common_pitfalls,
+                "strategic_focus": _get_strategic_focus(industry_type, negotiation_position),
+                "priority_actions": _get_priority_actions(industry_type, payload.get("priority_objectives", []))
+            }
+            
+            return recommendations
+            
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"Invalid industry: {str(e)}")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to get industry recommendations: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to get recommendations: {str(e)}")
+
+else:
+    # Fallback endpoints when industry analysis engine is not available
+    @api_router.post("/ai-agents/contract-negotiation/industry-analysis")
+    async def industry_analysis_unavailable():
+        raise HTTPException(
+            status_code=503,
+            detail="Industry-Specific Analysis Engine is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.get("/ai-agents/contract-negotiation/industry-analysis/{analysis_id}")
+    async def get_industry_analysis_unavailable(analysis_id: str):
+        raise HTTPException(
+            status_code=503,
+            detail="Industry-Specific Analysis Engine is currently unavailable."
+        )
+    
+    @api_router.get("/ai-agents/contract-negotiation/industry-profiles")
+    async def get_supported_industries_unavailable():
+        raise HTTPException(
+            status_code=503,
+            detail="Industry-Specific Analysis Engine is currently unavailable."
+        )
+
+def _get_strategic_focus(industry: IndustryType, position: str) -> List[str]:
+    """Get strategic focus areas based on industry and negotiation position"""
+    
+    focus_areas = []
+    
+    if industry == IndustryType.HEALTHCARE:
+        focus_areas = [
+            "Patient safety and quality outcomes",
+            "HIPAA compliance and data protection", 
+            "Professional liability and risk management",
+            "Value-based care arrangements"
+        ]
+    elif industry == IndustryType.FINANCIAL:
+        focus_areas = [
+            "Regulatory compliance and oversight",
+            "Risk management and capital adequacy",
+            "Data security and privacy protection",
+            "Anti-money laundering (AML) procedures"
+        ]
+    elif industry == IndustryType.TECHNOLOGY:
+        focus_areas = [
+            "Intellectual property rights and licensing",
+            "Data processing and privacy agreements", 
+            "Service level agreements and uptime",
+            "Scalability and integration capabilities"
+        ]
+    elif industry == IndustryType.MANUFACTURING:
+        focus_areas = [
+            "Quality standards and testing procedures",
+            "Supply chain security and resilience",
+            "Environmental compliance and sustainability",
+            "Product liability and warranty terms"
+        ]
+    
+    # Adjust based on negotiation position
+    if position == "strong":
+        focus_areas.insert(0, "Leverage advantages for favorable terms")
+    elif position == "weak":
+        focus_areas.insert(0, "Build collaborative relationships")
+    
+    return focus_areas
+
+def _get_priority_actions(industry: IndustryType, objectives: List[str]) -> List[str]:
+    """Get priority actions based on industry and objectives"""
+    
+    actions = []
+    
+    # Industry-specific base actions
+    if industry == IndustryType.HEALTHCARE:
+        actions = [
+            "Ensure comprehensive HIPAA compliance framework",
+            "Verify professional liability insurance requirements",
+            "Establish patient consent and authorization procedures"
+        ]
+    elif industry == IndustryType.FINANCIAL:
+        actions = [
+            "Confirm regulatory compliance and licensing",
+            "Implement robust AML/KYC procedures", 
+            "Establish capital adequacy and risk management"
+        ]
+    elif industry == IndustryType.TECHNOLOGY:
+        actions = [
+            "Execute comprehensive data processing agreement",
+            "Define clear intellectual property ownership",
+            "Establish service level agreements with penalties"
+        ]
+    elif industry == IndustryType.MANUFACTURING:
+        actions = [
+            "Define quality standards and testing protocols",
+            "Establish supply chain security requirements",
+            "Confirm environmental compliance obligations"
+        ]
+    
+    # Add objective-specific actions
+    if "cost reduction" in [obj.lower() for obj in objectives]:
+        actions.append("Focus on total cost of ownership optimization")
+    if "risk mitigation" in [obj.lower() for obj in objectives]:
+        actions.append("Implement comprehensive risk allocation framework")
+    if "compliance" in [obj.lower() for obj in objectives]:
+        actions.append("Prioritize regulatory compliance and audit provisions")
+    
+    return actions[:5]  # Limit to top 5 actions
+
 # Include all API routes in the main app (after ALL endpoints are defined)
 app.include_router(api_router)
