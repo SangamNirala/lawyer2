@@ -626,9 +626,19 @@ const AIAgentHub = () => {
                       </div>
                       
                       {currentSession.messages.length > 0 && (
-                        <div className="mt-2 flex items-center text-xs text-gray-500">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {currentSession.messages.length} messages
+                        <div className="mt-4 p-2 bg-gray-50 rounded-lg">
+                          <div className="flex items-center justify-between text-xs text-gray-600">
+                            <div className="flex items-center">
+                              <Clock className="w-3 h-3 mr-1" />
+                              <span className="font-medium">{currentSession.messages.length} messages</span>
+                            </div>
+                            <div className="flex items-center">
+                              <CheckCircle className="w-3 h-3 mr-1 text-green-500" />
+                              <span>Active Session</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                         </div>
                       )}
                     </div>
