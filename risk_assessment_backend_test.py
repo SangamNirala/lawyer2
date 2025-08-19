@@ -106,7 +106,7 @@ class RiskAssessmentTester:
                     data = await response.json()
                     
                     # Verify expected response structure
-                    required_fields = ['assessment_id', 'overall_risk_score', 'dimensional_scores', 'clause_analyses', 'mitigation_plan']
+                    required_fields = ['assessment_id', 'overall_risk_score', 'dimensional_scores', 'clause_analyses', 'risk_mitigation_plan']
                     missing_fields = [field for field in required_fields if field not in data]
                     
                     if missing_fields:
