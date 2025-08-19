@@ -594,12 +594,20 @@ const AIAgentHub = () => {
                             <div className="mt-3 pt-2 border-t border-gray-200">
                               <div className="text-xs font-semibold text-blue-600 mb-1">Enhanced Features:</div>
                               <div className="space-y-1">
-                                {agent.enhanced_features.map((feature, index) => (
+                                {agent.enhanced_features.slice(0, 4).map((feature, index) => (
                                   <div key={index} className="flex items-center text-xs text-gray-600">
                                     <FileText className="w-3 h-3 mr-1 text-blue-500" />
                                     {feature}
                                   </div>
                                 ))}
+                                <div className="flex items-center text-xs text-red-600 font-medium">
+                                  <AlertTriangle className="w-3 h-3 mr-1 text-red-500" />
+                                  Multi-dimensional risk scoring
+                                </div>
+                                <div className="flex items-center text-xs text-red-600 font-medium">
+                                  <AlertTriangle className="w-3 h-3 mr-1 text-red-500" />
+                                  Advanced risk assessment engine
+                                </div>
                               </div>
                             </div>
                           )}
