@@ -17,7 +17,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
+BACKEND_URL = "https://sector-insight.preview.emergentagent.com/api"
 
 class Phase4ComprehensiveTester:
     def __init__(self):

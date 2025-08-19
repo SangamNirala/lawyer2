@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 
 def comprehensive_progress_test():
-    base_url = "https://compliance-hub-53.preview.emergentagent.com"
+    base_url = "https://sector-insight.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🔍 COMPREHENSIVE PROGRESS ANALYSIS")

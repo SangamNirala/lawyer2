@@ -16,7 +16,7 @@ import aiohttp
 import asyncio
 
 # Use production URL from frontend .env
-BASE_URL = "https://compliance-hub-53.preview.emergentagent.com"
+BASE_URL = "https://sector-insight.preview.emergentagent.com"
 
 def log_test(message):
     """Log test messages with timestamp"""

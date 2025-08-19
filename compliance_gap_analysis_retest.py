@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 
 # Configuration
-BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
+BACKEND_URL = "https://sector-insight.preview.emergentagent.com/api"
 TEST_SESSION_ID = "test-session-regulatory-001"
 
 class ComplianceGapAnalysisRetest:

@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 # Test Configuration
-BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
+BACKEND_URL = "https://sector-insight.preview.emergentagent.com/api"
 TIMEOUT = 10  # 10 seconds timeout per call
 
 # Sample contract text from review request
