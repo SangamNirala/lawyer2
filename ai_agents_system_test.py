@@ -21,7 +21,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 
 class AIAgentSystemTester:
-    def __init__(self, base_url: str = "https://risk-ai-negotiator.preview.emergentagent.com"):
+    def __init__(self, base_url: str = "https://compliance-hub-53.preview.emergentagent.com"):
         self.base_url = base_url
         self.session_ids = {}
         

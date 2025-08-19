@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL from environment
-BACKEND_URL = "https://risk-ai-negotiator.preview.emergentagent.com/api"
+BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
 
 def test_independence():
     """Test with very different user input to see if AI is independent"""

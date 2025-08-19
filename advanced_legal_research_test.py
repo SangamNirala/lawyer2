@@ -39,7 +39,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BACKEND_URL = "https://risk-ai-negotiator.preview.emergentagent.com/api"
+BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
 
 def test_research_engine_stats():
     """Test the system health check endpoint"""

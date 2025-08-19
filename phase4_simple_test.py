@@ -12,7 +12,7 @@ import time
 import uuid
 
 # Configuration
-BACKEND_URL = "https://risk-ai-negotiator.preview.emergentagent.com/api"
+BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
 TEST_SESSION_ID = "test-session-123"
 TEST_SCENARIO_ID = "test-scenario-456"
 
