@@ -1,419 +1,453 @@
 #!/usr/bin/env python3
+"""
+Backend Testing Suite for Step 2 Regulatory Compliance Focus
+Enhanced Contract Negotiation Agent - Regulatory Compliance Testing
+
+Tests all 6 regulatory compliance endpoints:
+1. POST /api/ai-agents/contract-negotiation/regulatory-compliance
+2. GET /api/ai-agents/contract-negotiation/regulatory-compliance/{compliance_id}
+3. GET /api/ai-agents/contract-negotiation/regulatory-compliance/session/{session_id}
+4. GET /api/ai-agents/contract-negotiation/regulatory-frameworks
+5. POST /api/ai-agents/contract-negotiation/compliance-gap-analysis
+6. GET /api/ai-agents/contract-negotiation/industry-compliance/{industry_type}
+"""
 
 import asyncio
 import aiohttp
 import json
 import time
 import uuid
-import ssl
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, List, Any, Optional
 
-# Test Configuration
+# Configuration
 BACKEND_URL = "https://compliance-hub-53.preview.emergentagent.com/api"
-TIMEOUT = 10  # 10 seconds timeout per call as requested
+TEST_SESSION_ID = "test-session-regulatory-001"
 
-class ContractNegotiationTester:
+class RegulatoryComplianceTestSuite:
     def __init__(self):
         self.session = None
-        self.test_results = []
-        self.session_id = str(uuid.uuid4())
+        self.results = []
+        self.compliance_id = None
         
-    async def __aenter__(self):
-        # Create SSL context that doesn't verify certificates for testing
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
+    async def setup(self):
+        """Setup test session"""
+        self.session = aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=30),
+            headers={"Content-Type": "application/json"}
+        )
+        print("🔧 Test session initialized")
         
-        timeout = aiohttp.ClientTimeout(total=TIMEOUT)
-        connector = aiohttp.TCPConnector(ssl=ssl_context)
-        self.session = aiohttp.ClientSession(timeout=timeout, connector=connector)
-        return self
-        
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def cleanup(self):
+        """Cleanup test session"""
         if self.session:
             await self.session.close()
-    
-    def log_result(self, test_name: str, success: bool, response_data: Any = None, error: str = None, response_time: float = 0):
+        print("🧹 Test session cleaned up")
+        
+    def log_result(self, test_name: str, success: bool, response_time: float, details: str = ""):
         """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
         result = {
             "test": test_name,
             "success": success,
-            "response_time": f"{response_time:.3f}s",
-            "timestamp": datetime.now().isoformat()
+            "response_time": response_time,
+            "details": details,
+            "timestamp": datetime.utcnow().isoformat()
         }
+        self.results.append(result)
+        print(f"{status} {test_name} ({response_time:.3f}s) - {details}")
         
-        if success and response_data:
-            result["response_data"] = response_data
-        if error:
-            result["error"] = error
+    async def test_regulatory_compliance_assessment(self):
+        """Test POST /api/ai-agents/contract-negotiation/regulatory-compliance"""
+        test_name = "Regulatory Compliance Assessment"
+        start_time = time.time()
+        
+        try:
+            # Test payload from review request
+            payload = {
+                "session_id": TEST_SESSION_ID,
+                "contract_text": "This service agreement governs the relationship between parties for software development services. Payment terms are Net 30 days. The contractor will provide web development services for $50,000. Data processing activities include customer information handling.",
+                "target_frameworks": ["gdpr", "hipaa"],
+                "industry_type": "healthcare",
+                "jurisdiction": "US",
+                "data_processing_activities": ["customer_data", "health_information"],
+                "health_data_involved": True
+            }
             
-        self.test_results.append(result)
-        
-        status = "✅" if success else "❌"
-        print(f"{status} {test_name} ({response_time:.3f}s)")
-        if error:
-            print(f"   Error: {error}")
-        elif success and response_data:
-            # Print key response fields for verification
-            if isinstance(response_data, dict):
-                key_fields = []
-                if 'analysis_id' in response_data:
-                    key_fields.append(f"analysis_id: {response_data['analysis_id']}")
-                if 'strategy_id' in response_data:
-                    key_fields.append(f"strategy_id: {response_data['strategy_id']}")
-                if 'batna_id' in response_data:
-                    key_fields.append(f"batna_id: {response_data['batna_id']}")
-                if 'strength_score' in response_data:
-                    key_fields.append(f"strength_score: {response_data['strength_score']}")
-                if 'leverage_score' in response_data:
-                    key_fields.append(f"leverage_score: {response_data['leverage_score']}")
-                if 'scenarios' in response_data:
-                    key_fields.append(f"scenarios: {len(response_data['scenarios'])} items")
-                if 'alternatives' in response_data:
-                    key_fields.append(f"alternatives: {len(response_data['alternatives'])} items")
-                if 'recommended_walkaway_point' in response_data:
-                    key_fields.append(f"walkaway_point: {response_data['recommended_walkaway_point']}")
-                    
-                if key_fields:
-                    print(f"   Key fields: {', '.join(key_fields)}")
-
-    async def test_strategy_analysis(self) -> bool:
-        """Test POST /api/ai-agents/contract-negotiation/strategy-analysis"""
-        test_name = "Strategy Analysis Endpoint"
-        
-        # Minimal payload as requested
-        payload = {
-            "session_id": self.session_id,
-            "timeline_urgency": 7,
-            "risk_tolerance": 5,
-            "relationship_importance": 8,
-            "goals": ["Maximize value", "Maintain relationship"],
-            "key_terms": ["Price", "Timeline", "Quality standards"],
-            "base_offer": {
-                "price": 50000.0,
-                "currency": "USD",
-                "term_months": 6,
-                "payment_terms": "Net 30"
-            }
-        }
-        
-        start_time = time.time()
-        try:
             async with self.session.post(
-                f"{BACKEND_URL}/ai-agents/contract-negotiation/strategy-analysis",
-                json=payload,
-                headers={"Content-Type": "application/json"}
+                f"{BACKEND_URL}/ai-agents/contract-negotiation/regulatory-compliance",
+                json=payload
             ) as response:
                 response_time = time.time() - start_time
                 
                 if response.status == 200:
                     data = await response.json()
                     
-                    # Verify expected response structure
-                    required_fields = ['analysis_id', 'strength_score', 'leverage_score', 'risk_profile', 'market_benchmarking', 'timeline_impact']
+                    # Validate response structure
+                    required_fields = [
+                        "compliance_id", "session_id", "overall_compliance_score",
+                        "compliance_level", "framework_assessments", "compliance_gaps"
+                    ]
+                    
                     missing_fields = [field for field in required_fields if field not in data]
-                    
                     if missing_fields:
-                        self.log_result(test_name, False, None, f"Missing required fields: {missing_fields}", response_time)
-                        return False
+                        self.log_result(test_name, False, response_time, 
+                                      f"Missing required fields: {missing_fields}")
+                        return
                     
-                    # Verify strength_score is 1-10
-                    if not (1 <= data.get('strength_score', 0) <= 10):
-                        self.log_result(test_name, False, None, f"strength_score {data.get('strength_score')} not in range 1-10", response_time)
-                        return False
+                    # Store compliance_id for later tests
+                    self.compliance_id = data["compliance_id"]
                     
-                    # Verify leverage_score is 0-1
-                    if not (0 <= data.get('leverage_score', -1) <= 1):
-                        self.log_result(test_name, False, None, f"leverage_score {data.get('leverage_score')} not in range 0-1", response_time)
-                        return False
+                    # Validate framework assessments
+                    framework_assessments = data.get("framework_assessments", {})
+                    expected_frameworks = ["gdpr", "hipaa"]
                     
-                    self.log_result(test_name, True, data, None, response_time)
-                    return True
+                    for framework in expected_frameworks:
+                        if framework not in framework_assessments:
+                            self.log_result(test_name, False, response_time,
+                                          f"Missing framework assessment: {framework}")
+                            return
+                    
+                    # Validate compliance score range
+                    score = data.get("overall_compliance_score", 0)
+                    if not (0 <= score <= 10):
+                        self.log_result(test_name, False, response_time,
+                                      f"Invalid compliance score: {score} (should be 0-10)")
+                        return
+                    
+                    self.log_result(test_name, True, response_time,
+                                  f"Score: {score}/10, Level: {data.get('compliance_level')}, "
+                                  f"Frameworks: {list(framework_assessments.keys())}")
                 else:
                     error_text = await response.text()
-                    self.log_result(test_name, False, None, f"HTTP {response.status}: {error_text}", response_time)
-                    return False
+                    self.log_result(test_name, False, response_time,
+                                  f"HTTP {response.status}: {error_text}")
                     
-        except asyncio.TimeoutError:
-            response_time = time.time() - start_time
-            self.log_result(test_name, False, None, f"Timeout after {TIMEOUT}s", response_time)
-            return False
         except Exception as e:
             response_time = time.time() - start_time
-            self.log_result(test_name, False, None, str(e), response_time)
-            return False
-
-    async def test_generate_counter_offer(self) -> bool:
-        """Test POST /api/ai-agents/contract-negotiation/generate-counter-offer"""
-        test_name = "Generate Counter-Offer Endpoint"
-        
-        # Minimal payload as requested
-        payload = {
-            "session_id": self.session_id,
-            "goals": ["Better pricing", "Faster delivery"],
-            "key_terms": ["Price negotiation", "Timeline adjustment"],
-            "base_offer": {
-                "price": 50000.0,
-                "currency": "USD",
-                "term_months": 6,
-                "payment_terms": "Net 30"
-            }
-        }
-        
+            self.log_result(test_name, False, response_time, f"Exception: {str(e)}")
+            
+    async def test_get_compliance_assessment(self):
+        """Test GET /api/ai-agents/contract-negotiation/regulatory-compliance/{compliance_id}"""
+        test_name = "Get Compliance Assessment"
         start_time = time.time()
-        try:
-            async with self.session.post(
-                f"{BACKEND_URL}/ai-agents/contract-negotiation/generate-counter-offer",
-                json=payload,
-                headers={"Content-Type": "application/json"}
-            ) as response:
-                response_time = time.time() - start_time
-                
-                if response.status == 200:
-                    data = await response.json()
-                    
-                    # Verify expected response structure
-                    required_fields = ['strategy_id', 'scenarios', 'recommendations']
-                    missing_fields = [field for field in required_fields if field not in data]
-                    
-                    if missing_fields:
-                        self.log_result(test_name, False, None, f"Missing required fields: {missing_fields}", response_time)
-                        return False
-                    
-                    # Verify scenarios array has 3 items
-                    scenarios = data.get('scenarios', [])
-                    if len(scenarios) != 3:
-                        self.log_result(test_name, False, None, f"Expected 3 scenarios, got {len(scenarios)}", response_time)
-                        return False
-                    
-                    self.log_result(test_name, True, data, None, response_time)
-                    return True
-                else:
-                    error_text = await response.text()
-                    self.log_result(test_name, False, None, f"HTTP {response.status}: {error_text}", response_time)
-                    return False
-                    
-        except asyncio.TimeoutError:
-            response_time = time.time() - start_time
-            self.log_result(test_name, False, None, f"Timeout after {TIMEOUT}s", response_time)
-            return False
-        except Exception as e:
-            response_time = time.time() - start_time
-            self.log_result(test_name, False, None, str(e), response_time)
-            return False
-
-    async def test_batna_analysis(self) -> bool:
-        """Test POST /api/ai-agents/contract-negotiation/batna-analysis"""
-        test_name = "BATNA Analysis Endpoint"
         
-        # Minimal payload as requested
-        payload = {
-            "session_id": self.session_id,
-            "base_offer": {
-                "price": 50000.0,
-                "currency": "USD",
-                "term_months": 6,
-                "payment_terms": "Net 30"
-            }
-        }
-        
-        start_time = time.time()
-        try:
-            async with self.session.post(
-                f"{BACKEND_URL}/ai-agents/contract-negotiation/batna-analysis",
-                json=payload,
-                headers={"Content-Type": "application/json"}
-            ) as response:
-                response_time = time.time() - start_time
-                
-                if response.status == 200:
-                    data = await response.json()
-                    
-                    # Verify expected response structure
-                    required_fields = ['batna_id', 'alternatives', 'recommended_walkaway_point']
-                    missing_fields = [field for field in required_fields if field not in data]
-                    
-                    if missing_fields:
-                        self.log_result(test_name, False, None, f"Missing required fields: {missing_fields}", response_time)
-                        return False
-                    
-                    # Verify alternatives array has 3 items
-                    alternatives = data.get('alternatives', [])
-                    if len(alternatives) != 3:
-                        self.log_result(test_name, False, None, f"Expected 3 alternatives, got {len(alternatives)}", response_time)
-                        return False
-                    
-                    self.log_result(test_name, True, data, None, response_time)
-                    return True
-                else:
-                    error_text = await response.text()
-                    self.log_result(test_name, False, None, f"HTTP {response.status}: {error_text}", response_time)
-                    return False
-                    
-        except asyncio.TimeoutError:
-            response_time = time.time() - start_time
-            self.log_result(test_name, False, None, f"Timeout after {TIMEOUT}s", response_time)
-            return False
-        except Exception as e:
-            response_time = time.time() - start_time
-            self.log_result(test_name, False, None, str(e), response_time)
-            return False
-
-    async def test_strategy_session(self) -> bool:
-        """Test GET /api/ai-agents/contract-negotiation/strategy-session/{session_id}"""
-        test_name = "Strategy Session Retrieval Endpoint"
-        
-        start_time = time.time()
+        if not self.compliance_id:
+            self.log_result(test_name, False, 0, "No compliance_id available from previous test")
+            return
+            
         try:
             async with self.session.get(
-                f"{BACKEND_URL}/ai-agents/contract-negotiation/strategy-session/{self.session_id}"
+                f"{BACKEND_URL}/ai-agents/contract-negotiation/regulatory-compliance/{self.compliance_id}"
             ) as response:
                 response_time = time.time() - start_time
                 
                 if response.status == 200:
                     data = await response.json()
                     
-                    # Verify expected response structure
-                    required_fields = ['session_id']
+                    # Validate that we get the same compliance assessment
+                    if data.get("compliance_id") != self.compliance_id:
+                        self.log_result(test_name, False, response_time,
+                                      f"Compliance ID mismatch: expected {self.compliance_id}, got {data.get('compliance_id')}")
+                        return
+                    
+                    # Validate required fields
+                    required_fields = ["compliance_id", "session_id", "overall_compliance_score"]
                     missing_fields = [field for field in required_fields if field not in data]
                     
                     if missing_fields:
-                        self.log_result(test_name, False, None, f"Missing required fields: {missing_fields}", response_time)
-                        return False
+                        self.log_result(test_name, False, response_time,
+                                      f"Missing required fields: {missing_fields}")
+                        return
                     
-                    # Check if latest_* fields are populated (should be after calling endpoints 1-3)
-                    latest_fields = ['latest_position_analysis', 'latest_counter_offer', 'latest_batna']
-                    populated_fields = [field for field in latest_fields if data.get(field) is not None]
-                    
-                    self.log_result(test_name, True, {
-                        'session_id': data['session_id'],
-                        'populated_fields': populated_fields,
-                        'latest_position_analysis': bool(data.get('latest_position_analysis')),
-                        'latest_counter_offer': bool(data.get('latest_counter_offer')),
-                        'latest_batna': bool(data.get('latest_batna'))
-                    }, None, response_time)
-                    return True
+                    self.log_result(test_name, True, response_time,
+                                  f"Retrieved assessment: {data.get('compliance_id')}")
                 else:
                     error_text = await response.text()
-                    self.log_result(test_name, False, None, f"HTTP {response.status}: {error_text}", response_time)
-                    return False
+                    self.log_result(test_name, False, response_time,
+                                  f"HTTP {response.status}: {error_text}")
                     
-        except asyncio.TimeoutError:
-            response_time = time.time() - start_time
-            self.log_result(test_name, False, None, f"Timeout after {TIMEOUT}s", response_time)
-            return False
         except Exception as e:
             response_time = time.time() - start_time
-            self.log_result(test_name, False, None, str(e), response_time)
-            return False
-
-    async def verify_mongodb_collections(self) -> Dict[str, bool]:
-        """Verify data is saved in MongoDB collections"""
-        print("\n🔍 MongoDB Collections Verification:")
-        
-        # Note: We can't directly access MongoDB from this test, but we can infer
-        # from successful API responses that data should be persisted
-        collections_status = {
-            'position_analyses': True,  # Inferred from successful strategy-analysis call
-            'counter_offer_strategies': True,  # Inferred from successful generate-counter-offer call  
-            'batna_analyses': True,  # Inferred from successful batna-analysis call
-            'strategy_sessions': True   # Inferred from successful strategy-session call
-        }
-        
-        for collection, status in collections_status.items():
-            status_icon = "✅" if status else "❌"
-            print(f"   {status_icon} {collection}: {'Data should be persisted' if status else 'No data expected'}")
-        
-        return collections_status
-
-    async def run_comprehensive_test(self):
-        """Run all tests in sequence"""
-        print("🚀 Starting Enhanced Contract Negotiation Agent Backend Testing")
-        print(f"📍 Backend URL: {BACKEND_URL}")
-        print(f"🆔 Session ID: {self.session_id}")
-        print(f"⏱️  Timeout: {TIMEOUT}s per call")
-        print("=" * 80)
-        
-        # Test sequence as requested
-        test_functions = [
-            ("1. Strategy Analysis", self.test_strategy_analysis),
-            ("2. Generate Counter-Offer", self.test_generate_counter_offer), 
-            ("3. BATNA Analysis", self.test_batna_analysis),
-            ("4. Strategy Session Retrieval", self.test_strategy_session)
-        ]
-        
-        results = []
-        for test_name, test_func in test_functions:
-            print(f"\n📋 Running {test_name}...")
-            success = await test_func()
-            results.append(success)
+            self.log_result(test_name, False, response_time, f"Exception: {str(e)}")
             
-            # Small delay between tests to ensure proper sequencing
-            await asyncio.sleep(0.5)
+    async def test_get_session_compliance_history(self):
+        """Test GET /api/ai-agents/contract-negotiation/regulatory-compliance/session/{session_id}"""
+        test_name = "Get Session Compliance History"
+        start_time = time.time()
         
-        # Verify MongoDB collections
-        await self.verify_mongodb_collections()
+        try:
+            async with self.session.get(
+                f"{BACKEND_URL}/ai-agents/contract-negotiation/regulatory-compliance/session/{TEST_SESSION_ID}"
+            ) as response:
+                response_time = time.time() - start_time
+                
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    # Validate response structure
+                    required_fields = ["session_id", "assessments", "total_count"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if missing_fields:
+                        self.log_result(test_name, False, response_time,
+                                      f"Missing required fields: {missing_fields}")
+                        return
+                    
+                    # Validate session_id matches
+                    if data.get("session_id") != TEST_SESSION_ID:
+                        self.log_result(test_name, False, response_time,
+                                      f"Session ID mismatch: expected {TEST_SESSION_ID}, got {data.get('session_id')}")
+                        return
+                    
+                    assessments = data.get("assessments", [])
+                    total_count = data.get("total_count", 0)
+                    
+                    self.log_result(test_name, True, response_time,
+                                  f"Found {total_count} assessments, frameworks: {data.get('frameworks_analyzed', [])}")
+                else:
+                    error_text = await response.text()
+                    self.log_result(test_name, False, response_time,
+                                  f"HTTP {response.status}: {error_text}")
+                    
+        except Exception as e:
+            response_time = time.time() - start_time
+            self.log_result(test_name, False, response_time, f"Exception: {str(e)}")
+            
+    async def test_get_regulatory_frameworks(self):
+        """Test GET /api/ai-agents/contract-negotiation/regulatory-frameworks"""
+        test_name = "Get Regulatory Frameworks"
+        start_time = time.time()
         
-        # Summary
-        print("\n" + "=" * 80)
-        print("📊 TEST SUMMARY")
+        try:
+            async with self.session.get(
+                f"{BACKEND_URL}/ai-agents/contract-negotiation/regulatory-frameworks"
+            ) as response:
+                response_time = time.time() - start_time
+                
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    # Validate response structure
+                    required_fields = ["supported_frameworks", "industry_mappings", "total_frameworks"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if missing_fields:
+                        self.log_result(test_name, False, response_time,
+                                      f"Missing required fields: {missing_fields}")
+                        return
+                    
+                    # Validate expected frameworks
+                    supported_frameworks = data.get("supported_frameworks", {})
+                    expected_frameworks = ["gdpr", "sox", "hipaa", "ccpa", "pci_dss"]
+                    
+                    missing_frameworks = [fw for fw in expected_frameworks if fw not in supported_frameworks]
+                    if missing_frameworks:
+                        self.log_result(test_name, False, response_time,
+                                      f"Missing expected frameworks: {missing_frameworks}")
+                        return
+                    
+                    # Validate framework details
+                    for framework_key, framework_data in supported_frameworks.items():
+                        required_fw_fields = ["name", "jurisdiction", "industry", "key_areas"]
+                        missing_fw_fields = [field for field in required_fw_fields if field not in framework_data]
+                        
+                        if missing_fw_fields:
+                            self.log_result(test_name, False, response_time,
+                                          f"Framework {framework_key} missing fields: {missing_fw_fields}")
+                            return
+                    
+                    total_frameworks = data.get("total_frameworks", 0)
+                    industry_mappings = data.get("industry_mappings", {})
+                    
+                    self.log_result(test_name, True, response_time,
+                                  f"Found {total_frameworks} frameworks, {len(industry_mappings)} industry mappings")
+                else:
+                    error_text = await response.text()
+                    self.log_result(test_name, False, response_time,
+                                  f"HTTP {response.status}: {error_text}")
+                    
+        except Exception as e:
+            response_time = time.time() - start_time
+            self.log_result(test_name, False, response_time, f"Exception: {str(e)}")
+            
+    async def test_compliance_gap_analysis(self):
+        """Test POST /api/ai-agents/contract-negotiation/compliance-gap-analysis"""
+        test_name = "Compliance Gap Analysis"
+        start_time = time.time()
+        
+        try:
+            payload = {
+                "session_id": TEST_SESSION_ID,
+                "compliance_id": self.compliance_id,
+                "target_frameworks": ["gdpr", "hipaa"]
+            }
+            
+            async with self.session.post(
+                f"{BACKEND_URL}/ai-agents/contract-negotiation/compliance-gap-analysis",
+                json=payload
+            ) as response:
+                response_time = time.time() - start_time
+                
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    # Validate response structure
+                    required_fields = [
+                        "analysis_id", "session_id", "total_gaps", "detailed_gaps",
+                        "remediation_roadmap", "estimated_timeline", "estimated_cost_range"
+                    ]
+                    
+                    missing_fields = [field for field in required_fields if field not in data]
+                    if missing_fields:
+                        self.log_result(test_name, False, response_time,
+                                      f"Missing required fields: {missing_fields}")
+                        return
+                    
+                    # Validate session_id matches
+                    if data.get("session_id") != TEST_SESSION_ID:
+                        self.log_result(test_name, False, response_time,
+                                      f"Session ID mismatch: expected {TEST_SESSION_ID}, got {data.get('session_id')}")
+                        return
+                    
+                    total_gaps = data.get("total_gaps", 0)
+                    critical_gaps = data.get("critical_gaps", 0)
+                    high_priority_gaps = data.get("high_priority_gaps", 0)
+                    
+                    self.log_result(test_name, True, response_time,
+                                  f"Analysis: {total_gaps} total gaps, {critical_gaps} critical, {high_priority_gaps} high priority")
+                else:
+                    error_text = await response.text()
+                    self.log_result(test_name, False, response_time,
+                                  f"HTTP {response.status}: {error_text}")
+                    
+        except Exception as e:
+            response_time = time.time() - start_time
+            self.log_result(test_name, False, response_time, f"Exception: {str(e)}")
+            
+    async def test_industry_compliance_requirements(self):
+        """Test GET /api/ai-agents/contract-negotiation/industry-compliance/{industry_type}"""
+        test_name = "Industry Compliance Requirements"
+        
+        # Test all three industry types
+        industries = ["healthcare", "finance", "technology"]
+        
+        for industry in industries:
+            start_time = time.time()
+            
+            try:
+                async with self.session.get(
+                    f"{BACKEND_URL}/ai-agents/contract-negotiation/industry-compliance/{industry}"
+                ) as response:
+                    response_time = time.time() - start_time
+                    
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        # Validate response structure
+                        required_fields = [
+                            "industry", "profile", "applicable_frameworks",
+                            "compliance_checklist", "common_violations"
+                        ]
+                        
+                        missing_fields = [field for field in required_fields if field not in data]
+                        if missing_fields:
+                            self.log_result(f"{test_name} ({industry})", False, response_time,
+                                          f"Missing required fields: {missing_fields}")
+                            continue
+                        
+                        # Validate industry matches
+                        if data.get("industry") != industry:
+                            self.log_result(f"{test_name} ({industry})", False, response_time,
+                                          f"Industry mismatch: expected {industry}, got {data.get('industry')}")
+                            continue
+                        
+                        # Validate applicable frameworks
+                        applicable_frameworks = data.get("applicable_frameworks", {})
+                        mandatory_frameworks = applicable_frameworks.get("mandatory", [])
+                        
+                        if not mandatory_frameworks:
+                            self.log_result(f"{test_name} ({industry})", False, response_time,
+                                          "No mandatory frameworks found")
+                            continue
+                        
+                        profile = data.get("profile", {})
+                        checklist = data.get("compliance_checklist", [])
+                        violations = data.get("common_violations", [])
+                        
+                        self.log_result(f"{test_name} ({industry})", True, response_time,
+                                      f"Frameworks: {mandatory_frameworks}, Checklist: {len(checklist)} items, "
+                                      f"Violations: {len(violations)} items")
+                    else:
+                        error_text = await response.text()
+                        self.log_result(f"{test_name} ({industry})", False, response_time,
+                                      f"HTTP {response.status}: {error_text}")
+                        
+            except Exception as e:
+                response_time = time.time() - start_time
+                self.log_result(f"{test_name} ({industry})", False, response_time, f"Exception: {str(e)}")
+                
+    async def run_all_tests(self):
+        """Run all regulatory compliance tests"""
+        print("🛡️ Starting Step 2 Regulatory Compliance Focus Testing")
         print("=" * 80)
         
-        success_count = sum(results)
-        total_tests = len(results)
-        success_rate = (success_count / total_tests) * 100
+        await self.setup()
         
-        print(f"✅ Successful Tests: {success_count}/{total_tests}")
+        try:
+            # Test all 6 endpoints in sequence
+            await self.test_regulatory_compliance_assessment()
+            await self.test_get_compliance_assessment()
+            await self.test_get_session_compliance_history()
+            await self.test_get_regulatory_frameworks()
+            await self.test_compliance_gap_analysis()
+            await self.test_industry_compliance_requirements()
+            
+        finally:
+            await self.cleanup()
+            
+        # Print summary
+        print("\n" + "=" * 80)
+        print("🛡️ REGULATORY COMPLIANCE TESTING SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.results)
+        passed_tests = sum(1 for result in self.results if result["success"])
+        failed_tests = total_tests - passed_tests
+        
+        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"📊 Total Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
         print(f"📈 Success Rate: {success_rate:.1f}%")
         
-        if success_count == total_tests:
-            print("🎉 ALL TESTS PASSED - Enhanced Contract Negotiation Agent is fully operational!")
-        else:
-            print("⚠️  Some tests failed - Review errors above for details")
+        if failed_tests > 0:
+            print("\n❌ FAILED TESTS:")
+            for result in self.results:
+                if not result["success"]:
+                    print(f"  • {result['test']}: {result['details']}")
         
-        # Detailed results
-        print("\n📋 Detailed Results:")
-        for i, result in enumerate(self.test_results):
-            status = "✅" if result['success'] else "❌"
-            print(f"   {status} {result['test']} - {result['response_time']}")
-            if not result['success'] and 'error' in result:
-                print(f"      Error: {result['error']}")
+        print("\n🔍 DETAILED RESULTS:")
+        for result in self.results:
+            status = "✅" if result["success"] else "❌"
+            print(f"  {status} {result['test']} ({result['response_time']:.3f}s)")
+            if result["details"]:
+                print(f"      {result['details']}")
         
-        # UUID verification
-        print(f"\n🔍 UUID Verification:")
-        uuid_found = False
-        for result in self.test_results:
-            if result['success'] and 'response_data' in result:
-                data = result['response_data']
-                if isinstance(data, dict):
-                    for key, value in data.items():
-                        if key.endswith('_id') and isinstance(value, str):
-                            try:
-                                uuid.UUID(value)  # Validate UUID format
-                                print(f"   ✅ {key}: {value} (Valid UUID)")
-                                uuid_found = True
-                            except ValueError:
-                                print(f"   ❌ {key}: {value} (Invalid UUID format)")
-        
-        if not uuid_found:
-            print("   ⚠️  No UUID fields found in responses")
-        
-        return success_count == total_tests
+        return success_rate >= 80  # Consider 80%+ success rate as passing
 
 async def main():
     """Main test execution"""
-    async with ContractNegotiationTester() as tester:
-        success = await tester.run_comprehensive_test()
-        return success
+    test_suite = RegulatoryComplianceTestSuite()
+    success = await test_suite.run_all_tests()
+    
+    if success:
+        print("\n🎉 REGULATORY COMPLIANCE TESTING COMPLETED SUCCESSFULLY!")
+        exit(0)
+    else:
+        print("\n🚨 REGULATORY COMPLIANCE TESTING FAILED!")
+        exit(1)
 
 if __name__ == "__main__":
-    try:
-        success = asyncio.run(main())
-        exit(0 if success else 1)
-    except KeyboardInterrupt:
-        print("\n⚠️  Test interrupted by user")
-        exit(1)
-    except Exception as e:
-        print(f"\n❌ Test execution failed: {e}")
-        exit(1)
+    asyncio.run(main())
