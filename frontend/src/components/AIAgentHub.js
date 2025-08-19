@@ -639,8 +639,6 @@ const AIAgentHub = () => {
                           </div>
                         </div>
                       )}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
