@@ -17450,9 +17450,11 @@ if REGULATORY_ENGINE_AVAILABLE:
                 ]
             }
             
-            # Store gap analysis
-            await db.compliance_gap_analyses.insert_one(gap_analysis_result)
+            # Store gap analysis (serialize before storing)
+            gap_analysis_serialized = serialize_enums_for_mongodb(gap_analysis_result)
+            await db.compliance_gap_analyses.insert_one(gap_analysis_serialized)
             
+            # Return the original result (not the serialized version for MongoDB)
             return gap_analysis_result
             
         except HTTPException:
