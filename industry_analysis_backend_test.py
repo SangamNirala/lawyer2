@@ -699,7 +699,7 @@ class IndustryAnalysisTestSuite:
                         "Industry Recommendations",
                         True,
                         response_time,
-                        f"Recommendation ID: {data['recommendation_id'][:8]}..., Strategies: {len(data['negotiation_strategies'])}, Clauses: {len(data['priority_clauses'])}, Risks: {len(data['risk_mitigation'])}"
+                        f"Industry: {data['industry']}, Strategies: {len(data['negotiation_strategies'])}, Clauses: {len(data['mandatory_clauses'])}, Risks: {len(data['key_risks'])}"
                     )
                     
                 else:
