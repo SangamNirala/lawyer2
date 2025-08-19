@@ -16921,5 +16921,283 @@ else:
     async def strategy_session_unavailable(session_id: str):
         raise HTTPException(status_code=503, detail="Strategy Engine unavailable")
 
+# ============================================
+# Advanced Risk Assessment Endpoints
+# ============================================
+
+if RISK_ENGINE_AVAILABLE:
+    
+    @api_router.post("/ai-agents/contract-negotiation/risk-assessment", response_model=ComprehensiveRiskAssessment)
+    async def comprehensive_risk_assessment(payload: RiskAssessmentInput):
+        """
+        Advanced Risk Assessment - Automated Multi-Dimensional Risk Analysis
+        
+        Provides comprehensive risk analysis across four key dimensions:
+        - Legal Risk: Contract terms, liability exposure, enforceability  
+        - Financial Risk: Payment terms, penalties, cost implications
+        - Operational Risk: Performance requirements, delivery risks
+        - Compliance Risk: Regulatory violations, policy adherence
+        
+        Features:
+        - Automated clause-by-clause risk scoring
+        - AI-powered risk factor identification  
+        - Multi-dimensional risk aggregation
+        - Risk mitigation recommendations
+        - Red flag identification
+        - Alternative language suggestions for high-risk clauses
+        """
+        try:
+            logger.info(f"🔍 Starting risk assessment for session: {payload.session_id}")
+            
+            engine = await get_risk_assessment_engine(db)
+            assessment_result = await engine.assess_contract_risk(payload)
+            
+            logger.info(f"✅ Risk assessment completed: {assessment_result.overall_risk_score}/10 ({assessment_result.risk_level.value})")
+            return assessment_result
+            
+        except ValueError as e:
+            logger.warning(f"⚠️ Risk assessment validation error: {e}")
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logger.error(f"❌ Risk assessment error: {e}")
+            raise HTTPException(status_code=500, detail=f"Risk assessment failed: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/risk-assessment/{assessment_id}", response_model=ComprehensiveRiskAssessment)
+    async def get_risk_assessment(assessment_id: str):
+        """
+        Retrieve Previously Completed Risk Assessment
+        
+        Get detailed risk assessment results including:
+        - Overall risk score and level
+        - Dimensional risk breakdown
+        - Clause-by-clause analysis
+        - High-priority risk factors
+        - Mitigation recommendations
+        - Red flags and alerts
+        """
+        try:
+            assessment = await db.risk_assessments.find_one({"assessment_id": assessment_id})
+            if not assessment:
+                raise HTTPException(status_code=404, detail="Risk assessment not found")
+            
+            # Convert MongoDB document to Pydantic model
+            return ComprehensiveRiskAssessment(**assessment)
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve risk assessment: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve assessment: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/risk-assessments/session/{session_id}")
+    async def get_session_risk_assessments(session_id: str, limit: int = 10):
+        """
+        Get All Risk Assessments for Session
+        
+        Retrieve risk assessment history for a specific session including:
+        - Chronological list of assessments
+        - Risk trend analysis  
+        - Comparative risk scores
+        - Assessment metadata
+        """
+        try:
+            assessments_cursor = db.risk_assessments.find(
+                {"session_id": session_id}
+            ).sort("created_at", -1).limit(limit)
+            
+            assessments = []
+            async for assessment in assessments_cursor:
+                assessments.append(ComprehensiveRiskAssessment(**assessment))
+            
+            return {
+                "session_id": session_id,
+                "assessments": assessments,
+                "total_count": len(assessments),
+                "latest_assessment": assessments[0] if assessments else None,
+                "risk_trend": await _calculate_risk_trend(session_id) if assessments else None
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve session risk assessments: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve assessments: {str(e)}")
+
+    @api_router.get("/ai-agents/contract-negotiation/risk-factors/high-priority")
+    async def get_high_priority_risks(
+        session_id: Optional[str] = None,
+        risk_category: Optional[str] = None,
+        min_risk_score: float = 6.0,
+        limit: int = 20
+    ):
+        """
+        Get High-Priority Risk Factors
+        
+        Retrieve high-priority risk factors across assessments with filtering:
+        - Filter by session, category, or risk score
+        - Sort by risk severity
+        - Include mitigation suggestions
+        - Track risk frequency across contracts
+        """
+        try:
+            # Build query filters
+            query = {"risk_score": {"$gte": min_risk_score}}
+            if session_id:
+                # Get assessments for this session
+                session_assessments = await db.risk_assessments.find(
+                    {"session_id": session_id}, {"assessment_id": 1}
+                ).to_list(None)
+                assessment_ids = [a["assessment_id"] for a in session_assessments]
+                query["assessment_id"] = {"$in": assessment_ids}
+            
+            if risk_category:
+                query["category"] = risk_category
+            
+            # Get high-priority risk factors
+            risk_factors_cursor = db.risk_factors.find(query).sort("risk_score", -1).limit(limit)
+            
+            risk_factors = []
+            async for risk_factor in risk_factors_cursor:
+                risk_factors.append({
+                    "factor_id": risk_factor["factor_id"],
+                    "category": risk_factor["category"], 
+                    "description": risk_factor["description"],
+                    "risk_score": risk_factor["risk_score"],
+                    "severity": risk_factor["severity"],
+                    "mitigation_suggestions": risk_factor.get("mitigation_suggestions", []),
+                    "assessment_id": risk_factor["assessment_id"],
+                    "clause_id": risk_factor.get("clause_id")
+                })
+            
+            return {
+                "high_priority_risks": risk_factors,
+                "filter_criteria": {
+                    "session_id": session_id,
+                    "risk_category": risk_category,
+                    "min_risk_score": min_risk_score
+                },
+                "total_count": len(risk_factors),
+                "summary": {
+                    "avg_risk_score": sum(rf["risk_score"] for rf in risk_factors) / len(risk_factors) if risk_factors else 0,
+                    "categories": list(set(rf["category"] for rf in risk_factors)),
+                    "max_risk_score": max(rf["risk_score"] for rf in risk_factors) if risk_factors else 0
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve high-priority risks: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve risks: {str(e)}")
+
+    @api_router.post("/ai-agents/contract-negotiation/risk-mitigation-plan")
+    async def create_risk_mitigation_plan(request: dict):
+        """
+        Create Risk Mitigation Action Plan
+        
+        Generate actionable mitigation plan based on risk assessment:
+        - Prioritized mitigation actions
+        - Timeline and responsible parties
+        - Success metrics and tracking
+        - Integration with negotiation strategy
+        """
+        try:
+            session_id = request.get("session_id")
+            assessment_id = request.get("assessment_id") 
+            focus_areas = request.get("focus_areas", [])  # Categories to prioritize
+            
+            if not session_id and not assessment_id:
+                raise HTTPException(status_code=400, detail="Either session_id or assessment_id required")
+            
+            # Get latest assessment for session or specific assessment
+            if assessment_id:
+                assessment = await db.risk_assessments.find_one({"assessment_id": assessment_id})
+            else:
+                assessment = await db.risk_assessments.find_one(
+                    {"session_id": session_id}, sort=[("created_at", -1)]
+                )
+            
+            if not assessment:
+                raise HTTPException(status_code=404, detail="Risk assessment not found")
+            
+            # Create enhanced mitigation plan
+            mitigation_plan = {
+                "plan_id": str(uuid.uuid4()),
+                "session_id": assessment["session_id"],
+                "assessment_id": assessment["assessment_id"],
+                "created_at": datetime.utcnow().isoformat(),
+                "overall_risk_level": assessment["risk_level"],
+                "focus_areas": focus_areas,
+                "mitigation_actions": assessment.get("risk_mitigation_plan", []),
+                "negotiation_integration": assessment.get("negotiation_priorities", []),
+                "success_metrics": [
+                    f"Reduce overall risk score below {assessment['overall_risk_score'] * 0.7:.1f}",
+                    "Address all critical risk factors (score >= 8.0)",
+                    "Implement top 5 mitigation recommendations",
+                    "Complete risk reassessment within 30 days"
+                ],
+                "tracking": {
+                    "completion_rate": 0.0,
+                    "high_priority_completed": 0,
+                    "total_high_priority": len([a for a in assessment.get("risk_mitigation_plan", []) if a.get("timeline") == "immediate"]),
+                    "next_review_date": (datetime.utcnow() + timedelta(days=30)).isoformat()
+                }
+            }
+            
+            # Store mitigation plan
+            await db.risk_mitigations.insert_one(mitigation_plan)
+            
+            return mitigation_plan
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to create mitigation plan: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to create plan: {str(e)}")
+
+else:
+    # Fallback endpoints when Risk Assessment Engine is not available
+    @api_router.post("/ai-agents/contract-negotiation/risk-assessment")
+    async def risk_assessment_unavailable():
+        raise HTTPException(
+            status_code=503, 
+            detail="Advanced Risk Assessment Engine is currently unavailable. Please check system configuration."
+        )
+    
+    @api_router.get("/ai-agents/contract-negotiation/risk-assessment/{assessment_id}")
+    async def get_risk_assessment_unavailable(assessment_id: str):
+        raise HTTPException(
+            status_code=503,
+            detail="Advanced Risk Assessment Engine is currently unavailable."
+        )
+
+# Helper function for risk trend calculation
+async def _calculate_risk_trend(session_id: str) -> Dict[str, Any]:
+    """Calculate risk trend analysis for a session"""
+    try:
+        assessments = await db.risk_assessments.find(
+            {"session_id": session_id},
+            {"overall_risk_score": 1, "created_at": 1}
+        ).sort("created_at", 1).to_list(None)
+        
+        if len(assessments) < 2:
+            return {"trend": "insufficient_data", "assessments_count": len(assessments)}
+        
+        scores = [a["overall_risk_score"] for a in assessments]
+        latest_score = scores[-1]
+        previous_score = scores[-2]
+        
+        change = latest_score - previous_score
+        trend = "decreasing" if change < -0.5 else "increasing" if change > 0.5 else "stable"
+        
+        return {
+            "trend": trend,
+            "change": round(change, 2),
+            "latest_score": latest_score,
+            "previous_score": previous_score,
+            "assessments_count": len(assessments),
+            "score_range": {"min": min(scores), "max": max(scores), "avg": sum(scores) / len(scores)}
+        }
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Risk trend calculation failed: {e}")
+        return {"trend": "calculation_error", "error": str(e)}
+
 # Include all API routes in the main app (after ALL endpoints are defined)
 app.include_router(api_router)
