@@ -795,6 +795,15 @@ const AIAgentHub = () => {
         />
       )}
       
+      {/* Risk Assessment Dashboard Modal */}
+      {activeAgent === 'contract-negotiation' && showRiskAssessment && (
+        <RiskAssessmentDashboard
+          sessionId={getCurrentSession(activeAgent).sessionId}
+          isVisible={showRiskAssessment}
+          onClose={() => setShowRiskAssessment(false)}
+        />
+      )}
+      
       {/* Strategy Analytics Dashboard */}
       {activeAgent === 'contract-negotiation' && showStrategyDashboard && (
         <div className="mt-6">
