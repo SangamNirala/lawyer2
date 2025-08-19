@@ -17402,9 +17402,12 @@ if REGULATORY_ENGINE_AVAILABLE:
             if not assessment:
                 raise HTTPException(status_code=404, detail="No compliance assessment found")
             
-            # Remove MongoDB ObjectId before processing
+            # Remove MongoDB ObjectId before processing and serialize all data
             if "_id" in assessment:
                 del assessment["_id"]
+            
+            # Serialize the entire assessment to handle any ObjectId objects
+            assessment = serialize_enums_for_mongodb(assessment)
             
             # Analyze gaps in detail
             detailed_gaps = []
