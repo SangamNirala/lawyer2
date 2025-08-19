@@ -662,9 +662,9 @@ class IndustryAnalysisTestSuite:
                     
                     # Verify response structure
                     required_fields = [
-                        "recommendation_id", "session_id", "industry", "contract_category",
-                        "negotiation_strategies", "priority_clauses", "risk_mitigation",
-                        "market_insights", "tactical_recommendations"
+                        "industry", "negotiation_strategies", "mandatory_clauses", 
+                        "key_risks", "compliance_requirements", "best_practices",
+                        "common_pitfalls", "strategic_focus", "priority_actions"
                     ]
                     
                     missing_fields = [field for field in required_fields if field not in data]
