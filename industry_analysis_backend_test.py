@@ -297,10 +297,9 @@ class IndustryAnalysisTestSuite:
                     category_validation = True
                     category_details = []
                     
-                    for industry_data in data["industries"]:
-                        industry_name = industry_data["industry"]
+                    for industry_name, industry_data in data["supported_industries"].items():
                         expected_categories = self.test_data[industry_name]["contract_categories"]
-                        actual_categories = [cat["category"] for cat in industry_data["supported_contract_types"]]
+                        actual_categories = industry_data["supported_contract_types"]
                         
                         missing_categories = [cat for cat in expected_categories if cat not in actual_categories]
                         if missing_categories:
