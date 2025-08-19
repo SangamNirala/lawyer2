@@ -3000,10 +3000,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Judicial Behavior Analyzer Fixes - Different Judge Values"
+    - "Advanced Risk Assessment Functionality Testing"
   stuck_tasks: []
   test_all: false
-  test_priority: "judicial_behavior_fixes"
+  test_priority: "risk_assessment_complete"
 
   - task: "Legal Updates Monitoring System - Monitor Status Endpoint"
     implemented: true
