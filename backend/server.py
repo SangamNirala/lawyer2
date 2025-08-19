@@ -17409,18 +17409,20 @@ if REGULATORY_ENGINE_AVAILABLE:
             # Analyze gaps in detail
             detailed_gaps = []
             for gap in assessment.get("compliance_gaps", []):
+                # Serialize any ObjectId objects in the gap data
+                gap_serialized = serialize_enums_for_mongodb(gap)
                 gap_analysis = {
-                    "gap_id": gap.get("gap_id"),
-                    "framework": gap.get("requirement", {}).get("framework"),
-                    "requirement_code": gap.get("requirement", {}).get("requirement_code"),
-                    "gap_description": gap.get("gap_description"),
-                    "risk_score": gap.get("risk_score", 0),
-                    "business_impact": gap.get("business_impact"),
-                    "remediation_timeline": gap.get("remediation_timeline"),
-                    "estimated_effort": _estimate_remediation_effort(gap),
-                    "cost_estimate": _estimate_compliance_cost(gap),
-                    "implementation_steps": gap.get("recommended_clauses", []),
-                    "success_criteria": _generate_success_criteria(gap)
+                    "gap_id": gap_serialized.get("gap_id"),
+                    "framework": gap_serialized.get("requirement", {}).get("framework"),
+                    "requirement_code": gap_serialized.get("requirement", {}).get("requirement_code"),
+                    "gap_description": gap_serialized.get("gap_description"),
+                    "risk_score": gap_serialized.get("risk_score", 0),
+                    "business_impact": gap_serialized.get("business_impact"),
+                    "remediation_timeline": gap_serialized.get("remediation_timeline"),
+                    "estimated_effort": _estimate_remediation_effort(gap_serialized),
+                    "cost_estimate": _estimate_compliance_cost(gap_serialized),
+                    "implementation_steps": gap_serialized.get("recommended_clauses", []),
+                    "success_criteria": _generate_success_criteria(gap_serialized)
                 }
                 detailed_gaps.append(gap_analysis)
             
