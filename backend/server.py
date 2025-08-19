@@ -17787,6 +17787,9 @@ if INDUSTRY_ENGINE_AVAILABLE:
             
             analyses = await cursor.to_list(None)
             
+            # Convert ObjectId to string for JSON serialization
+            analyses = [convert_objectid_to_str(analysis) for analysis in analyses]
+            
             return {
                 "session_id": session_id,
                 "analyses": analyses,
