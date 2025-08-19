@@ -23,7 +23,9 @@ import {
   Users,
   TrendingUp,
   FileText,
-  Upload
+  Upload,
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 import MobileAIAgentHub from './MobileAIAgentHub';
 import EnhancedContractAnalysis from './EnhancedContractAnalysis';
